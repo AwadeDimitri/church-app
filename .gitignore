@@ -4,3 +4,4 @@ dist
 *.env
 .pnpm-store
 .angular/cache
+.claude/

@@ -1,2 +1,73 @@
-/* You can add global styles to this file, and also import other style files */
+/* Global styles */
 @use 'tailwindcss';
+
+@theme {
+  /* Colors */
+  --color-church-blue: #0047AB;
+  --color-church-blue-light: #E8F0FE;
+  --color-church-blue-dark: #003080;
+  --color-church-red: #FF4D4D;
+  --color-church-red-light: #FFE8E8;
+  --color-church-gold: #F5A623;
+  --color-church-green: #34C759;
+  --color-church-white: #FFFFFF;
+  --color-church-bg: #F8F9FA;
+  --color-church-text: #1A1A2E;
+  --color-church-text-secondary: #6B7280;
+
+  /* Radius */
+  --radius-church: 1.5rem;
+  --radius-church-sm: 0.75rem;
+  --radius-church-lg: 2rem;
+
+  /* Shadows */
+  --shadow-church-card: 0 2px 12px rgba(0, 71, 171, 0.08);
+  --shadow-church-elevated: 0 8px 32px rgba(0, 71, 171, 0.12);
+}
+
+/* Glass morphism */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* ng-zorro overrides */
+.ant-card {
+  border-radius: var(--radius-church-sm) !important;
+  border: none !important;
+  box-shadow: var(--shadow-church-card) !important;
+}
+
+.ant-tag {
+  border-radius: 999px !important;
+  border: none !important;
+  font-size: 11px !important;
+  padding: 2px 10px !important;
+}
+
+/* Safe area for notched phones */
+.safe-area-top {
+  padding-top: calc(env(safe-area-inset-top) + 1.5rem);
+}
+
+.safe-area-bottom {
+  padding-bottom: calc(env(safe-area-inset-bottom) + 0.75rem);
+}
+
+/* Horizontal scroll snap */
+.scroll-snap-x {
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  > * {
+    scroll-snap-align: start;
+  }
+}

@@ -1,0 +1,31 @@
+<div
+  class="bg-white rounded-church-sm p-4 shadow-church-card"
+  [class.border-l-4]="isAnswered()"
+  [class.border-church-green]="isAnswered()">
+  <div class="flex items-center gap-3 mb-3">
+    <app-avatar [name]="author()" [color]="avatarColor()" />
+    <div class="flex-1">
+      <p class="text-sm font-semibold text-church-text">{{ author() }}</p>
+      <p class="text-[10px] text-church-text-secondary">{{ date() }}</p>
+    </div>
+    <span
+      class="text-[10px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-1"
+      [class]="categoryColor().bg + ' ' + categoryColor().text">
+      @if (isAnswered()) {
+        <nz-icon nzType="check-circle" nzTheme="fill" />
+      }
+      {{ category() }}
+    </span>
+  </div>
+  <p class="text-sm text-church-text leading-relaxed mb-3">{{ content() }}</p>
+  <div class="flex items-center justify-between">
+    <button (click)="pray.emit()" class="flex items-center gap-1.5 text-xs font-medium"
+      [class]="isAnswered() ? 'text-church-green' : 'text-church-blue'">
+      <nz-icon [nzType]="isAnswered() ? 'like' : 'heart'" nzTheme="outline" />
+      {{ prayerCount() }} {{ isAnswered() ? 'louent Dieu' : 'prient' }}
+    </button>
+    <button (click)="share.emit()" class="flex items-center gap-1.5 text-church-text-secondary text-xs">
+      <nz-icon nzType="share-alt" nzTheme="outline" /> Partager
+    </button>
+  </div>
+</div>

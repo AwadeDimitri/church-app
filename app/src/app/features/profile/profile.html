@@ -1,0 +1,71 @@
+<div class="px-5 safe-area-top">
+  <!-- Profile Header -->
+  <div class="text-center mb-6">
+    <div class="relative w-fit mx-auto mb-3">
+      <app-avatar name="Dimitri Awade" size="lg" />
+      <button class="absolute bottom-0 right-0 w-8 h-8 bg-church-blue rounded-full flex items-center justify-center border-3 border-church-bg">
+        <nz-icon nzType="camera" nzTheme="outline" class="text-white text-xs" />
+      </button>
+    </div>
+    <h2 class="text-xl font-bold text-church-text">Dimitri Awade</h2>
+    <p class="text-sm text-church-text-secondary">Membre depuis 2023</p>
+  </div>
+
+  <!-- Stats -->
+  <div class="grid grid-cols-3 gap-3 mb-6">
+    @for (stat of stats; track stat.label) {
+      <app-stat-card [value]="stat.value" [label]="stat.label" [color]="stat.color" size="sm" />
+    }
+  </div>
+
+  <!-- Spiritual Growth -->
+  <div class="bg-gradient-to-r from-church-blue-light to-blue-50 rounded-church-sm p-4 mb-6">
+    <div class="flex items-center gap-3 mb-3">
+      <nz-icon nzType="fire" nzTheme="outline" class="text-xl text-church-gold" />
+      <div>
+        <h3 class="font-semibold text-church-text text-sm">Série en cours</h3>
+        <p class="text-xs text-church-text-secondary">5 jours consécutifs</p>
+      </div>
+    </div>
+    <div class="w-full bg-white/50 rounded-full h-2">
+      <div class="bg-church-gold h-2 rounded-full" style="width: 71%"></div>
+    </div>
+    <p class="text-[10px] text-church-text-secondary mt-1">5/7 jours cette semaine</p>
+  </div>
+
+  <!-- Main Menu -->
+  <div class="bg-white rounded-church-sm shadow-church-card mb-4 overflow-hidden">
+    @for (item of mainMenu; track item.icon; let isLast = $last) {
+      <app-menu-item
+        [icon]="item.icon"
+        [label]="item.label"
+        [bgClass]="item.bgClass"
+        [iconColor]="item.iconColor"
+        [last]="isLast" />
+    }
+  </div>
+
+  <!-- Support Menu -->
+  <div class="bg-white rounded-church-sm shadow-church-card mb-4 overflow-hidden">
+    @for (item of supportMenu; track item.icon; let isLast = $last) {
+      <app-menu-item
+        [icon]="item.icon"
+        [label]="item.label"
+        [bgClass]="item.bgClass"
+        [iconColor]="item.iconColor"
+        [last]="isLast" />
+    }
+  </div>
+
+  <!-- Logout -->
+  <div class="bg-white rounded-church-sm shadow-church-card mb-8 overflow-hidden">
+    <app-menu-item
+      icon="logout"
+      label="Déconnexion"
+      bgClass="bg-church-red-light"
+      iconColor="text-church-red"
+      labelColor="text-church-red"
+      [showArrow]="false"
+      [last]="true" />
+  </div>
+</div>

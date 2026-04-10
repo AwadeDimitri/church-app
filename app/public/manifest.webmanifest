@@ -1,9 +1,15 @@
 {
-  "name": "app",
-  "short_name": "app",
+  "name": "Église de Grâce",
+  "short_name": "Église",
+  "description": "Application mobile de l'Église de Grâce",
   "display": "standalone",
+  "orientation": "portrait",
   "scope": "./",
   "start_url": "./",
+  "theme_color": "#0047AB",
+  "background_color": "#F8F9FA",
+  "categories": ["lifestyle", "social"],
+  "lang": "fr",
   "icons": [
     {
       "src": "icons/icon-72x72.png",

@@ -1,0 +1,95 @@
+<div class="px-5 safe-area-top">
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <p class="text-church-text-secondary text-base">Bienvenue 👋, Florence</p>
+      <h1 class="text-2xl font-bold text-red text-church-text">Église CI-JCM</h1>
+    </div>
+    <div class="flex gap-3">
+      <app-button variant="icon" ariaLabel="Rechercher">
+        <nz-icon nzType="search" nzTheme="outline" class="text-church-text" />
+      </app-button>
+      <app-button variant="icon" ariaLabel="Notifications" customClass="relative">
+        <nz-icon nzType="bell" nzTheme="outline" class="text-church-text" />
+        <span class="absolute top-1 right-1 w-2.5 h-2.5 bg-church-red rounded-full border-2 border-white"></span>
+      </app-button>
+    </div>
+  </div>
+
+  <!-- Live Banner -->
+  <div class="bg-gradient-to-r from-church-blue to-church-blue-dark rounded-church p-5 mb-6 text-white relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+    <div class="flex items-center gap-2 mb-2">
+      <span class="w-2 h-2 bg-church-red rounded-full animate-pulse"></span>
+      <span class="text-xs font-semibold uppercase tracking-wider">En direct</span>
+    </div>
+    <h2 class="text-lg font-bold mb-1">Culte du Dimanche</h2>
+    <p class="text-sm text-white/80 mb-3">Pasteur Jean-Marc • La puissance de la foi</p>
+    <app-button variant="secondary">Rejoindre</app-button>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="grid grid-cols-4 gap-3 mb-6">
+    @for (action of quickActions; track action.icon) {
+      <a [routerLink]="action.route" class="flex flex-col items-center gap-2">
+        <div class="w-14 h-14 rounded-2xl flex items-center justify-center" [class]="action.bg">
+          <nz-icon [nzType]="action.icon" nzTheme="outline" [class]="'text-2xl ' + action.text" />
+        </div>
+        <span class="text-xs text-church-text font-medium">{{ action.label }}</span>
+      </a>
+    }
+  </div>
+
+  <!-- Upcoming Events -->
+  <div class="mb-6">
+    <app-section-header title="Événements à venir" actionLabel="Voir tout" />
+    <div class="scroll-snap-x flex gap-3">
+      @for (event of events; track event.title) {
+        <div class="min-w-[260px] bg-white rounded-church-sm p-4 shadow-church-card">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full" [class]="event.dayBg + ' ' + event.dayText">
+              {{ event.day }}
+            </span>
+            <span class="text-xs text-church-text-secondary">{{ event.date }}</span>
+          </div>
+          <h4 class="font-semibold text-church-text mb-1">{{ event.title }}</h4>
+          <p class="text-xs text-church-text-secondary">{{ event.description }}</p>
+          <div class="flex items-center gap-1 mt-3 text-church-text-secondary">
+            <nz-icon [nzType]="event.icon" nzTheme="outline" class="text-sm" />
+            <span class="text-xs">{{ event.location }}</span>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Latest Sermons -->
+  <div class="mb-6">
+    <app-section-header title="Derniers sermons" actionLabel="Voir tout" />
+    <div class="flex flex-col gap-3">
+      @for (sermon of sermons; track sermon.title) {
+        <app-sermon-card
+          [title]="sermon.title"
+          [speaker]="sermon.speaker"
+          [duration]="sermon.duration"
+          [date]="sermon.date"
+          [color]="sermon.color" />
+      }
+    </div>
+  </div>
+
+  <!-- Community -->
+  <div class="mb-8">
+    <app-section-header title="Communauté" />
+    <div class="bg-gradient-to-r from-church-gold/10 to-amber-50 rounded-church-sm p-5">
+      <div class="flex items-center gap-3 mb-3">
+        <nz-icon nzType="fire" nzTheme="outline" class="text-2xl text-church-gold" />
+        <h4 class="font-semibold text-church-text">Verset du jour</h4>
+      </div>
+      <p class="text-sm text-church-text italic leading-relaxed">
+        « Car je connais les projets que j'ai formés sur vous, dit l'Éternel, projets de paix et non de malheur, afin de vous donner un avenir et de l'espérance. »
+      </p>
+      <p class="text-xs text-church-text-secondary mt-2 font-medium">Jérémie 29:11</p>
+    </div>
+  </div>
+</div>
