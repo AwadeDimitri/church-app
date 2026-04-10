@@ -2,7 +2,6 @@
   "buildCommand": "ng build",
   "outputDirectory": "dist/app/browser",
   "framework": null,
-  "nodeVersion": "22.x",
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ]
