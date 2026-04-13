@@ -1,61 +1,99 @@
 <div class="px-5 safe-area-top">
   <!-- Header -->
-  <div class="flex justify-between items-center mb-6">
+  <div class="mb-6">
     <h1 class="text-2xl font-bold text-church-text">Prières</h1>
-    <app-button variant="primary" size="sm">
-      <nz-icon nzType="plus" nzTheme="outline" /> Demande
-    </app-button>
   </div>
 
   <!-- Stats -->
   <div class="grid grid-cols-3 gap-3 mb-6">
-    @for (stat of stats; track stat.label) {
-      <app-stat-card [value]="stat.value" [label]="stat.label" [color]="stat.color" />
-    }
+    <app-stat-card [value]="stats().active" label="Prières actives" color="text-church-blue" />
+    <app-stat-card [value]="stats().answered" label="Exaucées" color="text-church-green" />
+    <app-stat-card [value]="stats().totalPrayers" label="Intercesseurs" color="text-church-gold" />
   </div>
 
-  <!-- My Prayer -->
-  <div class="bg-gradient-to-r from-church-blue-light to-blue-50 rounded-church p-5 mb-6">
-    <div class="flex items-center gap-3 mb-3">
-      <div class="w-10 h-10 bg-church-blue rounded-full flex items-center justify-center">
-        <nz-icon nzType="edit" nzTheme="outline" class="text-white" />
+  <!-- Loading -->
+  @if (loading()) {
+    <div class="flex flex-col items-center justify-center py-16">
+      <nz-icon nzType="heart" nzTheme="outline" class="text-4xl text-church-blue animate-pulse mb-3" />
+      <p class="text-sm text-church-text-secondary">Chargement des prières...</p>
+    </div>
+  }
+
+  <!-- Error -->
+  @if (error(); as err) {
+    <div class="bg-red-50 rounded-church-sm p-5 text-center">
+      <nz-icon nzType="info-circle" nzTheme="outline" class="text-2xl text-church-red mb-2" />
+      <p class="text-sm text-church-red">{{ err }}</p>
+    </div>
+  }
+
+  @if (!loading() && !error()) {
+    <!-- My Prayer -->
+    <div class="bg-gradient-to-r from-church-blue-light to-blue-50 rounded-church p-5 mb-6">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-10 h-10 bg-church-blue rounded-full flex items-center justify-center">
+          <nz-icon nzType="edit" nzTheme="outline" class="text-white" />
+        </div>
+        <div>
+          <h3 class="font-semibold text-church-text">Partagez votre prière</h3>
+          <p class="text-xs text-church-text-secondary">La communauté prie avec vous</p>
+        </div>
       </div>
-      <div>
-        <h3 class="font-semibold text-church-text">Partagez votre prière</h3>
-        <p class="text-xs text-church-text-secondary">La communauté prie avec vous</p>
+      <textarea
+        placeholder="Écrivez votre sujet de prière..."
+        rows="3"
+        [value]="newPrayerContent()"
+        (input)="newPrayerContent.set($any($event.target).value)"
+        class="w-full bg-white rounded-xl p-3 text-sm border-none outline-none resize-none focus:ring-2 focus:ring-church-blue/20"
+      ></textarea>
+      <div class="flex justify-between items-center mt-3">
+        <div class="flex items-center gap-3">
+          <select
+            [value]="newPrayerCategory()"
+            (change)="newPrayerCategory.set($any($event.target).value)"
+            class="text-xs bg-white rounded-full px-3 py-1.5 border border-gray-200 outline-none">
+            <option value="general">Général</option>
+            <option value="guerison">Guérison</option>
+            <option value="famille">Famille</option>
+            <option value="travail">Travail</option>
+          </select>
+          <label class="flex items-center gap-2 text-xs text-church-text-secondary">
+            <input type="checkbox" [checked]="newPrayerAnonymous()" (change)="newPrayerAnonymous.set($any($event.target).checked)" class="rounded accent-church-blue" />
+            Anonyme
+          </label>
+        </div>
+        <app-button variant="primary" [disabled]="!newPrayerContent()" (click)="submitPrayer()">
+          <nz-icon nzType="send" nzTheme="outline" /> Envoyer
+        </app-button>
       </div>
     </div>
-    <textarea
-      placeholder="Écrivez votre sujet de prière..."
-      rows="3"
-      class="w-full bg-white rounded-xl p-3 text-sm border-none outline-none resize-none focus:ring-2 focus:ring-church-blue/20"
-    ></textarea>
-    <div class="flex justify-between items-center mt-3">
-      <label class="flex items-center gap-2 text-xs text-church-text-secondary">
-        <input type="checkbox" class="rounded accent-church-blue" />
-        Anonyme
-      </label>
-      <app-button variant="primary">
-        <nz-icon nzType="send" nzTheme="outline" /> Envoyer
-      </app-button>
-    </div>
-  </div>
 
-  <!-- Filter -->
-  <app-category-filter [categories]="categories" [(selected)]="selectedCategory" />
+    <!-- Filter -->
+    <app-category-filter [categories]="categories" [(selected)]="selectedCategory" />
 
-  <!-- Prayer Requests -->
-  <div class="flex flex-col gap-3 mb-8">
-    @for (prayer of prayers; track prayer.author + prayer.date) {
-      <app-prayer-card
-        [author]="prayer.author"
-        [content]="prayer.content"
-        [date]="prayer.date"
-        [category]="prayer.category"
-        [prayerCount]="prayer.prayerCount"
-        [isAnswered]="prayer.isAnswered"
-        [avatarColor]="prayer.avatarColor"
-        [categoryColor]="prayer.categoryColor" />
+    <!-- Empty state -->
+    @if (prayers().length === 0) {
+      <div class="flex flex-col items-center justify-center py-16">
+        <nz-icon nzType="heart" nzTheme="outline" class="text-4xl text-church-text-secondary mb-3" />
+        <p class="text-sm text-church-text-secondary">Aucune demande de prière pour le moment.</p>
+      </div>
     }
-  </div>
+
+    <!-- Prayer Requests -->
+    <div class="flex flex-col gap-3 mb-8">
+      @for (prayer of prayers(); track prayer.id; let i = $index) {
+        <app-prayer-card
+          [author]="getAuthorName(prayer)"
+          [content]="prayer.content"
+          [date]="(prayer.created_at | date:'d MMM yyyy') ?? ''"
+          [category]="prayer.category"
+          [prayerCount]="prayer.prayer_count"
+          [isAnswered]="prayer.is_answered"
+          [avatarColor]="getAvatarColor(i)"
+          [categoryColor]="getCategoryColor(prayer.category)"
+          (pray)="onPray(prayer.id)"
+          (share)="onShare(prayer)" />
+      }
+    </div>
+  }
 </div>

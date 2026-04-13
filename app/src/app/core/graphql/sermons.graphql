@@ -1,0 +1,45 @@
+query GetSermons($limit: Int = 20, $offset: Int = 0, $where: sermons_bool_exp = {}) {
+  sermons(
+    limit: $limit,
+    offset: $offset,
+    order_by: { published_at: desc },
+    where: $where
+  ) {
+    id
+    title
+    preacher_name
+    audio_url
+    video_url
+    description
+    duration
+    published_at
+    category {
+      id
+      name
+    }
+  }
+}
+
+query GetSermonById($id: uuid!) {
+  sermons_by_pk(id: $id) {
+    id
+    title
+    preacher_name
+    audio_url
+    video_url
+    description
+    duration
+    published_at
+    category {
+      id
+      name
+    }
+  }
+}
+
+query GetSermonCategories {
+  categories(where: { type: { _eq: "sermon" } }, order_by: { name: asc }) {
+    id
+    name
+  }
+}

@@ -1,47 +1,98 @@
-import { Component, ChangeDetectionStrategy, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, computed, signal } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { NzIconDirective } from 'ng-zorro-antd/icon';
 import { Button } from '@shared/components/button/button';
 import { StatCard } from '@shared/components/stat-card/stat-card';
 import { CategoryFilter } from '@shared/components/category-filter/category-filter';
 import { PrayerCard } from '@shared/components/prayer-card/prayer-card';
+import { PrayerService } from '@core/services/prayer.service';
 
-interface Stat {
-  readonly value: number;
-  readonly label: string;
-  readonly color: string;
-}
+const CATEGORY_COLORS: Record<string, { bg: string; text: string }> = {
+  guerison: { bg: 'bg-church-red-light', text: 'text-church-red' },
+  famille: { bg: 'bg-church-blue-light', text: 'text-church-blue' },
+  travail: { bg: 'bg-amber-50', text: 'text-church-gold' },
+  general: { bg: 'bg-green-50', text: 'text-church-green' },
+};
 
-interface PrayerRequestItem {
-  readonly author: string;
-  readonly content: string;
-  readonly date: string;
-  readonly category: string;
-  readonly prayerCount: number;
-  readonly isAnswered: boolean;
-  readonly avatarColor: 'blue' | 'red' | 'green' | 'gold' | 'purple';
-  readonly categoryColor: { bg: string; text: string };
-}
+const AVATAR_COLORS: Array<'blue' | 'red' | 'green' | 'gold' | 'purple'> = [
+  'blue', 'red', 'green', 'gold', 'purple',
+];
 
 @Component({
   selector: 'app-prayer',
-  imports: [NzIconDirective, Button, StatCard, CategoryFilter, PrayerCard],
+  imports: [DatePipe, NzIconDirective, Button, StatCard, CategoryFilter, PrayerCard],
   templateUrl: './prayer.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class Prayer {
-  readonly stats: Stat[] = [
-    { value: 127, label: 'Prières actives', color: 'text-church-blue' },
-    { value: 84,  label: 'Exaucées',        color: 'text-church-green' },
-    { value: 312, label: 'Intercesseurs',   color: 'text-church-gold' },
-  ];
+  private readonly prayerService = inject(PrayerService);
 
-  readonly categories = ['Toutes', 'Guérison', 'Famille', 'Travail', 'Exaucées'];
+  readonly categories = ['Toutes', 'Guerison', 'Famille', 'Travail', 'General'];
   readonly selectedCategory = signal('Toutes');
 
-  readonly prayers: PrayerRequestItem[] = [
-    { author: 'Marie A.',  content: 'Priez pour ma mère qui est hospitalisée. Elle a besoin de guérison et de force en ce moment difficile.',     date: 'Il y a 2 heures', category: 'Guérison', prayerCount: 24, isAnswered: false, avatarColor: 'blue',   categoryColor: { bg: 'bg-church-red-light', text: 'text-church-red' } },
-    { author: 'Pierre D.', content: 'Je cherche un emploi depuis 3 mois. Priez pour que Dieu ouvre les bonnes portes et me donne la patience.',  date: 'Il y a 5 heures', category: 'Travail',  prayerCount: 18, isAnswered: false, avatarColor: 'gold',   categoryColor: { bg: 'bg-amber-50', text: 'text-church-gold' } },
-    { author: 'Sophie L.',  content: 'Gloire à Dieu ! Mon fils a réussi ses examens. Merci pour vos prières fidèles.',                           date: 'Hier',            category: 'Exaucée',  prayerCount: 42, isAnswered: true,  avatarColor: 'green',  categoryColor: { bg: 'bg-green-50', text: 'text-church-green' } },
-    { author: 'Anonyme',   content: 'Priez pour la restauration de mon couple. Nous traversons des moments très difficiles.',                     date: 'Il y a 1 jour',   category: 'Famille',  prayerCount: 56, isAnswered: false, avatarColor: 'purple', categoryColor: { bg: 'bg-church-blue-light', text: 'text-church-blue' } },
-  ];
+  // Formulaire nouvelle prière
+  readonly newPrayerContent = signal('');
+  readonly newPrayerCategory = signal('general');
+  readonly newPrayerAnonymous = signal(false);
+  readonly submitting = signal(false);
+
+  readonly loading = this.prayerService.loading;
+  readonly error = this.prayerService.error;
+  readonly stats = this.prayerService.stats;
+
+  readonly prayers = computed(() => {
+    const selected = this.selectedCategory();
+    const all = this.prayerService.prayers();
+
+    if (selected === 'Toutes') return all;
+    if (selected === 'Exaucees') return all.filter(p => p.is_answered);
+    return all.filter(p => p.category.toLowerCase() === selected.toLowerCase());
+  });
+
+  getAuthorName(prayer: { is_anonymous: boolean; author?: { full_name: string } | null }): string {
+    return prayer.is_anonymous ? 'Anonyme' : (prayer.author?.full_name ?? 'Membre');
+  }
+
+  getCategoryColor(category: string) {
+    return CATEGORY_COLORS[category.toLowerCase()] ?? CATEGORY_COLORS['general'];
+  }
+
+  getAvatarColor(index: number) {
+    return AVATAR_COLORS[index % AVATAR_COLORS.length];
+  }
+
+  onPray(id: string) {
+    this.prayerService.pray(id).subscribe();
+  }
+
+  async onShare(prayer: { content: string }) {
+    const text = `Prière : ${prayer.content}`;
+    if (navigator.share) {
+      await navigator.share({ title: 'Demande de prière', text });
+    }
+  }
+
+  submitPrayer() {
+    const content = this.newPrayerContent().trim();
+    if (!content || this.submitting()) return;
+
+    this.submitting.set(true);
+    // TODO: remplacer par l'ID du user connecté quand l'auth sera en place
+    const tempAuthorId = 'c3129cd5-aafe-4766-8d32-eeb48349aac3';
+
+    this.prayerService.create(
+      content,
+      this.newPrayerCategory(),
+      tempAuthorId,
+      this.newPrayerAnonymous(),
+    ).subscribe({
+      next: () => {
+        this.newPrayerContent.set('');
+        this.newPrayerAnonymous.set(false);
+        this.newPrayerCategory.set('general');
+        this.submitting.set(false);
+      },
+      error: () => this.submitting.set(false),
+    });
+  }
 }

@@ -1,0 +1,23 @@
+query GetEvents($limit: Int = 20, $offset: Int = 0) {
+  events(limit: $limit, offset: $offset, order_by: { starts_at: asc }) {
+    id
+    title
+    description
+    location
+    cover_url
+    starts_at
+    ends_at
+  }
+}
+
+query GetUpcomingEvents($now: timestamptz!) {
+  events(where: { starts_at: { _gte: $now } }, order_by: { starts_at: asc }, limit: 5) {
+    id
+    title
+    description
+    location
+    cover_url
+    starts_at
+    ends_at
+  }
+}

@@ -1,0 +1,54 @@
+query GetPrayerRequests($limit: Int = 20, $offset: Int = 0) {
+  prayer_requests(limit: $limit, offset: $offset, order_by: { created_at: desc }) {
+    id
+    content
+    category
+    is_anonymous
+    is_answered
+    prayer_count
+    created_at
+    author {
+      id
+      full_name
+    }
+  }
+}
+
+query GetPrayerStats {
+  active: prayer_requests_aggregate(where: { is_answered: { _eq: false } }) {
+    aggregate {
+      count
+    }
+  }
+  answered: prayer_requests_aggregate(where: { is_answered: { _eq: true } }) {
+    aggregate {
+      count
+    }
+  }
+  total_prayers: prayer_requests_aggregate {
+    aggregate {
+      sum {
+        prayer_count
+      }
+    }
+  }
+}
+
+mutation CreatePrayerRequest($content: String!, $category: String!, $author_id: uuid!, $is_anonymous: Boolean!) {
+  insert_prayer_requests_one(object: {
+    content: $content,
+    category: $category,
+    author_id: $author_id,
+    is_anonymous: $is_anonymous
+  }) {
+    id
+    created_at
+  }
+}
+
+mutation IncrementPrayerCount($id: uuid!) {
+  update_prayer_requests_by_pk(pk_columns: { id: $id }, _inc: { prayer_count: 1 }) {
+    id
+    prayer_count
+  }
+}

@@ -18,6 +18,7 @@ import { provideNzIcons } from 'ng-zorro-antd/icon';
 import { routes } from './app.routes';
 import { environment } from '@env';
 import { errorInterceptor } from '@core/interceptors/error.interceptor';
+import { authInterceptor } from '@core/interceptors/auth.interceptor';
 import { PwaUpdateService } from '@core/services/pwa-update.service';
 import {
   HomeOutline,
@@ -89,7 +90,7 @@ export const appConfig: ApplicationConfig = {
       withComponentInputBinding(),
     ),
     provideHttpClient(
-      withInterceptors([errorInterceptor]),
+      withInterceptors([authInterceptor, errorInterceptor]),
     ),
     provideServiceWorker('ngsw-worker.js', {
       enabled: !isDevMode(),

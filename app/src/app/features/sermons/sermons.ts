@@ -1,32 +1,49 @@
-import { Component, ChangeDetectionStrategy, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, computed, signal } from '@angular/core';
+import { DatePipe } from '@angular/common';
+import { Router } from '@angular/router';
 import { NzIconDirective } from 'ng-zorro-antd/icon';
-import { Button } from '@shared/components/button/button';
 import { CategoryFilter } from '@shared/components/category-filter/category-filter';
 import { SermonCard } from '@shared/components/sermon-card/sermon-card';
-
-interface SermonItem {
-  readonly title: string;
-  readonly speaker: string;
-  readonly duration: number;
-  readonly tag: string;
-  readonly color: 'blue' | 'red' | 'green' | 'gold' | 'purple';
-}
+import { SermonService } from '@core/services/sermon.service';
 
 @Component({
   selector: 'app-sermons',
-  imports: [NzIconDirective, Button, CategoryFilter, SermonCard],
+  imports: [DatePipe, NzIconDirective, CategoryFilter, SermonCard],
   templateUrl: './sermons.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class Sermons {
-  readonly categories = ['Tous', 'Foi', 'Prière', 'Famille', 'Guérison', 'Louange'];
-  readonly selectedCategory = signal('Tous');
+  private readonly sermonService = inject(SermonService);
+  private readonly router = inject(Router);
 
-  readonly sermons: SermonItem[] = [
-    { title: 'La puissance de la prière',  speaker: 'Pasteur Jean-Marc', duration: 45, tag: 'Foi',      color: 'blue' },
-    { title: 'Marcher par la foi',         speaker: 'Pasteur Sarah',     duration: 38, tag: 'Prière',    color: 'red' },
-    { title: 'L\'amour inconditionnel',    speaker: 'Pasteur Jean-Marc', duration: 52, tag: 'Famille',   color: 'green' },
-    { title: 'Être sel et lumière',        speaker: 'Diacre Philippe',   duration: 33, tag: 'Louange',   color: 'gold' },
-    { title: 'La grâce suffisante',        speaker: 'Pasteur Sarah',     duration: 41, tag: 'Guérison',  color: 'purple' },
-  ];
+  readonly selectedCategory = signal('Tous');
+  readonly searchQuery = signal('');
+
+  readonly loading = this.sermonService.loading;
+  readonly error = this.sermonService.error;
+  readonly allSermons = this.sermonService.sermons;
+
+  readonly categories = computed(() =>
+    ['Tous', ...this.sermonService.categories().map(c => c.name)]
+  );
+
+  readonly sermons = computed(() => {
+    const selected = this.selectedCategory();
+    const query = this.searchQuery().toLowerCase();
+    const all = this.allSermons();
+    const featuredId = this.featured()?.id;
+
+    return all.filter(s => {
+      if (s.id === featuredId) return false;
+      if (selected !== 'Tous' && s.category?.name !== selected) return false;
+      if (query && !s.title.toLowerCase().includes(query) && !s.preacher_name.toLowerCase().includes(query)) return false;
+      return true;
+    });
+  });
+
+  readonly featured = computed(() => this.allSermons()[0] ?? null);
+
+  openSermon(id: string) {
+    this.router.navigate(['/sermons', id]);
+  }
 }

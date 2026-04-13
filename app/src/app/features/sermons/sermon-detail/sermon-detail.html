@@ -1,0 +1,75 @@
+<div class="px-5 safe-area-top">
+  <!-- Header -->
+  <div class="flex items-center gap-3 mb-6">
+    <a routerLink="/sermons" class="w-9 h-9 rounded-full bg-white shadow-church-card flex items-center justify-center">
+      <nz-icon nzType="left" nzTheme="outline" class="text-church-text" />
+    </a>
+    <h1 class="text-xl font-bold text-church-text">Sermon</h1>
+  </div>
+
+  @if (!sermon()) {
+    <div class="flex flex-col items-center justify-center py-16">
+      <nz-icon nzType="clock-circle" nzTheme="outline" class="text-4xl text-church-blue animate-pulse mb-3" />
+      <p class="text-sm text-church-text-secondary">Chargement...</p>
+    </div>
+  }
+
+  @if (sermon(); as sermon) {
+    <!-- Video Player -->
+    @if (youtubeEmbedUrl(); as embedUrl) {
+      <div class="relative w-full rounded-church overflow-hidden mb-5" style="padding-top: 56.25%">
+        <iframe
+          [src]="embedUrl"
+          class="absolute inset-0 w-full h-full"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen>
+        </iframe>
+      </div>
+    }
+
+    <!-- Audio Player (si pas de vidéo) -->
+    @if (!sermon.video_url && sermon.audio_url) {
+      <div class="bg-gradient-to-br from-church-blue to-church-blue-dark rounded-church p-6 mb-5 text-center">
+        <div class="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-4">
+          <nz-icon nzType="sound" nzTheme="outline" class="text-3xl text-white" />
+        </div>
+        <audio [src]="sermon.audio_url" controls class="w-full mt-2">
+          Votre navigateur ne supporte pas le lecteur audio.
+        </audio>
+      </div>
+    }
+
+    <!-- Sermon Info -->
+    <div class="mb-5">
+      <h2 class="text-xl font-bold text-church-text mb-1">{{ sermon.title }}</h2>
+      <p class="text-sm text-church-text-secondary mb-3">{{ sermon.preacher_name }}</p>
+
+      <div class="flex items-center gap-4 text-xs text-church-text-secondary">
+        @if (sermon.duration) {
+          <span class="flex items-center gap-1">
+            <nz-icon nzType="clock-circle" nzTheme="outline" /> {{ sermon.duration }} min
+          </span>
+        }
+        @if (sermon.published_at) {
+          <span class="flex items-center gap-1">
+            <nz-icon nzType="calendar" nzTheme="outline" /> {{ sermon.published_at | date:'d MMMM yyyy' }}
+          </span>
+        }
+        @if (sermon.category) {
+          <span class="px-2 py-0.5 rounded-full bg-church-blue-light text-church-blue font-medium">
+            {{ sermon.category.name }}
+          </span>
+        }
+      </div>
+    </div>
+
+    <!-- Description -->
+    @if (sermon.description) {
+      <div class="mb-8">
+        <h3 class="text-sm font-semibold text-church-text mb-2">Description</h3>
+        <p class="text-sm text-church-text-secondary leading-relaxed">{{ sermon.description }}</p>
+      </div>
+    }
+  }
+</div>

@@ -40,7 +40,7 @@ export class SermonCard {
   readonly title = input.required<string>();
   readonly speaker = input.required<string>();
   readonly duration = input.required<number>();
-  readonly date = input<string>();
+  readonly date = input('');
   readonly tag = input<string>();
   readonly color = input<'blue' | 'red' | 'green' | 'gold' | 'purple'>('blue');
   readonly showPlayButton = input(false);
