@@ -4,6 +4,11 @@ import { authGuard } from '@core/guards/auth.guard';
 export const routes: Routes = [
   {
     path: '',
+    pathMatch: 'full',
+    redirectTo: 'home',
+  },
+  {
+    path: '',
     loadComponent: () => import('@shared/layouts/auth-layout/auth-layout'),
     children: [
       {
@@ -21,11 +26,6 @@ export const routes: Routes = [
     loadComponent: () => import('@shared/layouts/app-layout/app-layout'),
     canActivate: [authGuard],
     children: [
-      {
-        path: '',
-        pathMatch: 'full',
-        redirectTo: 'home',
-      },
       {
         path: 'home',
         loadComponent: () => import('./features/home/home'),
