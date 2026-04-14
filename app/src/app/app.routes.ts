@@ -3,47 +3,55 @@ import { authGuard } from '@core/guards/auth.guard';
 
 export const routes: Routes = [
   {
-    path: 'login',
-    loadComponent: () => import('./features/auth/login'),
-  },
-  {
-    path: 'signup',
-    loadComponent: () => import('./features/auth/signup'),
+    path: '',
+    loadComponent: () => import('@shared/layouts/auth-layout/auth-layout'),
+    children: [
+      {
+        path: 'login',
+        loadComponent: () => import('./features/auth/login'),
+      },
+      {
+        path: 'signup',
+        loadComponent: () => import('./features/auth/signup'),
+      },
+    ],
   },
   {
     path: '',
-    pathMatch: 'full',
-    redirectTo: 'home',
-  },
-  {
-    path: 'home',
-    loadComponent: () => import('./features/home/home'),
+    loadComponent: () => import('@shared/layouts/app-layout/app-layout'),
     canActivate: [authGuard],
-  },
-  {
-    path: 'sermons',
-    loadComponent: () => import('./features/sermons/sermons'),
-    canActivate: [authGuard],
-  },
-  {
-    path: 'sermons/:id',
-    loadComponent: () => import('./features/sermons/sermon-detail/sermon-detail'),
-    canActivate: [authGuard],
-  },
-  {
-    path: 'donate',
-    loadComponent: () => import('./features/donate/donate'),
-    canActivate: [authGuard],
-  },
-  {
-    path: 'prayer',
-    loadComponent: () => import('./features/prayer/prayer'),
-    canActivate: [authGuard],
-  },
-  {
-    path: 'profile',
-    loadComponent: () => import('./features/profile/profile'),
-    canActivate: [authGuard],
+    children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        redirectTo: 'home',
+      },
+      {
+        path: 'home',
+        loadComponent: () => import('./features/home/home'),
+      },
+      {
+        path: 'sermons',
+        loadComponent: () => import('./features/sermons/sermons'),
+      },
+      {
+        path: 'sermons/:id',
+        loadComponent: () =>
+          import('./features/sermons/sermon-detail/sermon-detail'),
+      },
+      {
+        path: 'donate',
+        loadComponent: () => import('./features/donate/donate'),
+      },
+      {
+        path: 'prayer',
+        loadComponent: () => import('./features/prayer/prayer'),
+      },
+      {
+        path: 'profile',
+        loadComponent: () => import('./features/profile/profile'),
+      },
+    ],
   },
   {
     path: '**',
