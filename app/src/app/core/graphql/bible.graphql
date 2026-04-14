@@ -1,0 +1,20 @@
+query GetBibleBooks {
+  bible_books(order_by: { id: asc }) {
+    id
+    testament
+    position
+    name
+    slug
+    chapter_count
+  }
+}
+
+query GetBibleChapter($bookId: smallint!, $chapter: smallint!) {
+  bible_verses(
+    where: { book_id: { _eq: $bookId }, chapter: { _eq: $chapter } }
+    order_by: { verse: asc }
+  ) {
+    verse
+    text
+  }
+}

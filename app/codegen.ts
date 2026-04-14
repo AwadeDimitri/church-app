@@ -24,6 +24,7 @@ const config: CodegenConfig = {
           uuid: 'string',
           timestamptz: 'string',
           numeric: 'number',
+          smallint: 'number',
         },
         addExplicitOverride: true,
       },

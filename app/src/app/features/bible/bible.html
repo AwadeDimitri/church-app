@@ -1,0 +1,80 @@
+<div class="px-5 safe-area-top pb-24">
+  <!-- Header -->
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-church-text">Bible</h1>
+    <p class="text-sm text-church-text-secondary mt-1">Louis Segond 1910</p>
+  </div>
+
+  <!-- Reprendre la lecture -->
+  @if (lastReading(); as last) {
+    <a
+      [routerLink]="['/bible', last.bookSlug, last.chapter]"
+      class="block bg-gradient-to-br from-church-blue to-church-blue-dark rounded-church p-5 mb-6 text-white relative overflow-hidden">
+      <div class="absolute bottom-0 right-0 w-40 h-40 bg-white/5 rounded-full translate-y-1/2 translate-x-8 pointer-events-none"></div>
+      <div class="flex items-center gap-2 mb-2">
+        <nz-icon nzType="clock-circle" nzTheme="outline" class="text-sm" />
+        <span class="text-xs font-semibold uppercase tracking-wider">Reprendre la lecture</span>
+      </div>
+      <h3 class="text-xl font-bold">{{ last.bookName }} {{ last.chapter }}</h3>
+      <div class="inline-flex items-center gap-2 bg-white/20 rounded-full px-4 py-2 text-sm font-medium mt-4">
+        <nz-icon nzType="right" nzTheme="outline" /> Continuer
+      </div>
+    </a>
+  }
+
+  <!-- Tabs Testament -->
+  <div class="flex gap-2 mb-5 bg-slate-100 rounded-full p-1">
+    <button
+      type="button"
+      (click)="selectTestament(1)"
+      [class]="'flex-1 py-2 text-sm font-semibold rounded-full transition-colors ' + (selectedTestament() === 1 ? 'bg-white text-church-blue shadow-sm' : 'text-church-text-secondary')">
+      Ancien Testament
+    </button>
+    <button
+      type="button"
+      (click)="selectTestament(2)"
+      [class]="'flex-1 py-2 text-sm font-semibold rounded-full transition-colors ' + (selectedTestament() === 2 ? 'bg-white text-church-blue shadow-sm' : 'text-church-text-secondary')">
+      Nouveau Testament
+    </button>
+  </div>
+
+  <!-- Loading -->
+  @if (loading()) {
+    <div class="flex flex-col items-center justify-center py-16">
+      <nz-icon nzType="clock-circle" nzTheme="outline" class="text-4xl text-church-blue animate-pulse mb-3" />
+      <p class="text-sm text-church-text-secondary">Chargement de la Bible...</p>
+    </div>
+  }
+
+  <!-- Error -->
+  @if (error(); as err) {
+    <div class="bg-red-50 rounded-church-sm p-5 text-center">
+      <nz-icon nzType="info-circle" nzTheme="outline" class="text-2xl text-church-red mb-2" />
+      <p class="text-sm text-church-red">{{ err }}</p>
+    </div>
+  }
+
+  <!-- Liste des livres -->
+  @if (!loading() && !error()) {
+    <div class="flex flex-col gap-2">
+      @for (book of filteredBooks(); track book.id) {
+        <a
+          [routerLink]="['/bible', book.slug]"
+          class="flex items-center justify-between bg-white rounded-church-sm px-4 py-3 shadow-church-card active:bg-slate-50">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-church-blue-light flex items-center justify-center text-church-blue font-bold text-sm">
+              {{ book.position }}
+            </div>
+            <div>
+              <h4 class="font-semibold text-church-text">{{ book.name }}</h4>
+              <p class="text-xs text-church-text-secondary">
+                {{ book.chapter_count }} {{ book.chapter_count > 1 ? 'chapitres' : 'chapitre' }}
+              </p>
+            </div>
+          </div>
+          <nz-icon nzType="right" nzTheme="outline" class="text-church-text-secondary" />
+        </a>
+      }
+    </div>
+  }
+</div>

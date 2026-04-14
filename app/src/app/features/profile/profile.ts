@@ -1,14 +1,9 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, computed } from '@angular/core';
 import { NzIconDirective } from 'ng-zorro-antd/icon';
 import { Avatar } from '@shared/components/avatar/avatar';
 import { StatCard } from '@shared/components/stat-card/stat-card';
 import { MenuItem } from '@shared/components/menu-item/menu-item';
-
-interface Stat {
-  readonly value: number;
-  readonly label: string;
-  readonly color: string;
-}
+import { ProfileService } from '@core/services/profile.service';
 
 interface MenuEntry {
   readonly icon: string;
@@ -24,21 +19,31 @@ interface MenuEntry {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class Profile {
-  readonly stats: Stat[] = [
-    { value: 48, label: 'Cultes',  color: 'text-church-blue' },
-    { value: 12, label: 'Dons',    color: 'text-church-green' },
-    { value: 7,  label: 'Prières', color: 'text-church-gold' },
-  ];
+  private readonly profileService = inject(ProfileService);
+
+  protected readonly user = this.profileService.user;
+  protected readonly stats = this.profileService.stats;
+
+  protected readonly displayName = computed(() => this.user()?.full_name ?? '');
+  protected readonly memberSince = computed(() => {
+    const createdAt = this.user()?.created_at;
+    if (!createdAt) return '';
+    return `Membre depuis ${new Date(createdAt).getFullYear()}`;
+  });
 
   readonly mainMenu: MenuEntry[] = [
     { icon: 'user',    label: 'Informations personnelles', bgClass: 'bg-church-blue-light', iconColor: 'text-church-blue' },
-    { icon: 'bell',    label: 'Notifications',             bgClass: 'bg-amber-50',           iconColor: 'text-church-gold' },
-    { icon: 'lock',    label: 'Confidentialité',           bgClass: 'bg-green-50',            iconColor: 'text-church-green' },
-    { icon: 'setting', label: 'Paramètres',                bgClass: 'bg-purple-50',           iconColor: 'text-purple-500' },
+    { icon: 'bell',    label: 'Notifications',             bgClass: 'bg-amber-50',          iconColor: 'text-church-gold' },
+    { icon: 'lock',    label: 'Confidentialité',           bgClass: 'bg-green-50',          iconColor: 'text-church-green' },
+    { icon: 'setting', label: 'Paramètres',                bgClass: 'bg-purple-50',         iconColor: 'text-purple-500' },
   ];
 
   readonly supportMenu: MenuEntry[] = [
     { icon: 'question-circle', label: 'Aide & Support', bgClass: 'bg-church-blue-light', iconColor: 'text-church-blue' },
     { icon: 'info-circle',     label: 'À propos',       bgClass: 'bg-church-blue-light', iconColor: 'text-church-blue' },
   ];
+
+  signOut() {
+    this.profileService.signOut();
+  }
 }

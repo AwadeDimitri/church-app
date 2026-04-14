@@ -7,3 +7,5 @@ dist
 # GraphQL Codegen - se régénère via npm run codegen
 **/graphql/generated.ts
 .claude/
+# Cache local pour la génération du seed Bible (régénérable via le script)
+scripts/.cache-*.json
