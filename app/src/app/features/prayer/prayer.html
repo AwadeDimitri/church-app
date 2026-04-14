@@ -8,7 +8,7 @@
   <div class="grid grid-cols-3 gap-3 mb-6">
     <app-stat-card [value]="stats().active" label="Prières actives" color="text-church-blue" />
     <app-stat-card [value]="stats().answered" label="Exaucées" color="text-church-green" />
-    <app-stat-card [value]="stats().totalPrayers" label="Intercesseurs" color="text-church-gold" />
+    <app-stat-card [value]="stats().intercessors" label="Intercesseurs" color="text-church-gold" />
   </div>
 
   <!-- Loading -->
@@ -29,7 +29,7 @@
 
   @if (!loading() && !error()) {
     <!-- My Prayer -->
-    <div class="bg-gradient-to-r from-church-blue-light to-blue-50 rounded-church p-5 mb-6">
+    <form [formGroup]="form" (ngSubmit)="submitPrayer()" class="bg-gradient-to-r from-church-blue-light to-blue-50 rounded-church p-5 mb-6">
       <div class="flex items-center gap-3 mb-3">
         <div class="w-10 h-10 bg-church-blue rounded-full flex items-center justify-center">
           <nz-icon nzType="edit" nzTheme="outline" class="text-white" />
@@ -42,34 +42,34 @@
       <textarea
         placeholder="Écrivez votre sujet de prière..."
         rows="3"
-        [value]="newPrayerContent()"
-        (input)="newPrayerContent.set($any($event.target).value)"
+        formControlName="content"
         class="w-full bg-white rounded-xl p-3 text-sm border-none outline-none resize-none focus:ring-2 focus:ring-church-blue/20"
       ></textarea>
+      @if (form.controls.content.touched && form.controls.content.invalid) {
+        <p class="text-xs text-church-red mt-1 px-1">Merci d'écrire votre sujet de prière</p>
+      }
       <div class="flex justify-between items-center mt-3">
         <div class="flex items-center gap-3">
           <select
-            [value]="newPrayerCategory()"
-            (change)="newPrayerCategory.set($any($event.target).value)"
+            formControlName="categoryId"
             class="text-xs bg-white rounded-full px-3 py-1.5 border border-gray-200 outline-none">
-            <option value="general">Général</option>
-            <option value="guerison">Guérison</option>
-            <option value="famille">Famille</option>
-            <option value="travail">Travail</option>
+            @for (cat of serviceCategories(); track cat.id) {
+              <option [value]="cat.id">{{ cat.name }}</option>
+            }
           </select>
           <label class="flex items-center gap-2 text-xs text-church-text-secondary">
-            <input type="checkbox" [checked]="newPrayerAnonymous()" (change)="newPrayerAnonymous.set($any($event.target).checked)" class="rounded accent-church-blue" />
+            <input type="checkbox" formControlName="isAnonymous" class="rounded accent-church-blue" />
             Anonyme
           </label>
         </div>
-        <app-button variant="primary" [disabled]="!newPrayerContent()" (click)="submitPrayer()">
+        <app-button variant="primary" type="submit" [disabled]="submitting()">
           <nz-icon nzType="send" nzTheme="outline" /> Envoyer
         </app-button>
       </div>
-    </div>
+    </form>
 
     <!-- Filter -->
-    <app-category-filter [categories]="categories" [(selected)]="selectedCategory" />
+    <app-category-filter [categories]="filterCategories()" [(selected)]="selectedCategory" />
 
     <!-- Empty state -->
     @if (prayers().length === 0) {
@@ -86,12 +86,13 @@
           [author]="getAuthorName(prayer)"
           [content]="prayer.content"
           [date]="(prayer.created_at | date:'d MMM yyyy') ?? ''"
-          [category]="prayer.category"
-          [prayerCount]="prayer.prayer_count"
+          [category]="prayer.category.name"
+          [prayerCount]="prayer.likes_aggregate.aggregate?.count ?? 0"
           [isAnswered]="prayer.is_answered"
+          [isLiked]="isLikedByMe(prayer)"
           [avatarColor]="getAvatarColor(i)"
-          [categoryColor]="getCategoryColor(prayer.category)"
-          (pray)="onPray(prayer.id)"
+          [categoryColor]="getCategoryColor(prayer.category.color)"
+          (pray)="togglePray(prayer)"
           (share)="onShare(prayer)" />
       }
     </div>

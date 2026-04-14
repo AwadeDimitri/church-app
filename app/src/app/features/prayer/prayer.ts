@@ -1,5 +1,6 @@
-import { Component, ChangeDetectionStrategy, inject, computed, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, computed, signal, effect } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NzIconDirective } from 'ng-zorro-antd/icon';
 import { Button } from '@shared/components/button/button';
 import { StatCard } from '@shared/components/stat-card/stat-card';
@@ -7,12 +8,16 @@ import { CategoryFilter } from '@shared/components/category-filter/category-filt
 import { PrayerCard } from '@shared/components/prayer-card/prayer-card';
 import { PrayerService } from '@core/services/prayer.service';
 
-const CATEGORY_COLORS: Record<string, { bg: string; text: string }> = {
-  guerison: { bg: 'bg-church-red-light', text: 'text-church-red' },
-  famille: { bg: 'bg-church-blue-light', text: 'text-church-blue' },
-  travail: { bg: 'bg-amber-50', text: 'text-church-gold' },
-  general: { bg: 'bg-green-50', text: 'text-church-green' },
+// Mapping clé couleur DB -> classes Tailwind (palette de theming, pas de donnée)
+const PALETTE: Record<string, { bg: string; text: string }> = {
+  red:    { bg: 'bg-church-red-light',  text: 'text-church-red' },
+  blue:   { bg: 'bg-church-blue-light', text: 'text-church-blue' },
+  green:  { bg: 'bg-green-50',          text: 'text-church-green' },
+  gold:   { bg: 'bg-amber-50',          text: 'text-church-gold' },
+  purple: { bg: 'bg-purple-50',         text: 'text-purple-500' },
+  gray:   { bg: 'bg-gray-100',          text: 'text-gray-600' },
 };
+const FALLBACK_COLOR = PALETTE['gray']!;
 
 const AVATAR_COLORS: Array<'blue' | 'red' | 'green' | 'gold' | 'purple'> = [
   'blue', 'red', 'green', 'gold', 'purple',
@@ -20,20 +25,28 @@ const AVATAR_COLORS: Array<'blue' | 'red' | 'green' | 'gold' | 'purple'> = [
 
 @Component({
   selector: 'app-prayer',
-  imports: [DatePipe, NzIconDirective, Button, StatCard, CategoryFilter, PrayerCard],
+  imports: [DatePipe, ReactiveFormsModule, NzIconDirective, Button, StatCard, CategoryFilter, PrayerCard],
   templateUrl: './prayer.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class Prayer {
   private readonly prayerService = inject(PrayerService);
+  private readonly fb = inject(NonNullableFormBuilder);
 
-  readonly categories = ['Toutes', 'Guerison', 'Famille', 'Travail', 'General'];
+  readonly serviceCategories = this.prayerService.categories;
+
+  // "Toutes" = concept UX (filtre désactivé), préfixé côté client
+  readonly filterCategories = computed(() =>
+    ['Toutes', ...this.serviceCategories().map(c => c.name)],
+  );
   readonly selectedCategory = signal('Toutes');
 
-  // Formulaire nouvelle prière
-  readonly newPrayerContent = signal('');
-  readonly newPrayerCategory = signal('general');
-  readonly newPrayerAnonymous = signal(false);
+  readonly form = this.fb.group({
+    categoryId: ['', Validators.required],
+    content: ['', [Validators.required, Validators.pattern(/\S/)]],
+    isAnonymous: [false],
+  });
+
   readonly submitting = signal(false);
 
   readonly loading = this.prayerService.loading;
@@ -45,24 +58,41 @@ export default class Prayer {
     const all = this.prayerService.prayers();
 
     if (selected === 'Toutes') return all;
-    if (selected === 'Exaucees') return all.filter(p => p.is_answered);
-    return all.filter(p => p.category.toLowerCase() === selected.toLowerCase());
+    return all.filter(p => p.category.name === selected);
   });
+
+  constructor() {
+    // Sélectionne la première catégorie par défaut dès qu'elles sont chargées
+    effect(() => {
+      const cats = this.serviceCategories();
+      if (cats.length > 0 && !this.form.controls.categoryId.value) {
+        this.form.patchValue({ categoryId: cats[0].id });
+      }
+    });
+  }
 
   getAuthorName(prayer: { is_anonymous: boolean; author?: { full_name: string } | null }): string {
     return prayer.is_anonymous ? 'Anonyme' : (prayer.author?.full_name ?? 'Membre');
   }
 
-  getCategoryColor(category: string) {
-    return CATEGORY_COLORS[category.toLowerCase()] ?? CATEGORY_COLORS['general'];
+  getCategoryColor(colorKey: string) {
+    return PALETTE[colorKey] ?? FALLBACK_COLOR;
   }
 
   getAvatarColor(index: number) {
     return AVATAR_COLORS[index % AVATAR_COLORS.length];
   }
 
-  onPray(id: string) {
-    this.prayerService.pray(id).subscribe();
+  isLikedByMe(prayer: { my_likes: ReadonlyArray<unknown> }): boolean {
+    return prayer.my_likes.length > 0;
+  }
+
+  togglePray(prayer: { id: string; my_likes: ReadonlyArray<unknown> }) {
+    if (this.isLikedByMe(prayer)) {
+      this.prayerService.unlike(prayer.id).subscribe();
+    } else {
+      this.prayerService.like(prayer.id).subscribe();
+    }
   }
 
   async onShare(prayer: { content: string }) {
@@ -73,23 +103,22 @@ export default class Prayer {
   }
 
   submitPrayer() {
-    const content = this.newPrayerContent().trim();
-    if (!content || this.submitting()) return;
+    if (this.submitting()) return;
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
 
     this.submitting.set(true);
-    // TODO: remplacer par l'ID du user connecté quand l'auth sera en place
-    const tempAuthorId = 'c3129cd5-aafe-4766-8d32-eeb48349aac3';
+    const { content, categoryId, isAnonymous } = this.form.getRawValue();
 
-    this.prayerService.create(
-      content,
-      this.newPrayerCategory(),
-      tempAuthorId,
-      this.newPrayerAnonymous(),
-    ).subscribe({
+    this.prayerService.create(content.trim(), categoryId, isAnonymous).subscribe({
       next: () => {
-        this.newPrayerContent.set('');
-        this.newPrayerAnonymous.set(false);
-        this.newPrayerCategory.set('general');
+        this.form.reset({
+          content: '',
+          categoryId: this.serviceCategories()[0]?.id ?? '',
+          isAnonymous: false,
+        });
         this.submitting.set(false);
       },
       error: () => this.submitting.set(false),
