@@ -18,3 +18,24 @@ query GetBibleChapter($bookId: smallint!, $chapter: smallint!) {
     text
   }
 }
+
+query GetBibleVersesCount {
+  bible_verses_aggregate {
+    aggregate {
+      count
+    }
+  }
+}
+
+query GetDailyVerse($offset: Int!) {
+  bible_verses(
+    order_by: [{ book_id: asc }, { chapter: asc }, { verse: asc }]
+    limit: 1
+    offset: $offset
+  ) {
+    book_id
+    chapter
+    verse
+    text
+  }
+}

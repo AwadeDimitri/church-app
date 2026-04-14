@@ -9,7 +9,7 @@ import { AuthService } from '@core/services/auth.service';
   selector: 'app-signup',
   imports: [ReactiveFormsModule, NzIconDirective, Button],
   template: `
-    <div class="min-h-screen bg-church-bg flex flex-col justify-center px-6">
+    <div class="min-h-dvh bg-church-bg flex flex-col justify-center px-6 py-8">
       <div class="text-center mb-10">
         <div class="w-20 h-20 bg-church-blue rounded-full flex items-center justify-center mx-auto mb-4">
           <nz-icon nzType="heart" nzTheme="fill" class="text-3xl text-white" />

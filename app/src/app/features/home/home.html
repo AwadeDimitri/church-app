@@ -86,10 +86,13 @@
         <nz-icon nzType="fire" nzTheme="outline" class="text-2xl text-church-gold" />
         <h4 class="font-semibold text-church-text">Verset du jour</h4>
       </div>
-      <p class="text-sm text-church-text italic leading-relaxed">
-        « Car je connais les projets que j'ai formés sur vous, dit l'Éternel, projets de paix et non de malheur, afin de vous donner un avenir et de l'espérance. »
-      </p>
-      <p class="text-xs text-church-text-secondary mt-2 font-medium">Jérémie 29:11</p>
+      @if (dailyVerse(); as verse) {
+        <p class="text-sm text-church-text italic leading-relaxed">« {{ verse.text }} »</p>
+        <p class="text-xs text-church-text-secondary mt-2 font-medium">{{ verse.reference }}</p>
+      } @else {
+        <div class="h-4 bg-church-text/10 rounded animate-pulse mb-2"></div>
+        <div class="h-4 bg-church-text/10 rounded animate-pulse w-3/4"></div>
+      }
     </div>
   </div>
 </div>

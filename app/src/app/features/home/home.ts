@@ -1,6 +1,7 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { NzIconDirective } from 'ng-zorro-antd/icon';
+import { BibleService } from '@core/services/bible.service';
 import { Button } from '@shared/components/button/button';
 import { SectionHeader } from '@shared/components/section-header/section-header';
 import { SermonCard } from '@shared/components/sermon-card/sermon-card';
@@ -39,6 +40,9 @@ interface SermonPreview {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class Home {
+  private readonly bibleService = inject(BibleService);
+  readonly dailyVerse = this.bibleService.dailyVerseDisplay;
+
   readonly quickActions: QuickAction[] = [
     { icon: 'dollar-circle', label: 'Donner',      route: '/donate', bg: 'bg-church-blue-light', text: 'text-church-blue' },
     { icon: 'heart',         label: 'Prière',       route: '/prayer', bg: 'bg-church-red-light',  text: 'text-church-red' },
