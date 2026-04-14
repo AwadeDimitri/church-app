@@ -5,12 +5,11 @@ import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { NzIconDirective } from 'ng-zorro-antd/icon';
 import { DomSanitizer } from '@angular/platform-browser';
-import { Button } from '@shared/components/button/button';
 import { SermonService } from '@core/services/sermon.service';
 
 @Component({
   selector: 'app-sermon-detail',
-  imports: [DatePipe, RouterLink, NzIconDirective, Button],
+  imports: [DatePipe, RouterLink, NzIconDirective],
   templateUrl: './sermon-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
