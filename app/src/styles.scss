@@ -47,6 +47,14 @@
   padding: 2px 10px !important;
 }
 
+/* Empêche le zoom automatique iOS Safari au focus (déclenché quand font-size < 16px).
+   Utilitaires Tailwind type text-sm (14px) restent OK partout sauf sur les champs saisissables. */
+input,
+textarea,
+select {
+  font-size: 16px;
+}
+
 /* Safe area for notched phones */
 .safe-area-top {
   padding-top: calc(env(safe-area-inset-top) + 1.5rem);
