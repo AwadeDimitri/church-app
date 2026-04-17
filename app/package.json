@@ -7,7 +7,9 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "codegen": "graphql-codegen --config codegen.ts"
+    "codegen": "graphql-codegen --config codegen.ts",
+    "format": "prettier --write \"src/**/*.{ts,html,scss,json}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,html,scss,json}\""
   },
   "prettier": {
     "overrides": [
@@ -30,8 +32,10 @@
     "@angular/router": "^20.0.0",
     "@angular/service-worker": "^20.0.0",
     "@apollo/client": "^4.0.1",
+    "@ngrx/signals": "^20.1.0",
     "@supabase/supabase-js": "^2.103.0",
     "@tailwindcss/postcss": "^4.2.1",
+    "@tanstack/angular-query-experimental": "^5.99.0",
     "apollo-angular": "^13.0.0",
     "graphql": "^16",
     "ng-zorro-antd": "^20.4.4",
@@ -59,6 +63,7 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
+    "prettier": "^3.8.3",
     "typescript": "~5.8.2"
   }
 }

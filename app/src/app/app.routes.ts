@@ -13,11 +13,11 @@ export const routes: Routes = [
     children: [
       {
         path: 'login',
-        loadComponent: () => import('./features/auth/login'),
+        loadComponent: () => import('./features/auth/feature/login/login'),
       },
       {
         path: 'signup',
-        loadComponent: () => import('./features/auth/signup'),
+        loadComponent: () => import('./features/auth/feature/signup/signup'),
       },
     ],
   },

@@ -26,6 +26,39 @@ query GetPrayerRequests($userId: uuid!, $limit: Int = 20, $offset: Int = 0) {
   }
 }
 
+query GetMyPrayerRequests($userId: uuid!, $limit: Int = 50, $offset: Int = 0) {
+  prayer_requests(
+    where: { author_id: { _eq: $userId } }
+    limit: $limit
+    offset: $offset
+    order_by: { created_at: desc }
+  ) {
+    id
+    content
+    is_anonymous
+    is_answered
+    created_at
+    category {
+      id
+      slug
+      name
+      color
+    }
+    author {
+      id
+      full_name
+    }
+    likes_aggregate {
+      aggregate {
+        count
+      }
+    }
+    my_likes: likes(where: { user_id: { _eq: $userId } }, limit: 1) {
+      user_id
+    }
+  }
+}
+
 query GetPrayerStats {
   active: prayer_requests_aggregate(where: { is_answered: { _eq: false } }) {
     aggregate {

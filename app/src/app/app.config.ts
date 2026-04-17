@@ -14,6 +14,7 @@ import { provideApollo } from 'apollo-angular';
 import { HttpLink } from 'apollo-angular/http';
 import { InMemoryCache } from '@apollo/client';
 import { provideNzIcons } from 'ng-zorro-antd/icon';
+import { provideTanStackQuery, QueryClient } from '@tanstack/angular-query-experimental';
 
 import { routes } from './app.routes';
 import { environment } from '@env';
@@ -103,6 +104,7 @@ export const appConfig: ApplicationConfig = {
         cache: new InMemoryCache(),
       };
     }),
+    provideTanStackQuery(new QueryClient()),
     provideAppInitializer(() => inject(PwaUpdateService).init()),
   ],
 };
