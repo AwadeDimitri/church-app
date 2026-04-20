@@ -11,3 +11,10 @@ export const registerPageEvents = eventGroup({
     }>(),
   },
 });
+
+export const registerApiEvents = eventGroup({
+  source: 'Register API',
+  events: {
+    failed: type<{ message: string }>(),
+  },
+});

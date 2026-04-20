@@ -1,5 +1,10 @@
-import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
-import { Router } from '@angular/router';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  inject,
+  signal,
+} from '@angular/core';
+import { RouterLink } from '@angular/router';
 import {
   NonNullableFormBuilder,
   ReactiveFormsModule,
@@ -15,35 +20,40 @@ import {
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, NzIconDirective, Button],
+  imports: [ReactiveFormsModule, RouterLink, NzIconDirective, Button],
   template: `
-    <div class="min-h-dvh bg-church-bg flex flex-col justify-center px-6 py-8">
-      <div class="text-center mb-10">
-        <div
-          class="w-20 h-20 bg-church-blue rounded-full flex items-center justify-center mx-auto mb-4"
-        >
-          <nz-icon nzType="heart" nzTheme="fill" class="text-3xl text-white" />
-        </div>
-        <h1 class="text-2xl font-bold text-church-text">CI-JCM</h1>
-        <p class="text-sm text-church-text-secondary mt-1">
-          Bienvenue dans votre communaute
-        </p>
+    <div
+      class="min-h-dvh bg-church-bg flex flex-col px-6 py-10 max-w-md mx-auto w-full"
+    >
+      <div class="flex flex-col items-center mt-8">
+        <img
+          src="/logo-cijcm.png"
+          alt="CI-JCM"
+          class="w-24 h-24 object-contain mb-10"
+        />
+      </div>
+
+      <div>
+        <h1 class="text-xl font-bold text-church-text">
+          Connectez-vous à votre compte
+        </h1>
       </div>
 
       <form
         [formGroup]="form"
         (ngSubmit)="onLogin()"
-        class="flex flex-col gap-4"
+        class="flex flex-col gap-4 mt-4"
       >
         <div>
           <input
             type="email"
             placeholder="Email"
             formControlName="email"
-            class="w-full bg-white rounded-church-sm px-4 py-3 text-sm shadow-church-card border-none outline-none focus:ring-2 focus:ring-church-blue/20"
+            autocomplete="email"
+            class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3.5 text-base text-church-text placeholder:text-slate-400 outline-none transition-colors focus:border-church-blue"
           />
           @if (form.controls.email.touched && form.controls.email.invalid) {
-            <p class="text-xs text-church-red mt-1 px-1">
+            <p class="text-xs text-church-red mt-1.5 px-1">
               @if (form.controls.email.hasError('required')) {
                 Email requis
               } @else if (form.controls.email.hasError('email')) {
@@ -54,19 +64,46 @@ import {
         </div>
 
         <div>
-          <input
-            type="password"
-            placeholder="Mot de passe"
-            formControlName="password"
-            class="w-full bg-white rounded-church-sm px-4 py-3 text-sm shadow-church-card border-none outline-none focus:ring-2 focus:ring-church-blue/20"
-          />
+          <div class="relative">
+            <input
+              [type]="showPassword() ? 'text' : 'password'"
+              placeholder="Mot de passe"
+              formControlName="password"
+              autocomplete="current-password"
+              class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3.5 pr-12 text-base text-church-text placeholder:text-slate-400 outline-none transition-colors focus:border-church-blue"
+            />
+            <button
+              type="button"
+              (click)="showPassword.set(!showPassword())"
+              class="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 active:text-church-blue mt-4"
+              [attr.aria-label]="
+                showPassword()
+                  ? 'Masquer le mot de passe'
+                  : 'Afficher le mot de passe'
+              "
+            >
+              <nz-icon
+                [nzType]="showPassword() ? 'eye-invisible' : 'eye'"
+                class="text-lg"
+              />
+            </button>
+          </div>
           @if (
             form.controls.password.touched &&
             form.controls.password.hasError('required')
           ) {
-            <p class="text-xs text-church-red mt-1 px-1">Mot de passe requis</p>
+            <p class="text-xs text-church-red mt-1.5 px-1">
+              Mot de passe requis
+            </p>
           }
         </div>
+
+        <a
+          routerLink="/forgot-password"
+          class="text-sm text-church-blue font-medium self-end -mt-1"
+        >
+          Mot de passe oublié ?
+        </a>
 
         @if (authStore.signInErrorMessage()) {
           <p class="text-xs text-church-red text-center">
@@ -77,6 +114,8 @@ import {
         <app-button
           variant="primary"
           size="lg"
+          shape="rounded"
+          [fullWidth]="true"
           type="submit"
           [disabled]="authStore.signInMutation.isPending()"
         >
@@ -86,18 +125,16 @@ import {
               : 'Se connecter'
           }}
         </app-button>
-
-        <p class="text-center text-sm text-church-text-secondary mt-4">
-          Pas encore de compte ?
-          <button
-            type="button"
-            (click)="goToSignup()"
-            class="text-church-blue font-semibold"
-          >
-            S'inscrire
-          </button>
-        </p>
       </form>
+
+      <div class="flex-1"></div>
+
+      <p class="text-center text-sm text-church-text-secondary pt-8">
+        Pas encore de compte ?
+        <a routerLink="/signup" class="text-church-blue font-semibold">
+          S'inscrire
+        </a>
+      </p>
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -105,9 +142,9 @@ import {
 export default class Login {
   readonly authStore = inject(AuthStore);
   private readonly dispatch = injectDispatch(passwordSignInPageEvents);
-
-  private readonly router = inject(Router);
   private readonly fb = inject(NonNullableFormBuilder);
+
+  readonly showPassword = signal(false);
 
   readonly form = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
@@ -121,9 +158,5 @@ export default class Login {
     }
 
     this.dispatch.signIn(this.form.getRawValue());
-  }
-
-  goToSignup() {
-    this.router.navigate(['/signup']);
   }
 }

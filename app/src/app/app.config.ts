@@ -21,6 +21,7 @@ import { environment } from '@env';
 import { errorInterceptor } from '@core/interceptors/error.interceptor';
 import { authInterceptor } from '@core/interceptors/auth.interceptor';
 import { PwaUpdateService } from '@core/services/pwa-update.service';
+import { AuthService } from '@core/services/auth.service';
 import {
   HomeOutline,
   PlayCircleOutline,
@@ -65,6 +66,9 @@ import {
   DownOutline,
   CameraOutline,
   BookOutline,
+  EyeOutline,
+  EyeInvisibleOutline,
+  ArrowLeftOutline,
 } from '@ant-design/icons-angular/icons';
 
 const icons = [
@@ -77,6 +81,7 @@ const icons = [
   SendOutline, LikeOutline, LikeFill, CreditCardOutline, BankOutline,
   WalletOutline, CheckCircleOutline, CheckCircleFill, InfoCircleOutline,
   FilterOutline, DownOutline, CameraOutline, BookOutline,
+  EyeOutline, EyeInvisibleOutline, ArrowLeftOutline,
 ];
 
 export const appConfig: ApplicationConfig = {
@@ -105,6 +110,7 @@ export const appConfig: ApplicationConfig = {
       };
     }),
     provideTanStackQuery(new QueryClient()),
+    provideAppInitializer(() => inject(AuthService).ready()),
     provideAppInitializer(() => inject(PwaUpdateService).init()),
   ],
 };

@@ -2,9 +2,11 @@ import { Component, ChangeDetectionStrategy, input, computed } from '@angular/co
 
 type Variant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'icon';
 type Size = 'sm' | 'md' | 'lg';
+type Shape = 'pill' | 'rounded';
 
 @Component({
   selector: 'app-button',
+  host: { '[class.block]': 'fullWidth()' },
   template: `
     <button
       [type]="type()"
@@ -19,6 +21,7 @@ type Size = 'sm' | 'md' | 'lg';
 export class Button {
   readonly variant = input<Variant>('primary');
   readonly size = input<Size>('md');
+  readonly shape = input<Shape>('pill');
   readonly fullWidth = input(false);
   readonly disabled = input(false);
   readonly type = input<'button' | 'submit'>('button');
@@ -26,20 +29,26 @@ export class Button {
   readonly customClass = input('');
 
   protected readonly classes = computed(() => {
-    const base = 'inline-flex items-center justify-center gap-2 font-semibold rounded-full transition-colors disabled:opacity-50 disabled:pointer-events-none';
+    const base = 'inline-flex items-center justify-center gap-2 font-semibold transition-colors disabled:opacity-50 disabled:pointer-events-none';
+    const shape = this.variant() === 'icon' ? 'rounded-full' : Button.shapeMap[this.shape()];
     const variant = Button.variantMap[this.variant()];
     const size = this.variant() === 'icon' ? Button.iconSizeMap[this.size()] : Button.sizeMap[this.size()];
     const width = this.fullWidth() ? 'w-full' : '';
     const custom = this.customClass();
 
-    return `${base} ${variant} ${size} ${width} ${custom}`.trim();
+    return `${base} ${shape} ${variant} ${size} ${width} ${custom}`.trim();
   });
 
+  private static readonly shapeMap: Record<Shape, string> = {
+    pill: 'rounded-full',
+    rounded: 'rounded-xl',
+  };
+
   private static readonly variantMap: Record<Variant, string> = {
-    primary:   'bg-church-blue text-white shadow-sm active:bg-church-blue-dark',
-    secondary: 'bg-white text-church-blue shadow-church-card active:bg-slate-50',
-    danger:    'bg-church-red text-white shadow-lg shadow-church-red/30 active:bg-red-600',
-    ghost:     'text-church-text-secondary active:text-church-text',
+    primary:   'bg-church-blue text-white! shadow-sm active:bg-church-blue-dark',
+    secondary: 'bg-white text-church-blue! shadow-church-card active:bg-slate-50',
+    danger:    'bg-church-red text-white! shadow-lg shadow-church-red/30 active:bg-red-600',
+    ghost:     'text-church-text-secondary! active:text-church-text',
     icon:      'bg-white rounded-full shadow-church-card active:bg-slate-50',
   };
 

@@ -1,10 +1,5 @@
-import {
-  Component,
-  ChangeDetectionStrategy,
-  signal,
-  inject,
-} from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 import {
   NonNullableFormBuilder,
   ReactiveFormsModule,
@@ -12,24 +7,32 @@ import {
 } from '@angular/forms';
 import { NzIconDirective } from 'ng-zorro-antd/icon';
 import { Button } from '@shared/components/button/button';
-import { AuthService } from '@core/services/auth.service';
 import { injectDispatch } from '@ngrx/signals/events';
-import { registerPageEvents } from '@features/auth/data-access/register/events';
+import { AuthStore, registerPageEvents } from '@features/auth/data-access';
 
 @Component({
   selector: 'app-signup',
-  imports: [ReactiveFormsModule, NzIconDirective, Button],
+  imports: [ReactiveFormsModule, RouterLink, NzIconDirective, Button],
   template: `
-    <div class="min-h-dvh bg-church-bg flex flex-col justify-center px-6 py-8">
-      <div class="text-center mb-10">
-        <div
-          class="w-20 h-20 bg-church-blue rounded-full flex items-center justify-center mx-auto mb-4"
-        >
-          <nz-icon nzType="heart" nzTheme="fill" class="text-3xl text-white" />
-        </div>
-        <h1 class="text-2xl font-bold text-church-text">Rejoignez CI-JCM</h1>
+    <div class="min-h-dvh bg-church-bg flex flex-col px-6 py-10 max-w-md mx-auto w-full">
+      <button
+        type="button"
+        (click)="goBack()"
+        class="self-start w-10 h-10 flex items-center justify-center rounded-full bg-white shadow-church-card text-church-blue active:bg-slate-50"
+        aria-label="Retour"
+      >
+        <nz-icon nzType="arrow-left" class="text-lg" />
+      </button>
+
+      <div class="flex flex-col items-center mt-6 mb-8">
+        <img
+          src="/logo-cijcm.png"
+          alt="CI-JCM"
+          class="w-20 h-20 object-contain mb-5"
+        />
+        <h1 class="text-2xl font-bold text-church-text">Créer un compte</h1>
         <p class="text-sm text-church-text-secondary mt-1">
-          Creez votre compte
+          Rejoignez la communauté CI-JCM
         </p>
       </div>
 
@@ -43,12 +46,13 @@ import { registerPageEvents } from '@features/auth/data-access/register/events';
             type="text"
             placeholder="Nom complet"
             formControlName="fullName"
-            class="w-full bg-white rounded-church-sm px-4 py-3 text-sm shadow-church-card border-none outline-none focus:ring-2 focus:ring-church-blue/20"
+            autocomplete="name"
+            class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3.5 text-base text-church-text placeholder:text-slate-400 outline-none transition-colors focus:border-church-blue"
           />
           @if (
             form.controls.fullName.touched && form.controls.fullName.invalid
           ) {
-            <p class="text-xs text-church-red mt-1 px-1">
+            <p class="text-xs text-church-red mt-1.5 px-1">
               @if (form.controls.fullName.hasError('required')) {
                 Nom requis
               } @else if (form.controls.fullName.hasError('minlength')) {
@@ -63,10 +67,11 @@ import { registerPageEvents } from '@features/auth/data-access/register/events';
             type="email"
             placeholder="Email"
             formControlName="email"
-            class="w-full bg-white rounded-church-sm px-4 py-3 text-sm shadow-church-card border-none outline-none focus:ring-2 focus:ring-church-blue/20"
+            autocomplete="email"
+            class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3.5 text-base text-church-text placeholder:text-slate-400 outline-none transition-colors focus:border-church-blue"
           />
           @if (form.controls.email.touched && form.controls.email.invalid) {
-            <p class="text-xs text-church-red mt-1 px-1">
+            <p class="text-xs text-church-red mt-1.5 px-1">
               @if (form.controls.email.hasError('required')) {
                 Email requis
               } @else if (form.controls.email.hasError('email')) {
@@ -77,16 +82,27 @@ import { registerPageEvents } from '@features/auth/data-access/register/events';
         </div>
 
         <div>
-          <input
-            type="password"
-            placeholder="Mot de passe"
-            formControlName="password"
-            class="w-full bg-white rounded-church-sm px-4 py-3 text-sm shadow-church-card border-none outline-none focus:ring-2 focus:ring-church-blue/20"
-          />
+          <div class="relative">
+            <input
+              [type]="showPassword() ? 'text' : 'password'"
+              placeholder="Mot de passe"
+              formControlName="password"
+              autocomplete="new-password"
+              class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3.5 pr-12 text-base text-church-text placeholder:text-slate-400 outline-none transition-colors focus:border-church-blue"
+            />
+            <button
+              type="button"
+              (click)="showPassword.set(!showPassword())"
+              class="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 active:text-church-blue"
+              [attr.aria-label]="showPassword() ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+            >
+              <nz-icon [nzType]="showPassword() ? 'eye-invisible' : 'eye'" class="text-lg" />
+            </button>
+          </div>
           @if (
             form.controls.password.touched && form.controls.password.invalid
           ) {
-            <p class="text-xs text-church-red mt-1 px-1">
+            <p class="text-xs text-church-red mt-1.5 px-1">
               @if (form.controls.password.hasError('required')) {
                 Mot de passe requis
               } @else if (form.controls.password.hasError('minlength')) {
@@ -96,48 +112,45 @@ import { registerPageEvents } from '@features/auth/data-access/register/events';
           }
         </div>
 
-        @if (errorMessage()) {
+        @if (authStore.registerErrorMessage()) {
           <p class="text-xs text-church-red text-center">
-            {{ errorMessage() }}
-          </p>
-        }
-
-        @if (successMessage()) {
-          <p class="text-xs text-church-green text-center">
-            {{ successMessage() }}
+            {{ authStore.registerErrorMessage() }}
           </p>
         }
 
         <app-button
           variant="primary"
           size="lg"
+          shape="rounded"
+          [fullWidth]="true"
           type="submit"
-          [disabled]="loading()"
+          [disabled]="authStore.signUpMutation.isPending()"
         >
-          {{ loading() ? 'Inscription...' : "S'inscrire" }}
+          {{
+            authStore.signUpMutation.isPending()
+              ? 'Inscription...'
+              : "S'inscrire"
+          }}
         </app-button>
-
-        <p class="text-center text-sm text-church-text-secondary mt-4">
-          Deja un compte ?
-          <button
-            type="button"
-            (click)="goToLogin()"
-            class="text-church-blue font-semibold"
-          >
-            Se connecter
-          </button>
-        </p>
       </form>
+
+      <p class="text-center text-sm text-church-text-secondary mt-8">
+        Déjà un compte ?
+        <a routerLink="/login" class="text-church-blue font-semibold">
+          Se connecter
+        </a>
+      </p>
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class Signup {
-  private readonly authService = inject(AuthService);
-
-  readonly #dispatch = injectDispatch(registerPageEvents);
+  readonly authStore = inject(AuthStore);
+  private readonly dispatch = injectDispatch(registerPageEvents);
   private readonly router = inject(Router);
   private readonly fb = inject(NonNullableFormBuilder);
+
+  readonly showPassword = signal(false);
 
   readonly form = this.fb.group({
     fullName: ['', [Validators.required, Validators.minLength(2)]],
@@ -145,21 +158,16 @@ export default class Signup {
     password: ['', [Validators.required, Validators.minLength(6)]],
   });
 
-  readonly loading = signal(false);
-  readonly errorMessage = signal('');
-  readonly successMessage = signal('');
-
-  async onSignup() {
-    if (this.loading()) return;
+  onSignup() {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
 
-    this.#dispatch.signup(this.form.getRawValue());
+    this.dispatch.signup(this.form.getRawValue());
   }
 
-  goToLogin() {
+  goBack() {
     this.router.navigate(['/login']);
   }
 }

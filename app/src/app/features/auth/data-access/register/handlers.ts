@@ -3,10 +3,22 @@ import { inject } from '@angular/core';
 import { withEffects, Events, Dispatcher } from '@ngrx/signals/events';
 import { injectMutation } from '@tanstack/angular-query-experimental';
 import { tap } from 'rxjs';
+import { AuthError } from '@supabase/supabase-js';
 import { AuthService } from '@core/services/auth.service';
 import { sessionEvents } from '../session/events';
 import type { SessionUser } from '../session/types';
-import { passwordSignInApiEvents, passwordSignInPageEvents } from './events';
+import { registerApiEvents, registerPageEvents } from './events';
+
+const SIGNUP_ERROR_MESSAGES: Record<string, string> = {
+  user_already_exists: 'Cet email est déjà utilisé',
+  weak_password: 'Mot de passe trop faible',
+  email_address_invalid: "L'email n'est pas valide",
+  over_email_send_rate_limit: 'Trop de tentatives, réessayez plus tard',
+  signup_disabled: 'Les inscriptions sont désactivées',
+};
+
+const EMAIL_ALREADY_USED_MESSAGE = 'Cet email est déjà utilisé';
+const GENERIC_ERROR_MESSAGE = 'Une erreur est survenue';
 
 export function withRegisterHandlers() {
   return signalStoreFeature(
@@ -14,7 +26,7 @@ export function withRegisterHandlers() {
       const authService = inject(AuthService);
       const dispatcher = inject(Dispatcher);
 
-      const signInMutation = injectMutation(() => ({
+      const signUpMutation = injectMutation(() => ({
         mutationFn: ({
           email,
           password,
@@ -25,6 +37,13 @@ export function withRegisterHandlers() {
           fullName: string;
         }) => authService.signUp(email, password, fullName),
         onSuccess: (data) => {
+          if (data.user && data.user.identities?.length === 0) {
+            dispatcher.dispatch(
+              registerApiEvents.failed({ message: EMAIL_ALREADY_USED_MESSAGE }),
+            );
+            return;
+          }
+
           const user: SessionUser = {
             id: data.user!.id,
             email: data.user!.email!,
@@ -33,24 +52,23 @@ export function withRegisterHandlers() {
           dispatcher.dispatch(sessionEvents.signedIn({ user }));
         },
         onError: (err: Error) => {
+          const code = err instanceof AuthError ? err.code : undefined;
           const message =
-            err.message === 'Invalid login credentials'
-              ? 'Email ou mot de passe incorrect'
-              : 'Une erreur est survenue';
-          dispatcher.dispatch(passwordSignInApiEvents.failed({ message }));
+            (code && SIGNUP_ERROR_MESSAGES[code]) ?? GENERIC_ERROR_MESSAGE;
+          dispatcher.dispatch(registerApiEvents.failed({ message }));
         },
       }));
 
-      return { signInMutation };
+      return { signUpMutation };
     }),
 
     withEffects((store) => {
       const events = inject(Events);
 
       return {
-        triggerSignInMutation$: events
-          .on(passwordSignInPageEvents.signIn)
-          .pipe(tap(({ payload }) => store.signInMutation.mutate(payload))),
+        triggerSignUpMutation$: events
+          .on(registerPageEvents.signup)
+          .pipe(tap(({ payload }) => store.signUpMutation.mutate(payload))),
       };
     }),
   );

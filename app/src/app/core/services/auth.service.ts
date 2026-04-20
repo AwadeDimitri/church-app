@@ -7,6 +7,7 @@ export class AuthService {
   private readonly supabase: SupabaseClient;
   private readonly _user = signal<User | null>(null);
   private readonly _loading = signal(true);
+  private readonly _ready: Promise<void>;
 
   readonly user = this._user.asReadonly();
   readonly loading = this._loading.asReadonly();
@@ -15,17 +16,19 @@ export class AuthService {
   constructor() {
     this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
 
-    // Écouter les changements d'auth
     this.supabase.auth.onAuthStateChange((_event, session) => {
       this._user.set(session?.user ?? null);
       this._loading.set(false);
     });
 
-    // Vérifier la session existante
-    this.supabase.auth.getSession().then(({ data }) => {
+    this._ready = this.supabase.auth.getSession().then(({ data }) => {
       this._user.set(data.session?.user ?? null);
       this._loading.set(false);
     });
+  }
+
+  ready(): Promise<void> {
+    return this._ready;
   }
 
   async signUp(email: string, password: string, fullName: string) {
@@ -49,6 +52,13 @@ export class AuthService {
 
   async signOut() {
     const { error } = await this.supabase.auth.signOut();
+    if (error) throw error;
+  }
+
+  async resetPassword(email: string) {
+    const { error } = await this.supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
     if (error) throw error;
   }
 

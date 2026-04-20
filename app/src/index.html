@@ -6,7 +6,7 @@
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
   <meta name="description" content="Application mobile de l'Église de Grâce — Sermons, prières, événements et communauté.">
-  <meta name="theme-color" content="#0047AB">
+  <meta name="theme-color" content="#1A2B6D">
 
   <!-- PWA -->
   <link rel="manifest" href="manifest.webmanifest">
@@ -15,15 +15,56 @@
   <!-- iOS PWA -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="Église de Grâce">
+  <meta name="apple-mobile-web-app-title" content="Église CI-JCM">
   <link rel="apple-touch-icon" href="icons/icon-192x192.png">
 
   <!-- Open Graph -->
-  <meta property="og:title" content="Église de Grâce">
+  <meta property="og:title" content="Église CI-JCM">
   <meta property="og:description" content="Sermons, prières, événements et communauté.">
   <meta property="og:type" content="website">
+
+  <style>
+    #app-splash {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 44px;
+      background: radial-gradient(circle at 50% 40%, #243A87 0%, #1A2B6D 55%, #0F1B45 100%);
+      z-index: 9999;
+      transition: opacity 320ms ease;
+    }
+    #app-splash.is-hidden { opacity: 0; pointer-events: none; }
+    #app-splash .splash-logo-wrap {
+      width: 168px;
+      height: 168px;
+      border-radius: 50%;
+      background: #FFFFFF;
+      box-shadow: 0 20px 48px rgba(0, 0, 0, 0.28), 0 0 0 1px rgba(201, 162, 39, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: splash-pulse 1.8s ease-in-out infinite;
+    }
+    #app-splash img {
+      width: 140px;
+      height: 140px;
+      object-fit: contain;
+    }
+    @keyframes splash-pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(0.97); }
+    }
+  </style>
 </head>
 <body>
+  <div id="app-splash">
+    <div class="splash-logo-wrap">
+      <img src="logo-cijcm.png" alt="CI-JCM" />
+    </div>
+  </div>
   <app-root></app-root>
   <noscript>Veuillez activer JavaScript pour utiliser cette application.</noscript>
 </body>

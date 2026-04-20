@@ -19,6 +19,11 @@ export const routes: Routes = [
         path: 'signup',
         loadComponent: () => import('./features/auth/feature/signup/signup'),
       },
+      {
+        path: 'forgot-password',
+        loadComponent: () =>
+          import('./features/auth/feature/forgot-password/forgot-password'),
+      },
     ],
   },
   {

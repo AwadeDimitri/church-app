@@ -2,18 +2,19 @@
 @use 'tailwindcss';
 
 @theme {
-  /* Colors */
-  --color-church-blue: #0047AB;
-  --color-church-blue-light: #E8F0FE;
-  --color-church-blue-dark: #003080;
-  --color-church-red: #FF4D4D;
-  --color-church-red-light: #FFE8E8;
-  --color-church-gold: #F5A623;
-  --color-church-green: #34C759;
+  /* Heritage palette — inspired by CI-JCM logo */
+  --color-church-blue: #1A2B6D;
+  --color-church-blue-light: #E8EBF5;
+  --color-church-blue-dark: #0F1B45;
+  --color-church-red: #B71C1C;
+  --color-church-red-light: #FDEAEA;
+  --color-church-gold: #C9A227;
+  --color-church-gold-light: #F5EED0;
+  --color-church-green: #2E7D32;
   --color-church-white: #FFFFFF;
-  --color-church-bg: #F8F9FA;
-  --color-church-text: #1A1A2E;
-  --color-church-text-secondary: #6B7280;
+  --color-church-bg: #FAF8F2;
+  --color-church-text: #1A1A1A;
+  --color-church-text-secondary: #5A5A5A;
 
   /* Radius */
   --radius-church: 1.5rem;
@@ -21,8 +22,8 @@
   --radius-church-lg: 2rem;
 
   /* Shadows */
-  --shadow-church-card: 0 2px 12px rgba(0, 71, 171, 0.08);
-  --shadow-church-elevated: 0 8px 32px rgba(0, 71, 171, 0.12);
+  --shadow-church-card: 0 2px 12px rgba(26, 43, 109, 0.08);
+  --shadow-church-elevated: 0 8px 32px rgba(26, 43, 109, 0.14);
 }
 
 /* Glass morphism */
