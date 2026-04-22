@@ -18,8 +18,8 @@
   <!-- Category Filter -->
   <app-category-filter [categories]="categories()" [(selected)]="selectedCategory" />
 
-  <!-- Loading -->
-  @if (loading()) {
+  <!-- Loading initial (liste encore vide) -->
+  @if (loading() && allSermons().length === 0) {
     <div class="flex flex-col items-center justify-center py-16">
       <nz-icon nzType="clock-circle" nzTheme="outline" class="text-4xl text-church-blue animate-pulse mb-3" />
       <p class="text-sm text-church-text-secondary">Chargement des sermons...</p>
@@ -35,7 +35,7 @@
   }
 
   <!-- Content -->
-  @if (!loading() && !error()) {
+  @if (allSermons().length > 0 && !error()) {
     <!-- Featured Sermon -->
     @if (featured(); as sermon) {
       <button (click)="openSermon(sermon.id)" class="w-full text-left bg-gradient-to-br from-church-blue to-church-blue-dark rounded-church p-5 mb-6 text-white relative overflow-hidden z-0">
@@ -68,7 +68,7 @@
     }
 
     <!-- Sermon List -->
-    <div class="flex flex-col gap-3 mb-8 mt-6">
+    <div class="flex flex-col gap-3 mb-6 mt-6">
       @for (sermon of sermons(); track sermon.id) {
         <app-sermon-card
           [title]="sermon.title"
@@ -79,5 +79,19 @@
           (play)="openSermon(sermon.id)" />
       }
     </div>
+
+    @if (hasMore()) {
+      <div class="flex justify-end">
+        <button
+          type="button"
+          (click)="loadMore()"
+          [disabled]="loading()"
+          class="inline-flex items-center gap-1 !text-church-blue text-xs underline underline-offset-2 disabled:opacity-50 disabled:pointer-events-none"
+        >
+          {{ loading() ? 'Chargement...' : 'Charger plus' }}
+          <nz-icon nzType="arrow-right" nzTheme="outline" />
+        </button>
+      </div>
+    }
   }
 </div>

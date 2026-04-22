@@ -21,7 +21,12 @@ export default class Sermons {
 
   readonly loading = this.sermonService.loading;
   readonly error = this.sermonService.error;
+  readonly hasMore = this.sermonService.hasMore;
   readonly allSermons = this.sermonService.sermons;
+
+  loadMore(): void {
+    this.sermonService.loadMore();
+  }
 
   readonly categories = computed(() =>
     ['Tous', ...this.sermonService.categories().map(c => c.name)]

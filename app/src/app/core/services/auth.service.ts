@@ -1,10 +1,10 @@
-import { Injectable, signal, computed } from '@angular/core';
-import { createClient, SupabaseClient, User } from '@supabase/supabase-js';
-import { environment } from '@env';
+import { Injectable, signal, computed, inject } from '@angular/core';
+import { User } from '@supabase/supabase-js';
+import { SupabaseService } from '@core/services/supabase.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly supabase: SupabaseClient;
+  private readonly supabase = inject(SupabaseService).client;
   private readonly _user = signal<User | null>(null);
   private readonly _loading = signal(true);
   private readonly _ready: Promise<void>;
@@ -14,8 +14,6 @@ export class AuthService {
   readonly isAuthenticated = computed(() => !!this._user());
 
   constructor() {
-    this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
-
     this.supabase.auth.onAuthStateChange((_event, session) => {
       this._user.set(session?.user ?? null);
       this._loading.set(false);

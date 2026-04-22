@@ -1,24 +1,22 @@
-query GetProfile($userId: uuid!) {
-  users_by_pk(id: $userId) {
-    id
-    full_name
-    email
-    phone
-    avatar_url
-    role
-    is_active
-    created_at
-  }
-  sermons_count: sermons_aggregate {
-    aggregate {
-      count
+query GetProfile($userId: UUID!) {
+  usersCollection(filter: { id: { eq: $userId } }, first: 1) {
+    edges {
+      node {
+        id
+        full_name
+        avatar_url
+        role
+        is_active
+        created_at
+      }
     }
   }
-  user_prayers_count: prayer_requests_aggregate(
-    where: { author_id: { _eq: $userId } }
+  sermons_count: sermonsCollection {
+    totalCount
+  }
+  user_prayers_count: prayer_requestsCollection(
+    filter: { author_id: { eq: $userId } }
   ) {
-    aggregate {
-      count
-    }
+    totalCount
   }
 }

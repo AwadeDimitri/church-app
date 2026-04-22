@@ -69,6 +69,7 @@ import {
   EyeOutline,
   EyeInvisibleOutline,
   ArrowLeftOutline,
+  ArrowRightOutline,
 } from '@ant-design/icons-angular/icons';
 
 const icons = [
@@ -81,7 +82,7 @@ const icons = [
   SendOutline, LikeOutline, LikeFill, CreditCardOutline, BankOutline,
   WalletOutline, CheckCircleOutline, CheckCircleFill, InfoCircleOutline,
   FilterOutline, DownOutline, CameraOutline, BookOutline,
-  EyeOutline, EyeInvisibleOutline, ArrowLeftOutline,
+  EyeOutline, EyeInvisibleOutline, ArrowLeftOutline, ArrowRightOutline,
 ];
 
 export const appConfig: ApplicationConfig = {

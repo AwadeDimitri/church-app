@@ -1,112 +1,155 @@
-query GetPrayerRequests($userId: uuid!, $limit: Int = 20, $offset: Int = 0) {
-  prayer_requests(limit: $limit, offset: $offset, order_by: { created_at: desc }) {
-    id
-    content
-    is_anonymous
-    is_answered
-    created_at
-    category {
-      id
-      slug
-      name
-      color
-    }
-    author {
-      id
-      full_name
-    }
-    likes_aggregate {
-      aggregate {
-        count
+query GetPrayerRequests($userId: UUID!, $limit: Int = 10, $offset: Int = 0) {
+  prayer_requestsCollection(
+    first: $limit
+    offset: $offset
+    orderBy: [{ created_at: DescNullsLast }]
+  ) {
+    edges {
+      node {
+        id
+        content
+        is_anonymous
+        is_answered
+        created_at
+        category: categories {
+          id
+          slug
+          name
+          color
+        }
+        author: users {
+          id
+          full_name
+        }
+        likes: prayer_likesCollection {
+          totalCount
+        }
+        my_likes: prayer_likesCollection(
+          filter: { user_id: { eq: $userId } }
+          first: 1
+        ) {
+          edges {
+            node {
+              user_id
+            }
+          }
+        }
       }
-    }
-    my_likes: likes(where: { user_id: { _eq: $userId } }, limit: 1) {
-      user_id
     }
   }
 }
 
-query GetMyPrayerRequests($userId: uuid!, $limit: Int = 50, $offset: Int = 0) {
-  prayer_requests(
-    where: { author_id: { _eq: $userId } }
-    limit: $limit
+query GetMyPrayerRequests(
+  $userId: UUID!
+  $limit: Int = 50
+  $offset: Int = 0
+) {
+  prayer_requestsCollection(
+    filter: { author_id: { eq: $userId } }
+    first: $limit
     offset: $offset
-    order_by: { created_at: desc }
+    orderBy: [{ created_at: DescNullsLast }]
   ) {
-    id
-    content
-    is_anonymous
-    is_answered
-    created_at
-    category {
-      id
-      slug
-      name
-      color
-    }
-    author {
-      id
-      full_name
-    }
-    likes_aggregate {
-      aggregate {
-        count
+    edges {
+      node {
+        id
+        content
+        is_anonymous
+        is_answered
+        created_at
+        category: categories {
+          id
+          slug
+          name
+          color
+        }
+        author: users {
+          id
+          full_name
+        }
+        likes: prayer_likesCollection {
+          totalCount
+        }
+        my_likes: prayer_likesCollection(
+          filter: { user_id: { eq: $userId } }
+          first: 1
+        ) {
+          edges {
+            node {
+              user_id
+            }
+          }
+        }
       }
-    }
-    my_likes: likes(where: { user_id: { _eq: $userId } }, limit: 1) {
-      user_id
     }
   }
 }
 
 query GetPrayerStats {
-  active: prayer_requests_aggregate(where: { is_answered: { _eq: false } }) {
-    aggregate {
-      count
-    }
+  active: prayer_requestsCollection(filter: { is_answered: { eq: false } }) {
+    totalCount
   }
-  answered: prayer_requests_aggregate(where: { is_answered: { _eq: true } }) {
-    aggregate {
-      count
-    }
+  answered: prayer_requestsCollection(filter: { is_answered: { eq: true } }) {
+    totalCount
   }
-  intercessors: prayer_likes_aggregate {
-    aggregate {
-      count(columns: user_id, distinct: true)
-    }
-  }
+  intercessors: intercessors_count
 }
 
 query GetPrayerCategories {
-  categories(where: { type: { _eq: "prayer" } }, order_by: { name: asc }) {
-    id
-    slug
-    name
-    color
-    description
+  categoriesCollection(
+    filter: { type: { eq: "prayer" } }
+    orderBy: [{ name: AscNullsLast }]
+  ) {
+    edges {
+      node {
+        id
+        slug
+        name
+        color
+        description
+      }
+    }
   }
 }
 
-mutation CreatePrayerRequest($content: String!, $category_id: uuid!, $is_anonymous: Boolean!) {
-  insert_prayer_requests_one(object: {
-    content: $content,
-    category_id: $category_id,
-    is_anonymous: $is_anonymous
-  }) {
-    id
-    created_at
+mutation CreatePrayerRequest(
+  $content: String!
+  $category_id: UUID!
+  $is_anonymous: Boolean!
+) {
+  insertIntoprayer_requestsCollection(
+    objects: [
+      {
+        content: $content
+        category_id: $category_id
+        is_anonymous: $is_anonymous
+      }
+    ]
+  ) {
+    records {
+      id
+      created_at
+    }
   }
 }
 
-mutation LikePrayer($prayerId: uuid!) {
-  insert_prayer_likes_one(object: { prayer_id: $prayerId }) {
-    prayer_id
-    user_id
+mutation LikePrayer($prayerId: UUID!) {
+  insertIntoprayer_likesCollection(
+    objects: [{ prayer_id: $prayerId }]
+  ) {
+    records {
+      prayer_id
+      user_id
+    }
   }
 }
 
-mutation UnlikePrayer($prayerId: uuid!) {
-  delete_prayer_likes(where: { prayer_id: { _eq: $prayerId } }) {
-    affected_rows
+mutation UnlikePrayer($prayerId: UUID!) {
+  deleteFromprayer_likesCollection(
+    filter: { prayer_id: { eq: $prayerId } }
+  ) {
+    records {
+      prayer_id
+    }
   }
 }

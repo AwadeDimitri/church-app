@@ -11,8 +11,8 @@
     <app-stat-card [value]="stats().intercessors" label="Intercesseurs" color="text-church-gold" />
   </div>
 
-  <!-- Loading -->
-  @if (loading()) {
+  <!-- Loading initial (liste encore vide) -->
+  @if (loading() && allPrayers().length === 0) {
     <div class="flex flex-col items-center justify-center py-16">
       <nz-icon nzType="heart" nzTheme="outline" class="text-4xl text-church-blue animate-pulse mb-3" />
       <p class="text-sm text-church-text-secondary">Chargement des prières...</p>
@@ -27,7 +27,7 @@
     </div>
   }
 
-  @if (!loading() && !error()) {
+  @if (!error() && (!loading() || allPrayers().length > 0)) {
     <!-- My Prayer -->
     <form [formGroup]="form" (ngSubmit)="submitPrayer()" class="bg-gradient-to-r from-church-blue-light to-blue-50 rounded-church p-5 mb-6">
       <div class="flex items-center gap-3 mb-3">
@@ -80,21 +80,35 @@
     }
 
     <!-- Prayer Requests -->
-    <div class="flex flex-col gap-3 mb-8">
+    <div class="flex flex-col gap-3 mb-6">
       @for (prayer of prayers(); track prayer.id; let i = $index) {
         <app-prayer-card
           [author]="getAuthorName(prayer)"
           [content]="prayer.content"
           [date]="(prayer.created_at | date:'d MMM yyyy') ?? ''"
-          [category]="prayer.category.name"
-          [prayerCount]="prayer.likes_aggregate.aggregate?.count ?? 0"
+          [category]="prayer.category?.name ?? ''"
+          [prayerCount]="prayer.likes?.totalCount ?? 0"
           [isAnswered]="prayer.is_answered"
           [isLiked]="isLikedByMe(prayer)"
           [avatarColor]="getAvatarColor(i)"
-          [categoryColor]="getCategoryColor(prayer.category.color)"
+          [categoryColor]="getCategoryColor(prayer.category?.color ?? '')"
           (pray)="togglePray(prayer)"
           (share)="onShare(prayer)" />
       }
     </div>
+
+    @if (hasMore()) {
+      <div class="flex justify-end mb-8">
+        <button
+          type="button"
+          (click)="loadMore()"
+          [disabled]="loading()"
+          class="inline-flex items-center gap-1 !text-church-blue text-xs underline underline-offset-2 disabled:opacity-50 disabled:pointer-events-none"
+        >
+          {{ loading() ? 'Chargement...' : 'Charger plus' }}
+          <nz-icon nzType="arrow-right" nzTheme="outline" />
+        </button>
+      </div>
+    }
   }
 </div>

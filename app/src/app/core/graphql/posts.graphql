@@ -1,11 +1,19 @@
 query GetPosts($limit: Int = 20, $offset: Int = 0) {
-  posts(limit: $limit, offset: $offset, order_by: { created_at: desc }) {
-    id
-    title
-    content
-    category
-    cover_url
-    published_at
-    created_at
+  postsCollection(
+    first: $limit
+    offset: $offset
+    orderBy: [{ created_at: DescNullsLast }]
+  ) {
+    edges {
+      node {
+        id
+        title
+        content
+        category
+        cover_url
+        published_at
+        created_at
+      }
+    }
   }
 }

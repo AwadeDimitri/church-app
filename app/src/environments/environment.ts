@@ -1,6 +1,6 @@
 export const environment = {
   production: false,
-  apiUrl: 'https://hasura-church-app.onrender.com/v1/graphql',
+  apiUrl: 'https://uoktiyfxlqzvoscusowd.supabase.co/graphql/v1',
   supabaseUrl: 'https://uoktiyfxlqzvoscusowd.supabase.co',
   supabaseKey: 'sb_publishable_xmFjSJNqjFSiMIioHLx4kg_3euSfV4l',
 };

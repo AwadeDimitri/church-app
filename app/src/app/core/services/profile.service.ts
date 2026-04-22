@@ -6,9 +6,12 @@ import {
   GetProfileGQL,
   type GetProfileQuery,
 } from '@core/graphql/generated';
+import { unwrapNodes } from '@core/graphql/unwrap';
 import { AuthService } from '@core/services/auth.service';
 
-type ProfileUser = NonNullable<GetProfileQuery['users_by_pk']>;
+type ProfileUser = NonNullable<
+  NonNullable<GetProfileQuery['usersCollection']>['edges'][number]
+>['node'];
 
 interface ProfileStats {
   sermons: number;
@@ -30,7 +33,10 @@ export class ProfileService {
 
   readonly user = toSignal(
     this.profileQuery.valueChanges.pipe(
-      map(r => (r.data?.users_by_pk as ProfileUser | null | undefined) ?? null),
+      map(
+        (r): ProfileUser | null =>
+          unwrapNodes<ProfileUser>(r.data?.usersCollection)[0] ?? null,
+      ),
     ),
     { initialValue: null as ProfileUser | null },
   );
@@ -38,8 +44,8 @@ export class ProfileService {
   readonly stats = toSignal(
     this.profileQuery.valueChanges.pipe(
       map((r): ProfileStats => ({
-        sermons: r.data?.sermons_count?.aggregate?.count ?? 0,
-        prayers: r.data?.user_prayers_count?.aggregate?.count ?? 0,
+        sermons: r.data?.sermons_count?.totalCount ?? 0,
+        prayers: r.data?.user_prayers_count?.totalCount ?? 0,
         donations: 0,
       })),
     ),

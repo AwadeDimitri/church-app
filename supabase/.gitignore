@@ -1,0 +1,10 @@
+# Supabase
+.branches
+.temp
+
+# dotenvx
+.env.keys
+.env.local
+.env.*.local
+
+winget install --source winget --id PostgreSQL.PostgreSQL.17 --silent --accept-package-agreements --accept-source-agreements 2>&1 | tail -20

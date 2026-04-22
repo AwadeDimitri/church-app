@@ -51,14 +51,20 @@ export default class Prayer {
 
   readonly loading = this.prayerService.loading;
   readonly error = this.prayerService.error;
+  readonly hasMore = this.prayerService.hasMore;
+  readonly allPrayers = this.prayerService.prayers;
   readonly stats = this.prayerService.stats;
+
+  loadMore(): void {
+    this.prayerService.loadMore();
+  }
 
   readonly prayers = computed(() => {
     const selected = this.selectedCategory();
     const all = this.prayerService.prayers();
 
     if (selected === 'Toutes') return all;
-    return all.filter(p => p.category.name === selected);
+    return all.filter(p => p.category?.name === selected);
   });
 
   constructor() {
@@ -83,11 +89,11 @@ export default class Prayer {
     return AVATAR_COLORS[index % AVATAR_COLORS.length];
   }
 
-  isLikedByMe(prayer: { my_likes: ReadonlyArray<unknown> }): boolean {
-    return prayer.my_likes.length > 0;
+  isLikedByMe(prayer: { my_likes?: { edges: ReadonlyArray<unknown> } | null }): boolean {
+    return (prayer.my_likes?.edges.length ?? 0) > 0;
   }
 
-  togglePray(prayer: { id: string; my_likes: ReadonlyArray<unknown> }) {
+  togglePray(prayer: { id: string; my_likes?: { edges: ReadonlyArray<unknown> } | null }) {
     if (this.isLikedByMe(prayer)) {
       this.prayerService.unlike(prayer.id).subscribe();
     } else {
