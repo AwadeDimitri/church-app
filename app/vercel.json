@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm run codegen && ng build",
+  "buildCommand": "ng build",
   "outputDirectory": "dist/app/browser",
   "framework": null,
   "rewrites": [
