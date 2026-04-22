@@ -12,6 +12,7 @@ import {
 } from '@angular/forms';
 import { NzIconDirective } from 'ng-zorro-antd/icon';
 import { Button } from '@shared/components/button/button';
+import { GoogleSignInButton } from '@features/auth/ui/google-sign-in-button/google-sign-in-button';
 import { injectDispatch } from '@ngrx/signals/events';
 import {
   AuthStore,
@@ -20,23 +21,31 @@ import {
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, RouterLink, NzIconDirective, Button],
+  imports: [
+    ReactiveFormsModule,
+    RouterLink,
+    NzIconDirective,
+    Button,
+    GoogleSignInButton,
+  ],
   template: `
     <div
       class="min-h-dvh bg-church-bg flex flex-col px-6 py-10 max-w-md mx-auto w-full"
     >
-      <div class="flex flex-col items-center mt-8">
+      <div class="flex flex-col items-center mt-12">
         <img
           src="/logo-cijcm.png"
           alt="CI-JCM"
-          class="w-24 h-24 object-contain mb-10"
+          class="w-30 h-30 object-contain mb-10"
         />
-      </div>
 
-      <div>
-        <h1 class="text-xl font-bold text-church-text">
-          Connectez-vous à votre compte
+        <h1 class="text-2xl font-bold text-church-text text-center">
+          Connectez-vous
         </h1>
+        <p class="text-sm text-center text-church-text-secondary mt-2">
+          Entrer un email et mot de passe valide pour se connecter à votre
+          compte.
+        </p>
       </div>
 
       <form
@@ -127,6 +136,14 @@ import {
         </app-button>
       </form>
 
+      <div class="flex items-center gap-4 my-6">
+        <hr class="flex-1 border-slate-200" />
+        <span class="text-sm text-church-text-secondary">Ou</span>
+        <hr class="flex-1 border-slate-200" />
+      </div>
+
+      <app-google-sign-in-button (click)="onGoogleSignIn()" />
+
       <div class="flex-1"></div>
 
       <p class="text-center text-sm text-church-text-secondary pt-8">
@@ -158,5 +175,9 @@ export default class Login {
     }
 
     this.dispatch.signIn(this.form.getRawValue());
+  }
+
+  onGoogleSignIn() {
+    // TODO: wire Supabase OAuth flow
   }
 }

@@ -1,4 +1,9 @@
-import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  inject,
+  signal,
+} from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import {
   NonNullableFormBuilder,
@@ -13,7 +18,9 @@ import { AuthService } from '@core/services/auth.service';
   selector: 'app-forgot-password',
   imports: [ReactiveFormsModule, RouterLink, NzIconDirective, Button],
   template: `
-    <div class="min-h-dvh bg-church-bg flex flex-col px-6 py-10 max-w-md mx-auto w-full">
+    <div
+      class="min-h-dvh bg-church-bg flex flex-col px-6 py-10 max-w-md mx-auto w-full"
+    >
       <button
         type="button"
         (click)="goBack()"
@@ -23,21 +30,28 @@ import { AuthService } from '@core/services/auth.service';
         <nz-icon nzType="arrow-left" class="text-lg" />
       </button>
 
-      <div class="flex flex-col items-center mt-6 mb-8">
-        <div class="w-20 h-20 rounded-full bg-church-blue-light flex items-center justify-center mb-5">
-          <nz-icon nzType="mail" class="text-3xl text-church-blue" />
-        </div>
+      <div class="flex flex-col items-center mt-6">
+        <img
+          src="/logo-cijcm.png"
+          alt="CI-JCM"
+          class="w-30 h-30 object-contain mb-10"
+        />
         <h1 class="text-2xl font-bold text-church-text text-center">
           Mot de passe oublié ?
         </h1>
         <p class="text-sm text-church-text-secondary mt-2 text-center max-w-xs">
-          Entrez votre email, nous vous enverrons un lien pour réinitialiser votre mot de passe.
+          Entrez votre email, nous vous enverrons un lien pour réinitialiser
+          votre mot de passe.
         </p>
       </div>
 
       @if (sent()) {
-        <div class="flex flex-col items-center gap-4 bg-white rounded-2xl p-6 shadow-church-card">
-          <div class="w-14 h-14 rounded-full bg-church-gold-light flex items-center justify-center">
+        <div
+          class="flex flex-col items-center gap-4 bg-white rounded-2xl p-6 shadow-church-card mt-4"
+        >
+          <div
+            class="w-14 h-14 rounded-full bg-church-gold-light flex items-center justify-center"
+          >
             <nz-icon nzType="check-circle" class="text-3xl text-church-gold" />
           </div>
           <p class="text-center text-sm text-church-text">
@@ -47,7 +61,10 @@ import { AuthService } from '@core/services/auth.service';
           <p class="text-xs text-church-text-secondary text-center">
             Vérifiez votre boîte de réception (et les spams).
           </p>
-          <a routerLink="/login" class="text-sm text-church-blue font-semibold mt-2">
+          <a
+            routerLink="/login"
+            class="text-sm text-church-blue font-semibold mt-2"
+          >
             Retour à la connexion
           </a>
         </div>
@@ -55,7 +72,7 @@ import { AuthService } from '@core/services/auth.service';
         <form
           [formGroup]="form"
           (ngSubmit)="onSubmit()"
-          class="flex flex-col gap-4"
+          class="flex flex-col gap-4 mt-4"
         >
           <div>
             <input
@@ -77,7 +94,9 @@ import { AuthService } from '@core/services/auth.service';
           </div>
 
           @if (errorMessage()) {
-            <p class="text-xs text-church-red text-center">{{ errorMessage() }}</p>
+            <p class="text-xs text-church-red text-center">
+              {{ errorMessage() }}
+            </p>
           }
 
           <app-button
@@ -92,6 +111,15 @@ import { AuthService } from '@core/services/auth.service';
           </app-button>
         </form>
       }
+
+      <div class="flex-1"></div>
+
+      <p class="text-center text-sm text-church-text-secondary pt-8">
+        Vous avez retrouvé le mot de passe ?
+        <a routerLink="/login" class="text-church-blue font-semibold">
+          Se connecter
+        </a>
+      </p>
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -122,7 +150,9 @@ export default class ForgotPassword {
       await this.authService.resetPassword(this.form.controls.email.value);
       this.sent.set(true);
     } catch {
-      this.errorMessage.set("Impossible d'envoyer l'email. Réessayez plus tard.");
+      this.errorMessage.set(
+        "Impossible d'envoyer l'email. Réessayez plus tard.",
+      );
     } finally {
       this.loading.set(false);
     }

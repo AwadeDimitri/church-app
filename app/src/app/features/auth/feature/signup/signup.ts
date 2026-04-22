@@ -1,4 +1,9 @@
-import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  inject,
+  signal,
+} from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import {
   NonNullableFormBuilder,
@@ -7,14 +12,23 @@ import {
 } from '@angular/forms';
 import { NzIconDirective } from 'ng-zorro-antd/icon';
 import { Button } from '@shared/components/button/button';
+import { GoogleSignInButton } from '@features/auth/ui/google-sign-in-button/google-sign-in-button';
 import { injectDispatch } from '@ngrx/signals/events';
 import { AuthStore, registerPageEvents } from '@features/auth/data-access';
 
 @Component({
   selector: 'app-signup',
-  imports: [ReactiveFormsModule, RouterLink, NzIconDirective, Button],
+  imports: [
+    ReactiveFormsModule,
+    RouterLink,
+    NzIconDirective,
+    Button,
+    GoogleSignInButton,
+  ],
   template: `
-    <div class="min-h-dvh bg-church-bg flex flex-col px-6 py-10 max-w-md mx-auto w-full">
+    <div
+      class="min-h-dvh bg-church-bg flex flex-col px-6 py-10 max-w-md mx-auto w-full"
+    >
       <button
         type="button"
         (click)="goBack()"
@@ -24,22 +38,24 @@ import { AuthStore, registerPageEvents } from '@features/auth/data-access';
         <nz-icon nzType="arrow-left" class="text-lg" />
       </button>
 
-      <div class="flex flex-col items-center mt-6 mb-8">
+      <div class="flex flex-col items-center mt-6">
         <img
           src="/logo-cijcm.png"
           alt="CI-JCM"
-          class="w-20 h-20 object-contain mb-5"
+          class="w-30 h-30 object-contain mb-10"
         />
-        <h1 class="text-2xl font-bold text-church-text">Créer un compte</h1>
-        <p class="text-sm text-church-text-secondary mt-1">
-          Rejoignez la communauté CI-JCM
+        <h1 class="text-2xl font-bold text-church-text text-center">
+          Créer un compte
+        </h1>
+        <p class="text-sm text-center text-church-text-secondary mt-2">
+          Utilisez les informations appropriées pour continuer
         </p>
       </div>
 
       <form
         [formGroup]="form"
         (ngSubmit)="onSignup()"
-        class="flex flex-col gap-4"
+        class="flex flex-col gap-4 mt-4"
       >
         <div>
           <input
@@ -94,9 +110,16 @@ import { AuthStore, registerPageEvents } from '@features/auth/data-access';
               type="button"
               (click)="showPassword.set(!showPassword())"
               class="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 active:text-church-blue"
-              [attr.aria-label]="showPassword() ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+              [attr.aria-label]="
+                showPassword()
+                  ? 'Masquer le mot de passe'
+                  : 'Afficher le mot de passe'
+              "
             >
-              <nz-icon [nzType]="showPassword() ? 'eye-invisible' : 'eye'" class="text-lg" />
+              <nz-icon
+                [nzType]="showPassword() ? 'eye-invisible' : 'eye'"
+                class="text-lg"
+              />
             </button>
           </div>
           @if (
@@ -134,7 +157,20 @@ import { AuthStore, registerPageEvents } from '@features/auth/data-access';
         </app-button>
       </form>
 
-      <p class="text-center text-sm text-church-text-secondary mt-8">
+      <div class="flex items-center gap-4 my-6">
+        <hr class="flex-1 border-slate-200" />
+        <span class="text-sm text-church-text-secondary">Ou</span>
+        <hr class="flex-1 border-slate-200" />
+      </div>
+
+      <app-google-sign-in-button
+        label="S'inscrire avec Google"
+        (click)="onGoogleSignUp()"
+      />
+
+      <div class="flex-1"></div>
+
+      <p class="text-center text-sm text-church-text-secondary pt-8">
         Déjà un compte ?
         <a routerLink="/login" class="text-church-blue font-semibold">
           Se connecter
@@ -165,6 +201,10 @@ export default class Signup {
     }
 
     this.dispatch.signup(this.form.getRawValue());
+  }
+
+  onGoogleSignUp() {
+    // TODO: wire Supabase OAuth flow
   }
 
   goBack() {
