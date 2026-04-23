@@ -3,6 +3,7 @@ import { computed } from '@angular/core';
 import { withSessionReducers, withSessionHandlers } from './session';
 import { withPasswordReducers, withPasswordHandlers } from './password';
 import { withRegisterReducers, withRegisterHandlers } from './register';
+import { withOauthReducers, withOauthHandlers } from './oauth';
 
 export const AuthStore = signalStore(
   { providedIn: 'root' },
@@ -10,6 +11,7 @@ export const AuthStore = signalStore(
   withSessionReducers(),
   withPasswordReducers(),
   withRegisterReducers(),
+  withOauthReducers(),
 
   withComputed(({ sessionStatus }) => ({
     isAuthenticated: computed(() => sessionStatus() === 'authenticated'),
@@ -20,4 +22,5 @@ export const AuthStore = signalStore(
   withSessionHandlers(),
   withPasswordHandlers(),
   withRegisterHandlers(),
+  withOauthHandlers(),
 );

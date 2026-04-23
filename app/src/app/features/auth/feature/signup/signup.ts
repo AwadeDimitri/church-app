@@ -14,7 +14,11 @@ import { NzIconDirective } from 'ng-zorro-antd/icon';
 import { Button } from '@shared/components/button/button';
 import { GoogleSignInButton } from '@features/auth/ui/google-sign-in-button/google-sign-in-button';
 import { injectDispatch } from '@ngrx/signals/events';
-import { AuthStore, registerPageEvents } from '@features/auth/data-access';
+import {
+  AuthStore,
+  registerPageEvents,
+  oauthSignInPageEvents,
+} from '@features/auth/data-access';
 
 @Component({
   selector: 'app-signup',
@@ -163,8 +167,15 @@ import { AuthStore, registerPageEvents } from '@features/auth/data-access';
         <hr class="flex-1 border-slate-200" />
       </div>
 
+      @if (authStore.googleSignInErrorMessage()) {
+        <p class="text-xs text-church-red text-center mb-2">
+          {{ authStore.googleSignInErrorMessage() }}
+        </p>
+      }
+
       <app-google-sign-in-button
         label="S'inscrire avec Google"
+        [disabled]="authStore.googleSignInMutation.isPending()"
         (click)="onGoogleSignUp()"
       />
 
@@ -182,7 +193,8 @@ import { AuthStore, registerPageEvents } from '@features/auth/data-access';
 })
 export default class Signup {
   readonly authStore = inject(AuthStore);
-  private readonly dispatch = injectDispatch(registerPageEvents);
+  private readonly registerDispatch = injectDispatch(registerPageEvents);
+  private readonly oauthDispatch = injectDispatch(oauthSignInPageEvents);
   private readonly router = inject(Router);
   private readonly fb = inject(NonNullableFormBuilder);
 
@@ -200,11 +212,11 @@ export default class Signup {
       return;
     }
 
-    this.dispatch.signup(this.form.getRawValue());
+    this.registerDispatch.signup(this.form.getRawValue());
   }
 
   onGoogleSignUp() {
-    // TODO: wire Supabase OAuth flow
+    this.oauthDispatch.signInWithGoogle();
   }
 
   goBack() {

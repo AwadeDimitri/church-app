@@ -17,6 +17,7 @@ import { injectDispatch } from '@ngrx/signals/events';
 import {
   AuthStore,
   passwordSignInPageEvents,
+  oauthSignInPageEvents,
 } from '@features/auth/data-access';
 
 @Component({
@@ -142,7 +143,16 @@ import {
         <hr class="flex-1 border-slate-200" />
       </div>
 
-      <app-google-sign-in-button (click)="onGoogleSignIn()" />
+      @if (authStore.googleSignInErrorMessage()) {
+        <p class="text-xs text-church-red text-center mb-2">
+          {{ authStore.googleSignInErrorMessage() }}
+        </p>
+      }
+
+      <app-google-sign-in-button
+        [disabled]="authStore.googleSignInMutation.isPending()"
+        (click)="onGoogleSignIn()"
+      />
 
       <div class="flex-1"></div>
 
@@ -158,7 +168,8 @@ import {
 })
 export default class Login {
   readonly authStore = inject(AuthStore);
-  private readonly dispatch = injectDispatch(passwordSignInPageEvents);
+  private readonly passwordDispatch = injectDispatch(passwordSignInPageEvents);
+  private readonly oauthDispatch = injectDispatch(oauthSignInPageEvents);
   private readonly fb = inject(NonNullableFormBuilder);
 
   readonly showPassword = signal(false);
@@ -174,10 +185,10 @@ export default class Login {
       return;
     }
 
-    this.dispatch.signIn(this.form.getRawValue());
+    this.passwordDispatch.signIn(this.form.getRawValue());
   }
 
   onGoogleSignIn() {
-    // TODO: wire Supabase OAuth flow
+    this.oauthDispatch.signInWithGoogle();
   }
 }

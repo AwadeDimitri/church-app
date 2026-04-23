@@ -24,6 +24,11 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/auth/feature/forgot-password/forgot-password'),
       },
+      {
+        path: 'auth/callback',
+        loadComponent: () =>
+          import('./features/auth/feature/auth-callback/auth-callback'),
+      },
     ],
   },
   {

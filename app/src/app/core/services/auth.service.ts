@@ -48,6 +48,23 @@ export class AuthService {
     return data;
   }
 
+  async signInWithGoogle() {
+    const redirectTo = `${window.location.origin}/auth/callback`;
+    const { data, error } = await this.supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo },
+    });
+    if (error) throw error;
+    return data;
+  }
+
+  async exchangeCodeForSession(code: string) {
+    const { data, error } =
+      await this.supabase.auth.exchangeCodeForSession(code);
+    if (error) throw error;
+    return data;
+  }
+
   async signOut() {
     const { error } = await this.supabase.auth.signOut();
     if (error) throw error;
