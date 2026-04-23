@@ -39,6 +39,43 @@ query GetPrayerRequests($userId: UUID!, $limit: Int = 10, $offset: Int = 0) {
   }
 }
 
+query GetPrayerRequest($id: UUID!, $userId: UUID!) {
+  prayer_requestsCollection(filter: { id: { eq: $id } }, first: 1) {
+    edges {
+      node {
+        id
+        content
+        is_anonymous
+        is_answered
+        created_at
+        category: categories {
+          id
+          slug
+          name
+          color
+        }
+        author: users {
+          id
+          full_name
+        }
+        likes: prayer_likesCollection {
+          totalCount
+        }
+        my_likes: prayer_likesCollection(
+          filter: { user_id: { eq: $userId } }
+          first: 1
+        ) {
+          edges {
+            node {
+              user_id
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
 query GetMyPrayerRequests(
   $userId: UUID!
   $limit: Int = 50

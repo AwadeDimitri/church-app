@@ -1,14 +1,18 @@
-import { Component, ChangeDetectionStrategy, inject, computed, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, computed, signal, effect } from '@angular/core';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
+import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { NzIconDirective } from 'ng-zorro-antd/icon';
 import { CategoryFilter } from '@shared/components/category-filter/category-filter';
 import { SermonCard } from '@shared/components/sermon-card/sermon-card';
+import { PageHeader } from '@shared/components/page-header/page-header';
 import { SermonService } from '@core/services/sermon.service';
+import { getYouTubeThumbnail } from '@core/utils/youtube.util';
 
 @Component({
   selector: 'app-sermons',
-  imports: [DatePipe, NzIconDirective, CategoryFilter, SermonCard],
+  imports: [DatePipe, NzIconDirective, CategoryFilter, SermonCard, PageHeader],
   templateUrl: './sermons.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -23,6 +27,27 @@ export default class Sermons {
   readonly error = this.sermonService.error;
   readonly hasMore = this.sermonService.hasMore;
   readonly allSermons = this.sermonService.sermons;
+  readonly activeSearch = this.sermonService.search;
+
+  readonly hasFilter = computed(
+    () => !!this.activeSearch() || this.selectedCategory() !== 'Tous',
+  );
+
+  constructor() {
+    toObservable(this.searchQuery)
+      .pipe(debounceTime(300), distinctUntilChanged(), takeUntilDestroyed())
+      .subscribe(value => this.sermonService.setSearch(value));
+
+    effect(() => {
+      const name = this.selectedCategory();
+      if (name === 'Tous') {
+        this.sermonService.setCategoryId(null);
+        return;
+      }
+      const cat = this.sermonService.categories().find(c => c.name === name);
+      if (cat) this.sermonService.setCategoryId(cat.id);
+    });
+  }
 
   loadMore(): void {
     this.sermonService.loadMore();
@@ -33,22 +58,18 @@ export default class Sermons {
   );
 
   readonly sermons = computed(() => {
-    const selected = this.selectedCategory();
-    const query = this.searchQuery().toLowerCase();
     const all = this.allSermons();
     const featuredId = this.featured()?.id;
-
-    return all.filter(s => {
-      if (s.id === featuredId) return false;
-      if (selected !== 'Tous' && s.category?.name !== selected) return false;
-      if (query && !s.title.toLowerCase().includes(query) && !s.preacher_name.toLowerCase().includes(query)) return false;
-      return true;
-    });
+    return all.filter(s => s.id !== featuredId);
   });
 
-  readonly featured = computed(() => this.allSermons()[0] ?? null);
+  readonly featured = computed(() =>
+    this.hasFilter() ? null : (this.allSermons()[0] ?? null),
+  );
 
   openSermon(id: string) {
     this.router.navigate(['/sermons', id]);
   }
+
+  protected readonly getThumbnail = getYouTubeThumbnail;
 }

@@ -1,11 +1,12 @@
 import { Component, ChangeDetectionStrategy, inject, input, computed } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { NzIconDirective } from 'ng-zorro-antd/icon';
+import { PageHeader } from '@shared/components/page-header/page-header';
 import { BibleService } from '@core/services/bible.service';
 
 @Component({
   selector: 'app-bible-book',
-  imports: [RouterLink, NzIconDirective],
+  imports: [RouterLink, NzIconDirective, PageHeader],
   templateUrl: './bible-book.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -24,6 +25,14 @@ export default class BibleBook {
   readonly chapters = computed(() => {
     const n = this.book()?.chapter_count ?? 0;
     return Array.from({ length: n }, (_, i) => i + 1);
+  });
+
+  readonly subtitle = computed(() => {
+    const b = this.book();
+    if (!b) return '';
+    const testament = b.testament === 1 ? 'Ancien Testament' : 'Nouveau Testament';
+    const chapters = `${b.chapter_count} ${b.chapter_count > 1 ? 'chapitres' : 'chapitre'}`;
+    return `${testament} • ${chapters}`;
   });
 
   readonly notFound = computed(() => !this.loading() && !this.book());

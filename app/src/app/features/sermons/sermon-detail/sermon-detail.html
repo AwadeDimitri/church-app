@@ -1,11 +1,5 @@
 <div class="px-5 safe-area-top">
-  <!-- Header -->
-  <div class="flex items-center gap-3 mb-6">
-    <a routerLink="/sermons" class="w-9 h-9 rounded-full bg-white shadow-church-card flex items-center justify-center">
-      <nz-icon nzType="left" nzTheme="outline" class="text-church-text" />
-    </a>
-    <h1 class="text-xl font-bold text-church-text">Sermon</h1>
-  </div>
+  <app-page-header title="Sermon" [backLink]="true" />
 
   @if (!sermon()) {
     <div class="flex flex-col items-center justify-center py-16">
@@ -42,7 +36,7 @@
 
     <!-- Sermon Info -->
     <div class="mb-5">
-      <h2 class="text-xl font-bold text-church-text mb-1">{{ sermon.title }}</h2>
+      <h1 class="text-xl font-bold text-church-text mb-1">{{ sermon.title }}</h1>
       <p class="text-sm text-church-text-secondary mb-3">{{ sermon.preacher_name }}</p>
 
       <div class="flex items-center gap-4 text-xs text-church-text-secondary">

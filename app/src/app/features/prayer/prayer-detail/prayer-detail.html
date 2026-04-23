@@ -1,0 +1,57 @@
+<div class="px-5 safe-area-top">
+  <app-page-header title="Prière" backLink="/prayer" />
+
+  @if (!prayer()) {
+    <div class="flex flex-col items-center justify-center py-16">
+      <nz-icon nzType="heart" nzTheme="outline" class="text-4xl text-church-blue animate-pulse mb-3" />
+      <p class="text-sm text-church-text-secondary">Chargement...</p>
+    </div>
+  }
+
+  @if (prayer(); as p) {
+    <div
+      class="bg-white rounded-church p-5 shadow-church-card mb-5"
+      [class.border-l-4]="p.is_answered"
+      [class.border-church-green]="p.is_answered">
+
+      <div class="flex items-center gap-3 mb-4">
+        <app-avatar [name]="authorName()" color="blue" size="md" />
+        <div class="flex-1">
+          <p class="text-base font-semibold text-church-text">{{ authorName() }}</p>
+          <p class="text-xs text-church-text-secondary">{{ p.created_at | date:'d MMMM yyyy' }}</p>
+        </div>
+        @if (p.category; as cat) {
+          <span
+            class="text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1"
+            [class]="categoryColor().bg + ' ' + categoryColor().text">
+            @if (p.is_answered) {
+              <nz-icon nzType="check-circle" nzTheme="fill" />
+            }
+            {{ cat.name }}
+          </span>
+        }
+      </div>
+
+      <p class="text-base text-church-text leading-relaxed whitespace-pre-line mb-5">{{ p.content }}</p>
+
+      <div class="flex items-center justify-between border-t border-gray-100 pt-4">
+        <button
+          type="button"
+          (click)="togglePray()"
+          class="flex items-center gap-2 text-sm font-medium transition-colors"
+          [class]="p.is_answered ? 'text-church-green' : isLikedByMe() ? 'text-church-red' : 'text-church-blue'">
+          <nz-icon
+            [nzType]="p.is_answered ? 'like' : 'heart'"
+            [nzTheme]="isLikedByMe() && !p.is_answered ? 'fill' : 'outline'" />
+          {{ p.likes?.totalCount ?? 0 }} {{ p.is_answered ? 'louent Dieu' : 'prient' }}
+        </button>
+        <button
+          type="button"
+          (click)="onShare()"
+          class="flex items-center gap-2 text-sm text-church-text-secondary">
+          <nz-icon nzType="share-alt" nzTheme="outline" /> Partager
+        </button>
+      </div>
+    </div>
+  }
+</div>

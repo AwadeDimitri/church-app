@@ -19,14 +19,14 @@
   </div>
   <p class="text-sm text-church-text leading-relaxed mb-3">{{ content() }}</p>
   <div class="flex items-center justify-between">
-    <button (click)="pray.emit()" class="flex items-center gap-1.5 text-xs font-medium transition-colors"
+    <button type="button" (click)="$event.stopPropagation(); $event.preventDefault(); pray.emit()" class="flex items-center gap-1.5 text-xs font-medium transition-colors"
       [class]="isAnswered() ? 'text-church-green' : isLiked() ? 'text-church-red' : 'text-church-blue'">
       <nz-icon
         [nzType]="isAnswered() ? 'like' : 'heart'"
         [nzTheme]="isLiked() && !isAnswered() ? 'fill' : 'outline'" />
       {{ prayerCount() }} {{ isAnswered() ? 'louent Dieu' : 'prient' }}
     </button>
-    <button (click)="share.emit()" class="flex items-center gap-1.5 text-church-text-secondary text-xs">
+    <button type="button" (click)="$event.stopPropagation(); $event.preventDefault(); share.emit()" class="flex items-center gap-1.5 text-church-text-secondary text-xs">
       <nz-icon nzType="share-alt" nzTheme="outline" /> Partager
     </button>
   </div>

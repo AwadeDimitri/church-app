@@ -1,30 +1,8 @@
 <div class="px-5 safe-area-top pb-28">
-  <!-- Header avec back -->
-  <div class="flex items-center gap-3 mb-6">
-    @if (book(); as b) {
-      <a
-        [routerLink]="['/bible', b.slug]"
-        class="w-10 h-10 rounded-full bg-white shadow-church-card flex items-center justify-center active:bg-slate-50"
-        aria-label="Retour au livre">
-        <nz-icon nzType="left" nzTheme="outline" class="text-church-text" />
-      </a>
-      <div>
-        <h1 class="text-2xl font-bold text-church-text leading-tight">
-          {{ b.name }} {{ chapter() }}
-        </h1>
-        <p class="text-xs text-church-text-secondary">
-          {{ b.testament === 1 ? 'Ancien Testament' : 'Nouveau Testament' }}
-        </p>
-      </div>
-    } @else {
-      <a
-        routerLink="/bible"
-        class="w-10 h-10 rounded-full bg-white shadow-church-card flex items-center justify-center active:bg-slate-50"
-        aria-label="Retour">
-        <nz-icon nzType="left" nzTheme="outline" class="text-church-text" />
-      </a>
-    }
-  </div>
+  <app-page-header
+    [title]="headerTitle()"
+    [subtitle]="headerSubtitle()"
+    [backLink]="true" />
 
   <!-- Loading livres -->
   @if (booksLoading()) {
@@ -54,11 +32,17 @@
   @if (book() && verses().length > 0) {
     <article class="bg-white rounded-church-sm p-5 shadow-church-card">
       <div class="text-base leading-relaxed text-church-text">
-        @for (v of verses(); track v.verse) {
-          <span class="inline">
-            <sup class="text-church-blue font-bold text-xs mr-1 select-none">{{ v.verse }}</sup>{{ v.text }}
-          </span>
-          {{ ' ' }}
+        @for (v of verses(); track v.verse; let first = $first) {
+          @if (first) {
+            <p class="mb-2 flex items-center gap-3">
+              <span class="text-church-red font-serif text-7xl leading-none select-none shrink-0">{{ chapter() }}</span>
+              <span>{{ v.text }}</span>
+            </p>
+          } @else {
+            <p class="mb-2 last:mb-0">
+              <sup class="text-church-red font-bold text-xs mr-1 select-none">{{ v.verse }}</sup>{{ v.text }}
+            </p>
+          }
         }
       </div>
     </article>

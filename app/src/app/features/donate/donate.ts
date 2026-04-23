@@ -1,6 +1,7 @@
 import { Component, ChangeDetectionStrategy, signal } from '@angular/core';
 import { NzIconDirective } from 'ng-zorro-antd/icon';
 import { Button } from '@shared/components/button/button';
+import { PageHeader } from '@shared/components/page-header/page-header';
 
 interface PaymentOption {
   readonly icon: string;
@@ -12,7 +13,7 @@ interface PaymentOption {
 
 @Component({
   selector: 'app-donate',
-  imports: [NzIconDirective, Button],
+  imports: [NzIconDirective, Button, PageHeader],
   templateUrl: './donate.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

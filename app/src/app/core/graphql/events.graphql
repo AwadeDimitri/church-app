@@ -18,11 +18,12 @@ query GetEvents($limit: Int = 20, $offset: Int = 0) {
   }
 }
 
-query GetUpcomingEvents($now: Datetime!) {
+query GetUpcomingEvents($now: Datetime!, $limit: Int = 20, $offset: Int = 0) {
   eventsCollection(
     filter: { starts_at: { gte: $now } }
     orderBy: [{ starts_at: AscNullsLast }]
-    first: 5
+    first: $limit
+    offset: $offset
   ) {
     edges {
       node {

@@ -2,6 +2,10 @@
 @use 'tailwindcss';
 
 @theme {
+  /* Typography — switch between 'Inter' and 'Plus Jakarta Sans' to compare */
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  // --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+
   /* Heritage palette — inspired by CI-JCM logo */
   --color-church-blue: #1A2B6D;
   --color-church-blue-light: #E8EBF5;
@@ -24,6 +28,14 @@
   /* Shadows */
   --shadow-church-card: 0 2px 12px rgba(26, 43, 109, 0.08);
   --shadow-church-elevated: 0 8px 32px rgba(26, 43, 109, 0.14);
+}
+
+/* Force font globally (body + ng-zorro override) */
+body {
+  font-family: var(--font-sans);
+}
+:root {
+  --ant-font-family: var(--font-sans);
 }
 
 /* Glass morphism */

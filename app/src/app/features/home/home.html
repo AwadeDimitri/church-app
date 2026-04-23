@@ -2,7 +2,9 @@
   <!-- Header -->
   <div class="flex justify-between items-center mb-6">
     <div>
-      <p class="text-church-text-secondary text-base">Bienvenue 👋, Florence AWADE</p>
+      <p class="text-church-text-secondary text-base">
+        Bienvenue 👋@if (firstName(); as name) {, {{ name }}}
+      </p>
       <h1 class="text-2xl font-bold text-red text-church-text">Église CI-JCM</h1>
     </div>
     <div class="flex gap-3">
@@ -41,42 +43,54 @@
   </div>
 
   <!-- Upcoming Events -->
-  <div class="mb-6">
-    <app-section-header title="Événements à venir" actionLabel="Voir tout" />
-    <div class="scroll-snap-x flex gap-3">
-      @for (event of events; track event.title) {
-        <div class="min-w-[260px] bg-white rounded-church-sm p-4 shadow-church-card">
-          <div class="flex items-center gap-2 mb-2">
-            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full" [class]="event.dayBg + ' ' + event.dayText">
-              {{ event.day }}
-            </span>
-            <span class="text-xs text-church-text-secondary">{{ event.date }}</span>
+  @if (upcomingEvents().length > 0) {
+    <div class="mb-6">
+      <app-section-header title="Événements à venir" actionLabel="Voir tout" (action)="goToEvents()" />
+      <div class="scroll-snap-x flex gap-3">
+        @for (event of upcomingEvents(); track event.id) {
+          <div class="min-w-[260px] bg-white rounded-church-sm p-4 shadow-church-card">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full" [class]="event.dayBg + ' ' + event.dayText">
+                {{ event.day }}
+              </span>
+              <span class="text-xs text-church-text-secondary">{{ event.date }}</span>
+            </div>
+            <h4 class="font-semibold text-church-text mb-1">{{ event.title }}</h4>
+            @if (event.description) {
+              <p class="text-xs text-church-text-secondary">{{ event.description }}</p>
+            }
+            @if (event.location) {
+              <div class="flex items-center gap-1 mt-3 text-church-text-secondary">
+                <nz-icon nzType="environment" nzTheme="outline" class="text-sm" />
+                <span class="text-xs">{{ event.location }}</span>
+              </div>
+            }
           </div>
-          <h4 class="font-semibold text-church-text mb-1">{{ event.title }}</h4>
-          <p class="text-xs text-church-text-secondary">{{ event.description }}</p>
-          <div class="flex items-center gap-1 mt-3 text-church-text-secondary">
-            <nz-icon [nzType]="event.icon" nzTheme="outline" class="text-sm" />
-            <span class="text-xs">{{ event.location }}</span>
-          </div>
-        </div>
-      }
+        }
+      </div>
     </div>
-  </div>
+  }
 
   <!-- Latest Sermons -->
-  <div class="mb-6">
-    <app-section-header title="Derniers sermons" actionLabel="Voir tout" />
-    <div class="flex flex-col gap-3">
-      @for (sermon of sermons; track sermon.title) {
-        <app-sermon-card
-          [title]="sermon.title"
-          [speaker]="sermon.speaker"
-          [duration]="sermon.duration"
-          [date]="sermon.date"
-          [color]="sermon.color" />
-      }
+  @if (latestSermons().length > 0) {
+    <div class="mb-6">
+      <app-section-header title="Derniers sermons" actionLabel="Voir tout" (action)="goToSermons()" />
+      <div class="flex flex-col gap-3">
+        @for (sermon of latestSermons(); track sermon.id) {
+          <app-sermon-card
+            [title]="sermon.title"
+            [speaker]="sermon.speaker"
+            [duration]="sermon.duration"
+            [date]="sermon.date"
+            [color]="sermon.color"
+            [thumbnailUrl]="sermon.thumbnailUrl"
+            [audioUrl]="sermon.audioUrl"
+            [showPlayButton]="true"
+            (play)="openSermon(sermon.id)" />
+        }
+      </div>
     </div>
-  </div>
+  }
 
   <!-- Community -->
   <div class="mb-8">

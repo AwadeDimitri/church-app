@@ -1,7 +1,8 @@
-query GetSermons($limit: Int = 10, $offset: Int = 0) {
+query GetSermons($limit: Int = 10, $offset: Int = 0, $filter: sermonsFilter) {
   sermonsCollection(
     first: $limit
     offset: $offset
+    filter: $filter
     orderBy: [{ published_at: DescNullsLast }]
   ) {
     edges {

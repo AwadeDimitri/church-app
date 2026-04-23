@@ -3,6 +3,7 @@ import { toSignal, toObservable } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { NzIconDirective } from 'ng-zorro-antd/icon';
 import { combineLatest, filter, switchMap } from 'rxjs';
+import { PageHeader } from '@shared/components/page-header/page-header';
 import { BibleService, type BibleVerse } from '@core/services/bible.service';
 
 interface ChapterNav {
@@ -13,7 +14,7 @@ interface ChapterNav {
 
 @Component({
   selector: 'app-bible-chapter',
-  imports: [RouterLink, NzIconDirective],
+  imports: [RouterLink, NzIconDirective, PageHeader],
   templateUrl: './bible-chapter.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -56,6 +57,17 @@ export default class BibleChapter {
     if (ch < book.chapter_count) return { slug: book.slug, chapter: ch + 1, bookName: book.name };
     const next = this.bibleService.books().find(b => b.position === book.position + 1);
     return next ? { slug: next.slug, chapter: 1, bookName: next.name } : null;
+  });
+
+  readonly headerTitle = computed(() => {
+    const b = this.book();
+    return b ? `${b.name} ${this.chapter()}` : 'Chapitre';
+  });
+
+  readonly headerSubtitle = computed(() => {
+    const b = this.book();
+    if (!b) return '';
+    return b.testament === 1 ? 'Ancien Testament' : 'Nouveau Testament';
   });
 
   readonly notFound = computed(() => !this.booksLoading() && !this.book());

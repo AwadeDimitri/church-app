@@ -50,12 +50,26 @@ export const routes: Routes = [
           import('./features/sermons/sermon-detail/sermon-detail'),
       },
       {
+        path: 'events',
+        loadComponent: () => import('./features/events/events'),
+      },
+      {
         path: 'donate',
         loadComponent: () => import('./features/donate/donate'),
       },
       {
         path: 'prayer',
         loadComponent: () => import('./features/prayer/prayer'),
+      },
+      {
+        path: 'prayer/new',
+        loadComponent: () =>
+          import('./features/prayer/prayer-new/prayer-new'),
+      },
+      {
+        path: 'prayer/:id',
+        loadComponent: () =>
+          import('./features/prayer/prayer-detail/prayer-detail'),
       },
       {
         path: 'bible',

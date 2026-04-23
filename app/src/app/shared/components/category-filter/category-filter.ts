@@ -1,4 +1,10 @@
-import { Component, ChangeDetectionStrategy, input, output, model } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  input,
+  output,
+  model,
+} from '@angular/core';
 
 @Component({
   selector: 'app-category-filter',
@@ -7,9 +13,12 @@ import { Component, ChangeDetectionStrategy, input, output, model } from '@angul
       @for (category of categories(); track category) {
         <button
           (click)="selected.set(category)"
-          [class]="category === selected()
-            ? 'shrink-0 bg-church-blue text-white text-xs font-semibold px-4 py-2 rounded-full'
-            : 'shrink-0 bg-white text-church-text-secondary text-xs font-semibold px-4 py-2 rounded-full shadow-church-card'">
+          [class]="
+            category === selected()
+              ? 'shrink-0 bg-church-blue text-white! text-xs font-semibold px-4 py-2 rounded-full'
+              : 'shrink-0 bg-white text-church-text-secondary text-xs font-semibold px-4 py-2 rounded-full shadow-church-card'
+          "
+        >
           {{ category }}
         </button>
       }

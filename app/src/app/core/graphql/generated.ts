@@ -910,8 +910,6 @@ export type Bible_VersesConnection = {
   __typename?: 'bible_versesConnection';
   edges: Array<Bible_VersesEdge>;
   pageInfo: PageInfo;
-  /** The total number of records matching the `filter` criteria */
-  totalCount: Scalars['Int']['output'];
 };
 
 export type Bible_VersesDeleteResponse = {
@@ -2077,6 +2075,8 @@ export type GetEventsQuery = { __typename?: 'Query', eventsCollection?: { __type
 
 export type GetUpcomingEventsQueryVariables = Exact<{
   now: Scalars['Datetime']['input'];
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
 
@@ -2098,6 +2098,14 @@ export type GetPrayerRequestsQueryVariables = Exact<{
 
 
 export type GetPrayerRequestsQuery = { __typename?: 'Query', prayer_requestsCollection?: { __typename?: 'prayer_requestsConnection', edges: Array<{ __typename?: 'prayer_requestsEdge', node: { __typename?: 'prayer_requests', id: string, content: string, is_anonymous: boolean, is_answered: boolean, created_at: string, category?: { __typename?: 'categories', id: string, slug: string, name: string, color: string } | null, author?: { __typename?: 'users', id: string, full_name: string } | null, likes?: { __typename?: 'prayer_likesConnection', totalCount: number } | null, my_likes?: { __typename?: 'prayer_likesConnection', edges: Array<{ __typename?: 'prayer_likesEdge', node: { __typename?: 'prayer_likes', user_id: string } }> } | null } }> } | null };
+
+export type GetPrayerRequestQueryVariables = Exact<{
+  id: Scalars['UUID']['input'];
+  userId: Scalars['UUID']['input'];
+}>;
+
+
+export type GetPrayerRequestQuery = { __typename?: 'Query', prayer_requestsCollection?: { __typename?: 'prayer_requestsConnection', edges: Array<{ __typename?: 'prayer_requestsEdge', node: { __typename?: 'prayer_requests', id: string, content: string, is_anonymous: boolean, is_answered: boolean, created_at: string, category?: { __typename?: 'categories', id: string, slug: string, name: string, color: string } | null, author?: { __typename?: 'users', id: string, full_name: string } | null, likes?: { __typename?: 'prayer_likesConnection', totalCount: number } | null, my_likes?: { __typename?: 'prayer_likesConnection', edges: Array<{ __typename?: 'prayer_likesEdge', node: { __typename?: 'prayer_likes', user_id: string } }> } | null } }> } | null };
 
 export type GetMyPrayerRequestsQueryVariables = Exact<{
   userId: Scalars['UUID']['input'];
@@ -2144,6 +2152,7 @@ export type UnlikePrayerMutation = { __typename?: 'Mutation', deleteFromprayer_l
 export type GetSermonsQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
+  filter?: InputMaybe<SermonsFilter>;
 }>;
 
 
@@ -2201,11 +2210,12 @@ export const GetEventsDocument = gql`
     }
   }
 export const GetUpcomingEventsDocument = gql`
-    query GetUpcomingEvents($now: Datetime!) {
+    query GetUpcomingEvents($now: Datetime!, $limit: Int = 20, $offset: Int = 0) {
   eventsCollection(
     filter: {starts_at: {gte: $now}}
     orderBy: [{starts_at: AscNullsLast}]
-    first: 5
+    first: $limit
+    offset: $offset
   ) {
     edges {
       node {
@@ -2310,6 +2320,52 @@ export const GetPrayerRequestsDocument = gql`
   export class GetPrayerRequestsGQL extends Apollo.Query<GetPrayerRequestsQuery, GetPrayerRequestsQueryVariables> {
     override document = GetPrayerRequestsDocument;
     
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const GetPrayerRequestDocument = gql`
+    query GetPrayerRequest($id: UUID!, $userId: UUID!) {
+  prayer_requestsCollection(filter: {id: {eq: $id}}, first: 1) {
+    edges {
+      node {
+        id
+        content
+        is_anonymous
+        is_answered
+        created_at
+        category: categories {
+          id
+          slug
+          name
+          color
+        }
+        author: users {
+          id
+          full_name
+        }
+        likes: prayer_likesCollection {
+          totalCount
+        }
+        my_likes: prayer_likesCollection(filter: {user_id: {eq: $userId}}, first: 1) {
+          edges {
+            node {
+              user_id
+            }
+          }
+        }
+      }
+    }
+  }
+}
+    `;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class GetPrayerRequestGQL extends Apollo.Query<GetPrayerRequestQuery, GetPrayerRequestQueryVariables> {
+    override document = GetPrayerRequestDocument;
+
     constructor(apollo: Apollo.Apollo) {
       super(apollo);
     }
@@ -2481,10 +2537,11 @@ export const UnlikePrayerDocument = gql`
     }
   }
 export const GetSermonsDocument = gql`
-    query GetSermons($limit: Int = 10, $offset: Int = 0) {
+    query GetSermons($limit: Int = 10, $offset: Int = 0, $filter: sermonsFilter) {
   sermonsCollection(
     first: $limit
     offset: $offset
+    filter: $filter
     orderBy: [{published_at: DescNullsLast}]
   ) {
     edges {

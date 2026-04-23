@@ -1,13 +1,14 @@
 import { Component, ChangeDetectionStrategy, inject, signal, computed } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { NzIconDirective } from 'ng-zorro-antd/icon';
+import { PageHeader } from '@shared/components/page-header/page-header';
 import { BibleService } from '@core/services/bible.service';
 
 type Testament = 1 | 2;
 
 @Component({
   selector: 'app-bible',
-  imports: [RouterLink, NzIconDirective],
+  imports: [RouterLink, NzIconDirective, PageHeader],
   templateUrl: './bible.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

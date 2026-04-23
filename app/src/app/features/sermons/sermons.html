@@ -1,8 +1,5 @@
 <div class="px-5 safe-area-top">
-  <!-- Header -->
-  <div class="mb-6">
-    <h1 class="text-2xl font-bold text-church-text">Sermons</h1>
-  </div>
+  <app-page-header title="Sermons" backLink="/" />
 
   <!-- Search -->
   <div class="relative mb-5">
@@ -34,6 +31,18 @@
     </div>
   }
 
+  <!-- Empty: no results for current search/filter -->
+  @if (!loading() && !error() && allSermons().length === 0) {
+    <div class="flex flex-col items-center justify-center py-16">
+      <nz-icon nzType="sound" nzTheme="outline" class="text-4xl text-church-text-secondary mb-3" />
+      @if (activeSearch()) {
+        <p class="text-sm text-church-text-secondary">Aucun résultat pour « {{ activeSearch() }} »</p>
+      } @else {
+        <p class="text-sm text-church-text-secondary">Aucun sermon disponible pour le moment.</p>
+      }
+    </div>
+  }
+
   <!-- Content -->
   @if (allSermons().length > 0 && !error()) {
     <!-- Featured Sermon -->
@@ -41,7 +50,7 @@
       <button (click)="openSermon(sermon.id)" class="w-full text-left bg-gradient-to-br from-church-blue to-church-blue-dark rounded-church p-5 mb-6 text-white relative overflow-hidden z-0">
         <div class="absolute bottom-0 right-0 w-40 h-40 bg-white/5 rounded-full translate-y-1/2 translate-x-8 pointer-events-none"></div>
         <span class="text-[10px] font-bold uppercase tracking-wider bg-church-gold text-white px-2 py-0.5 rounded-full">À la une</span>
-        <h3 class="text-lg font-bold mt-3 mb-1">{{ sermon.title }}</h3>
+        <h3 class="text-lg font-bold text-white/90! mt-5 mb-1">{{ sermon.title }}</h3>
         <p class="text-sm text-white/70 mb-1">{{ sermon.preacher_name }}</p>
         <div class="flex items-center gap-3 text-xs text-white/60 mb-4">
           @if (sermon.duration) {
@@ -75,13 +84,15 @@
           [speaker]="sermon.preacher_name"
           [duration]="sermon.duration ?? 0"
           [date]="(sermon.published_at | date:'d MMM yyyy') ?? ''"
+          [thumbnailUrl]="getThumbnail(sermon.video_url)"
+          [audioUrl]="sermon.audio_url"
           [showPlayButton]="true"
           (play)="openSermon(sermon.id)" />
       }
     </div>
 
     @if (hasMore()) {
-      <div class="flex justify-end">
+      <div class="flex justify-end mb-6">
         <button
           type="button"
           (click)="loadMore()"

@@ -3,6 +3,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { map, tap } from 'rxjs';
 import {
   GetPrayerRequestsGQL,
+  GetPrayerRequestGQL,
   GetPrayerStatsGQL,
   GetPrayerCategoriesGQL,
   CreatePrayerRequestGQL,
@@ -36,6 +37,7 @@ const EMPTY_UUID = '00000000-0000-0000-0000-000000000000';
 export class PrayerService {
   private readonly authService = inject(AuthService);
   private readonly getPrayersGQL = inject(GetPrayerRequestsGQL);
+  private readonly getPrayerGQL = inject(GetPrayerRequestGQL);
   private readonly getStatsGQL = inject(GetPrayerStatsGQL);
   private readonly getCategoriesGQL = inject(GetPrayerCategoriesGQL);
   private readonly createPrayerGQL = inject(CreatePrayerRequestGQL);
@@ -107,6 +109,18 @@ export class PrayerService {
     this._offset.set(0);
     this._hasMore.set(true);
     this.loadMore();
+  }
+
+  getById(id: string) {
+    const userId = this.authService.user()?.id ?? EMPTY_UUID;
+    return this.getPrayerGQL
+      .watch({ variables: { id, userId } })
+      .valueChanges.pipe(
+        map(
+          (r): PrayerRequest | null =>
+            unwrapNodes<PrayerRequest>(r.data?.prayer_requestsCollection)[0] ?? null,
+        ),
+      );
   }
 
   create(content: string, categoryId: string, isAnonymous: boolean) {

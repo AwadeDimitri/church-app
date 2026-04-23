@@ -1,0 +1,86 @@
+<div class="px-5 safe-area-top">
+  <app-page-header title="Événements" backLink="/" />
+
+  <!-- Loading initial -->
+  @if (loading() && events().length === 0) {
+    <div class="flex flex-col items-center justify-center py-16">
+      <nz-icon nzType="calendar" nzTheme="outline" class="text-4xl text-church-blue animate-pulse mb-3" />
+      <p class="text-sm text-church-text-secondary">Chargement des événements...</p>
+    </div>
+  }
+
+  <!-- Error -->
+  @if (error(); as err) {
+    <div class="bg-red-50 rounded-church-sm p-5 text-center">
+      <nz-icon nzType="info-circle" nzTheme="outline" class="text-2xl text-church-red mb-2" />
+      <p class="text-sm text-church-red">{{ err }}</p>
+    </div>
+  }
+
+  <!-- Empty -->
+  @if (!loading() && !error() && events().length === 0) {
+    <div class="flex flex-col items-center justify-center py-16">
+      <nz-icon nzType="calendar" nzTheme="outline" class="text-4xl text-church-text-secondary mb-3" />
+      <p class="text-sm text-church-text-secondary">Aucun événement prévu pour le moment.</p>
+    </div>
+  }
+
+  <!-- List -->
+  @if (events().length > 0) {
+    <div class="flex flex-col gap-4 mb-6">
+      @for (event of events(); track event.id) {
+        <article class="bg-white rounded-church shadow-church-card overflow-hidden">
+          @if (event.coverUrl) {
+            <div class="relative h-36 bg-slate-100">
+              <img
+                [src]="event.coverUrl"
+                [alt]="event.title"
+                class="w-full h-full object-cover"
+                loading="lazy"
+              />
+              <div class="absolute top-3 left-3 bg-white/95 backdrop-blur rounded-xl px-3 py-1.5 shadow text-center">
+                <div class="text-[10px] font-semibold text-church-red leading-none">{{ event.month }}</div>
+                <div class="text-lg font-bold text-church-text leading-tight">{{ event.dayNumber }}</div>
+              </div>
+            </div>
+          }
+          <div class="p-4 flex gap-3">
+            @if (!event.coverUrl) {
+              <div class="shrink-0 w-14 h-14 bg-church-blue-light rounded-xl flex flex-col items-center justify-center">
+                <span class="text-[10px] font-semibold text-church-blue leading-none">{{ event.month }}</span>
+                <span class="text-lg font-bold text-church-blue leading-tight mt-0.5">{{ event.dayNumber }}</span>
+              </div>
+            }
+            <div class="flex-1 min-w-0">
+              <h3 class="font-semibold text-church-text leading-tight">{{ event.title }}</h3>
+              <p class="text-xs text-church-text-secondary mt-1">{{ event.fullDate }} • {{ event.timeRange }}</p>
+              @if (event.description) {
+                <p class="text-sm text-church-text-secondary mt-2 line-clamp-2">{{ event.description }}</p>
+              }
+              @if (event.location) {
+                <div class="flex items-center gap-1 mt-2 text-church-text-secondary">
+                  <nz-icon nzType="environment" nzTheme="outline" class="text-sm" />
+                  <span class="text-xs">{{ event.location }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        </article>
+      }
+    </div>
+
+    @if (hasMore()) {
+      <div class="flex justify-end mb-6">
+        <button
+          type="button"
+          (click)="loadMore()"
+          [disabled]="loading()"
+          class="inline-flex items-center gap-1 !text-church-blue text-xs underline underline-offset-2 disabled:opacity-50 disabled:pointer-events-none"
+        >
+          {{ loading() ? 'Chargement...' : 'Charger plus' }}
+          <nz-icon nzType="arrow-right" nzTheme="outline" />
+        </button>
+      </div>
+    }
+  }
+</div>

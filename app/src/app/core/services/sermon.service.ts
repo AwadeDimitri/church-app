@@ -7,6 +7,7 @@ import {
   GetSermonCategoriesGQL,
   type GetSermonsQuery,
   type GetSermonCategoriesQuery,
+  type SermonsFilter,
 } from '@core/graphql/generated';
 import { unwrapNodes } from '@core/graphql/unwrap';
 
@@ -31,11 +32,15 @@ export class SermonService {
   private readonly _hasMore = signal(true);
   private readonly _error = signal<string | null>(null);
   private readonly _offset = signal(0);
+  private readonly _search = signal('');
+  private readonly _categoryId = signal<string | null>(null);
 
   readonly sermons = this._sermons.asReadonly();
   readonly loading = this._loading.asReadonly();
   readonly hasMore = this._hasMore.asReadonly();
   readonly error = this._error.asReadonly();
+  readonly search = this._search.asReadonly();
+  readonly categoryId = this._categoryId.asReadonly();
 
   private readonly categoriesResult = this.getCategoriesGQL.watch().valueChanges;
   readonly categories = toSignal(
@@ -49,13 +54,40 @@ export class SermonService {
     this.loadMore();
   }
 
+  setSearch(query: string): void {
+    const next = query.trim();
+    if (next === this._search()) return;
+    this._search.set(next);
+    this.resetAndReload();
+  }
+
+  setCategoryId(id: string | null): void {
+    if (id === this._categoryId()) return;
+    this._categoryId.set(id);
+    this.resetAndReload();
+  }
+
+  private resetAndReload(): void {
+    this._sermons.set([]);
+    this._offset.set(0);
+    this._hasMore.set(true);
+    this._error.set(null);
+    this.loadMore();
+  }
+
   loadMore(): void {
     if (this._loading() || !this._hasMore()) return;
     this._loading.set(true);
     this._error.set(null);
 
     this.getSermonsGQL
-      .fetch({ variables: { limit: PAGE_SIZE, offset: this._offset() } })
+      .fetch({
+        variables: {
+          limit: PAGE_SIZE,
+          offset: this._offset(),
+          filter: this.buildFilter(),
+        },
+      })
       .subscribe({
         next: r => {
           const batch = unwrapNodes<Sermon>(r.data?.sermonsCollection);
@@ -76,6 +108,30 @@ export class SermonService {
     this._offset.set(0);
     this._hasMore.set(true);
     this.loadMore();
+  }
+
+  private buildFilter(): SermonsFilter | undefined {
+    const clauses: SermonsFilter[] = [];
+
+    const query = this._search();
+    if (query) {
+      const pattern = `%${query}%`;
+      clauses.push({
+        or: [
+          { title: { ilike: pattern } },
+          { preacher_name: { ilike: pattern } },
+        ],
+      });
+    }
+
+    const categoryId = this._categoryId();
+    if (categoryId) {
+      clauses.push({ category_id: { eq: categoryId } });
+    }
+
+    if (clauses.length === 0) return undefined;
+    if (clauses.length === 1) return clauses[0];
+    return { and: clauses };
   }
 
   getById(id: string) {

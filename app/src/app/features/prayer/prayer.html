@@ -1,8 +1,5 @@
 <div class="px-5 safe-area-top">
-  <!-- Header -->
-  <div class="mb-6">
-    <h1 class="text-2xl font-bold text-church-text">Prières</h1>
-  </div>
+  <app-page-header title="Prières" backLink="/" />
 
   <!-- Stats -->
   <div class="grid grid-cols-3 gap-3 mb-6">
@@ -28,45 +25,12 @@
   }
 
   @if (!error() && (!loading() || allPrayers().length > 0)) {
-    <!-- My Prayer -->
-    <form [formGroup]="form" (ngSubmit)="submitPrayer()" class="bg-gradient-to-r from-church-blue-light to-blue-50 rounded-church p-5 mb-6">
-      <div class="flex items-center gap-3 mb-3">
-        <div class="w-10 h-10 bg-church-blue rounded-full flex items-center justify-center">
-          <nz-icon nzType="edit" nzTheme="outline" class="text-white" />
-        </div>
-        <div>
-          <h3 class="font-semibold text-church-text">Partagez votre prière</h3>
-          <p class="text-xs text-church-text-secondary">La communauté prie avec vous</p>
-        </div>
-      </div>
-      <textarea
-        placeholder="Écrivez votre sujet de prière..."
-        rows="3"
-        formControlName="content"
-        class="w-full bg-white rounded-xl p-3 text-sm border-none outline-none resize-none focus:ring-2 focus:ring-church-blue/20"
-      ></textarea>
-      @if (form.controls.content.touched && form.controls.content.invalid) {
-        <p class="text-xs text-church-red mt-1 px-1">Merci d'écrire votre sujet de prière</p>
-      }
-      <div class="flex justify-between items-center mt-3">
-        <div class="flex items-center gap-3">
-          <select
-            formControlName="categoryId"
-            class="text-xs bg-white rounded-full px-3 py-1.5 border border-gray-200 outline-none">
-            @for (cat of serviceCategories(); track cat.id) {
-              <option [value]="cat.id">{{ cat.name }}</option>
-            }
-          </select>
-          <label class="flex items-center gap-2 text-xs text-church-text-secondary">
-            <input type="checkbox" formControlName="isAnonymous" class="rounded accent-church-blue" />
-            Anonyme
-          </label>
-        </div>
-        <app-button variant="primary" type="submit" [disabled]="submitting()">
-          <nz-icon nzType="send" nzTheme="outline" /> Envoyer
-        </app-button>
-      </div>
-    </form>
+    <!-- CTA ajouter une prière -->
+    <div class="mb-6" (click)="goToNew()">
+      <app-button variant="primary" size="lg" shape="rounded" [fullWidth]="true">
+        <nz-icon nzType="plus" nzTheme="outline" /> Ajouter une prière
+      </app-button>
+    </div>
 
     <!-- Filter -->
     <app-category-filter [categories]="filterCategories()" [(selected)]="selectedCategory" />
@@ -82,18 +46,20 @@
     <!-- Prayer Requests -->
     <div class="flex flex-col gap-3 mb-6">
       @for (prayer of prayers(); track prayer.id; let i = $index) {
-        <app-prayer-card
-          [author]="getAuthorName(prayer)"
-          [content]="prayer.content"
-          [date]="(prayer.created_at | date:'d MMM yyyy') ?? ''"
-          [category]="prayer.category?.name ?? ''"
-          [prayerCount]="prayer.likes?.totalCount ?? 0"
-          [isAnswered]="prayer.is_answered"
-          [isLiked]="isLikedByMe(prayer)"
-          [avatarColor]="getAvatarColor(i)"
-          [categoryColor]="getCategoryColor(prayer.category?.color ?? '')"
-          (pray)="togglePray(prayer)"
-          (share)="onShare(prayer)" />
+        <a [routerLink]="['/prayer', prayer.id]" class="block active:opacity-80 transition-opacity">
+          <app-prayer-card
+            [author]="getAuthorName(prayer)"
+            [content]="prayer.content"
+            [date]="(prayer.created_at | date:'d MMM yyyy') ?? ''"
+            [category]="prayer.category?.name ?? ''"
+            [prayerCount]="prayer.likes?.totalCount ?? 0"
+            [isAnswered]="prayer.is_answered"
+            [isLiked]="isLikedByMe(prayer)"
+            [avatarColor]="getAvatarColor(i)"
+            [categoryColor]="getCategoryColor(prayer.category?.color ?? '')"
+            (pray)="togglePray(prayer)"
+            (share)="onShare(prayer)" />
+        </a>
       }
     </div>
 
