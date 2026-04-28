@@ -110,7 +110,10 @@ export const appConfig: ApplicationConfig = {
     provideApollo(() => {
       const httpLink = inject(HttpLink);
       return {
-        link: httpLink.create({ uri: environment.apiUrl }),
+        link: httpLink.create({
+          uri: environment.apiUrl,
+          useGETForQueries: true,
+        }),
         cache: new InMemoryCache(),
       };
     }),

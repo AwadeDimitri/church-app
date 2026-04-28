@@ -37,14 +37,14 @@
   ],
   "dataGroups": [
     {
-      "name": "api-freshness",
+      "name": "supabase-graphql",
       "urls": [
-        "/graphql"
+        "https://uoktiyfxlqzvoscusowd.supabase.co/graphql/v1**"
       ],
       "cacheConfig": {
         "strategy": "freshness",
-        "maxSize": 100,
-        "maxAge": "1h",
+        "maxSize": 200,
+        "maxAge": "7d",
         "timeout": "5s"
       }
     }

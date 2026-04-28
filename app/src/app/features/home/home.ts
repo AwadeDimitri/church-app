@@ -90,7 +90,7 @@ export default class Home {
     { icon: 'dollar-circle', label: 'Donner',      route: '/donate', bg: 'bg-church-blue-light', text: 'text-church-blue' },
     { icon: 'heart',         label: 'Prière',       route: '/prayer', bg: 'bg-church-red-light',  text: 'text-church-red' },
     { icon: 'calendar',      label: 'Événements',   route: '/events', bg: 'bg-amber-50',          text: 'text-church-gold' },
-    { icon: 'book',          label: 'Bible',        route: '/bible',  bg: 'bg-green-50',          text: 'text-church-green' },
+    { icon: 'play-circle',   label: 'Sermons',      route: '/sermons', bg: 'bg-green-50',         text: 'text-church-green' },
   ];
 
   openSermon(id: string): void {

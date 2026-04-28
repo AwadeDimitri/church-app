@@ -37,6 +37,7 @@ export interface DailyVerse {
 export interface DailyVerseDisplay {
   readonly text: string;
   readonly reference: string;
+  readonly route: readonly [string, string, number] | null;
 }
 
 export interface LastReading {
@@ -88,7 +89,10 @@ export class BibleService {
     const reference = book
       ? `${book.name} ${verse.chapter}:${verse.verse}`
       : `${verse.chapter}:${verse.verse}`;
-    return { text: verse.text, reference };
+    const route = book
+      ? (['/bible', book.slug, verse.chapter] as const)
+      : null;
+    return { text: verse.text, reference, route };
   });
 
   constructor() {

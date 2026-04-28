@@ -95,18 +95,27 @@
   <!-- Community -->
   <div class="mb-8">
     <app-section-header title="Communauté" />
-    <div class="bg-gradient-to-r from-church-gold/10 to-amber-50 rounded-church-sm p-5">
-      <div class="flex items-center gap-3 mb-3">
-        <nz-icon nzType="fire" nzTheme="outline" class="text-2xl text-church-gold" />
-        <h4 class="font-semibold text-church-text">Verset du jour</h4>
-      </div>
-      @if (dailyVerse(); as verse) {
+    @if (dailyVerse(); as verse) {
+      <a
+        [routerLink]="verse.route"
+        class="block bg-gradient-to-r from-church-gold/10 to-amber-50 rounded-church-sm p-5 active:opacity-80 transition-opacity"
+      >
+        <div class="flex items-center gap-3 mb-3">
+          <nz-icon nzType="fire" nzTheme="outline" class="text-2xl text-church-gold" />
+          <h4 class="font-semibold text-church-text">Verset du jour</h4>
+        </div>
         <p class="text-sm text-church-text italic leading-relaxed">« {{ verse.text }} »</p>
         <p class="text-xs text-church-text-secondary mt-2 font-medium">{{ verse.reference }}</p>
-      } @else {
+      </a>
+    } @else {
+      <div class="bg-gradient-to-r from-church-gold/10 to-amber-50 rounded-church-sm p-5">
+        <div class="flex items-center gap-3 mb-3">
+          <nz-icon nzType="fire" nzTheme="outline" class="text-2xl text-church-gold" />
+          <h4 class="font-semibold text-church-text">Verset du jour</h4>
+        </div>
         <div class="h-4 bg-church-text/10 rounded animate-pulse mb-2"></div>
         <div class="h-4 bg-church-text/10 rounded animate-pulse w-3/4"></div>
-      }
-    </div>
+      </div>
+    }
   </div>
 </div>
