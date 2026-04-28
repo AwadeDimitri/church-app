@@ -4,7 +4,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import {
   NonNullableFormBuilder,
   ReactiveFormsModule,
@@ -19,6 +19,12 @@ import {
   passwordSignInPageEvents,
   oauthSignInPageEvents,
 } from '@features/auth/data-access';
+
+const REASON_MESSAGES: Record<string, string> = {
+  prayer:
+    'Connectez-vous pour partager vos sujets de prière avec la communauté.',
+  profile: 'Connectez-vous pour accéder à votre profil.',
+};
 
 @Component({
   selector: 'app-login',
@@ -43,10 +49,16 @@ import {
         <h1 class="text-2xl font-bold text-church-text text-center">
           Connectez-vous
         </h1>
-        <p class="text-sm text-center text-church-text-secondary mt-2">
-          Entrer un email et mot de passe valide pour se connecter à votre
-          compte.
-        </p>
+        @if (reasonMessage) {
+          <p class="text-sm text-center text-church-text mt-2">
+            {{ reasonMessage }}
+          </p>
+        } @else {
+          <p class="text-sm text-center text-church-text-secondary mt-2">
+            Entrer un email et mot de passe valide pour se connecter à votre
+            compte.
+          </p>
+        }
       </div>
 
       <form
@@ -162,6 +174,13 @@ import {
           S'inscrire
         </a>
       </p>
+
+      <a
+        routerLink="/home"
+        class="text-center text-xs text-church-text-secondary mt-4 active:text-church-blue"
+      >
+        Continuer sans compte →
+      </a>
     </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -171,8 +190,14 @@ export default class Login {
   private readonly passwordDispatch = injectDispatch(passwordSignInPageEvents);
   private readonly oauthDispatch = injectDispatch(oauthSignInPageEvents);
   private readonly fb = inject(NonNullableFormBuilder);
+  private readonly route = inject(ActivatedRoute);
 
   readonly showPassword = signal(false);
+
+  readonly reasonMessage = (() => {
+    const reason = this.route.snapshot.queryParamMap.get('reason');
+    return reason ? REASON_MESSAGES[reason] ?? null : null;
+  })();
 
   readonly form = this.fb.group({
     email: ['', [Validators.required, Validators.email]],

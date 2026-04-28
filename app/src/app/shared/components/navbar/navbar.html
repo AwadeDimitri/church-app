@@ -18,8 +18,15 @@
     <span class="text-[10px] font-medium mt-1">Prière</span>
   </a>
 
-  <a routerLink="/profile" routerLinkActive="text-church-blue" class="flex flex-col items-center text-slate-400 transition-colors">
-    <nz-icon nzType="user" nzTheme="outline" class="text-2xl" />
-    <span class="text-[10px] font-medium mt-1">Profil</span>
-  </a>
+  @if (isAuthenticated()) {
+    <a routerLink="/profile" routerLinkActive="text-church-blue" class="flex flex-col items-center text-slate-400 transition-colors">
+      <nz-icon nzType="user" nzTheme="outline" class="text-2xl" />
+      <span class="text-[10px] font-medium mt-1">Profil</span>
+    </a>
+  } @else {
+    <a routerLink="/login" class="flex flex-col items-center text-slate-400 transition-colors">
+      <nz-icon nzType="user" nzTheme="outline" class="text-2xl" />
+      <span class="text-[10px] font-medium mt-1">Connexion</span>
+    </a>
+  }
 </nav>

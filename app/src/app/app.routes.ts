@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authGuard } from '@core/guards/auth.guard';
+import { memberGuard } from '@core/guards/member.guard';
 
 export const routes: Routes = [
   {
@@ -34,7 +34,6 @@ export const routes: Routes = [
   {
     path: '',
     loadComponent: () => import('@shared/layouts/app-layout/app-layout'),
-    canActivate: [authGuard],
     children: [
       {
         path: 'home',
@@ -58,20 +57,6 @@ export const routes: Routes = [
         loadComponent: () => import('./features/donate/donate'),
       },
       {
-        path: 'prayer',
-        loadComponent: () => import('./features/prayer/prayer'),
-      },
-      {
-        path: 'prayer/new',
-        loadComponent: () =>
-          import('./features/prayer/prayer-new/prayer-new'),
-      },
-      {
-        path: 'prayer/:id',
-        loadComponent: () =>
-          import('./features/prayer/prayer-detail/prayer-detail'),
-      },
-      {
         path: 'bible',
         loadComponent: () => import('./features/bible/bible'),
       },
@@ -81,10 +66,33 @@ export const routes: Routes = [
       },
       {
         path: 'bible/:bookSlug/:chapter',
-        loadComponent: () => import('./features/bible/bible-chapter/bible-chapter'),
+        loadComponent: () =>
+          import('./features/bible/bible-chapter/bible-chapter'),
+      },
+      {
+        path: 'prayer',
+        canActivate: [memberGuard],
+        data: { reason: 'prayer' },
+        loadComponent: () => import('./features/prayer/prayer'),
+      },
+      {
+        path: 'prayer/new',
+        canActivate: [memberGuard],
+        data: { reason: 'prayer' },
+        loadComponent: () =>
+          import('./features/prayer/prayer-new/prayer-new'),
+      },
+      {
+        path: 'prayer/:id',
+        canActivate: [memberGuard],
+        data: { reason: 'prayer' },
+        loadComponent: () =>
+          import('./features/prayer/prayer-detail/prayer-detail'),
       },
       {
         path: 'profile',
+        canActivate: [memberGuard],
+        data: { reason: 'profile' },
         loadComponent: () => import('./features/profile/profile'),
       },
     ],

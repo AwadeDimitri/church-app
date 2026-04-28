@@ -18,6 +18,13 @@ export function withSessionReducers() {
     withState(initialState),
     withReducer(
       on(
+        sessionEvents.bootstrapped,
+        (event): Partial<SessionState> => ({
+          sessionStatus: event.payload.user ? 'authenticated' : 'unauthenticated',
+          user: event.payload.user,
+        }),
+      ),
+      on(
         sessionEvents.signedIn,
         (event): Partial<SessionState> => ({
           sessionStatus: 'authenticated',

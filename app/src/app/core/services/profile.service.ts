@@ -1,6 +1,4 @@
-import { Injectable, inject, effect } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { map } from 'rxjs';
+import { Injectable, inject, signal, effect } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   GetProfileGQL,
@@ -19,7 +17,7 @@ interface ProfileStats {
   donations: number;
 }
 
-const EMPTY_UUID = '00000000-0000-0000-0000-000000000000';
+const EMPTY_STATS: ProfileStats = { sermons: 0, prayers: 0, donations: 0 };
 
 @Injectable({ providedIn: 'root' })
 export class ProfileService {
@@ -27,42 +25,39 @@ export class ProfileService {
   private readonly router = inject(Router);
   private readonly getProfileGQL = inject(GetProfileGQL);
 
-  private readonly profileQuery = this.getProfileGQL.watch({
-    variables: { userId: this.authService.user()?.id ?? EMPTY_UUID },
-  });
+  private readonly _user = signal<ProfileUser | null>(null);
+  private readonly _stats = signal<ProfileStats>(EMPTY_STATS);
+  private readonly _loading = signal(false);
 
-  readonly user = toSignal(
-    this.profileQuery.valueChanges.pipe(
-      map(
-        (r): ProfileUser | null =>
-          unwrapNodes<ProfileUser>(r.data?.usersCollection)[0] ?? null,
-      ),
-    ),
-    { initialValue: null as ProfileUser | null },
-  );
-
-  readonly stats = toSignal(
-    this.profileQuery.valueChanges.pipe(
-      map((r): ProfileStats => ({
-        sermons: r.data?.sermons_count?.totalCount ?? 0,
-        prayers: r.data?.user_prayers_count?.totalCount ?? 0,
-        donations: 0,
-      })),
-    ),
-    { initialValue: { sermons: 0, prayers: 0, donations: 0 } as ProfileStats },
-  );
-
-  readonly loading = toSignal(
-    this.profileQuery.valueChanges.pipe(map(r => r.loading)),
-    { initialValue: true },
-  );
+  readonly user = this._user.asReadonly();
+  readonly stats = this._stats.asReadonly();
+  readonly loading = this._loading.asReadonly();
 
   constructor() {
     effect(() => {
       const user = this.authService.user();
-      if (user?.id) {
-        this.profileQuery.refetch({ userId: user.id });
+      if (!user) {
+        this._user.set(null);
+        this._stats.set(EMPTY_STATS);
+        this._loading.set(false);
+        return;
       }
+
+      this._loading.set(true);
+      this.getProfileGQL.fetch({ variables: { userId: user.id } }).subscribe({
+        next: (r) => {
+          this._user.set(
+            unwrapNodes<ProfileUser>(r.data?.usersCollection)[0] ?? null,
+          );
+          this._stats.set({
+            sermons: r.data?.sermons_count?.totalCount ?? 0,
+            prayers: r.data?.user_prayers_count?.totalCount ?? 0,
+            donations: 0,
+          });
+          this._loading.set(false);
+        },
+        error: () => this._loading.set(false),
+      });
     });
   }
 
