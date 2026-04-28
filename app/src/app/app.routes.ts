@@ -100,6 +100,17 @@ export const routes: Routes = [
         data: { reason: 'profile' },
         loadComponent: () => import('./features/profile/profile'),
       },
+      {
+        path: 'profile/edit',
+        canActivate: [memberGuard],
+        data: { reason: 'profile' },
+        loadComponent: () =>
+          import('./features/profile/profile-edit/profile-edit'),
+      },
+      {
+        path: 'about',
+        loadComponent: () => import('./features/about/about'),
+      },
     ],
   },
   {

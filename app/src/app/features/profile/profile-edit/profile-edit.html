@@ -1,0 +1,60 @@
+<div class="px-5 safe-area-top">
+  <app-page-header title="Informations personnelles" backLink="/profile" />
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-4 mt-4">
+    <div>
+      <label class="block text-sm font-semibold text-church-text mb-2">Email</label>
+      <div class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-base text-church-text-secondary">
+        {{ user()?.email || '—' }}
+      </div>
+      <p class="text-xs text-church-text-secondary mt-1.5 px-1">
+        Pour modifier l'email, contactez l'administration.
+      </p>
+    </div>
+
+    <div>
+      <label class="block text-sm font-semibold text-church-text mb-2">Nom complet *</label>
+      <input
+        type="text"
+        formControlName="full_name"
+        autocomplete="name"
+        class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3.5 text-base text-church-text placeholder:text-slate-400 outline-none transition-colors focus:border-church-blue"
+      />
+      @if (form.controls.full_name.touched && form.controls.full_name.invalid) {
+        <p class="text-xs text-church-red mt-1.5 px-1">
+          @if (form.controls.full_name.hasError('required')) {
+            Nom requis
+          } @else if (form.controls.full_name.hasError('minlength')) {
+            Au moins 2 caractères
+          }
+        </p>
+      }
+    </div>
+
+    <div>
+      <label class="block text-sm font-semibold text-church-text mb-2">Téléphone</label>
+      <input
+        type="tel"
+        formControlName="phone"
+        autocomplete="tel"
+        placeholder="+228 90 00 00 00"
+        class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3.5 text-base text-church-text placeholder:text-slate-400 outline-none transition-colors focus:border-church-blue"
+      />
+    </div>
+
+    @if (errorMessage()) {
+      <p class="text-xs text-church-red text-center">{{ errorMessage() }}</p>
+    }
+
+    <app-button
+      variant="primary"
+      size="lg"
+      shape="rounded"
+      [fullWidth]="true"
+      type="submit"
+      [disabled]="loading()"
+    >
+      {{ loading() ? 'Enregistrement...' : 'Enregistrer' }}
+    </app-button>
+  </form>
+</div>

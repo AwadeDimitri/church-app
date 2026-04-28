@@ -3,7 +3,9 @@ query GetProfile($userId: UUID!) {
     edges {
       node {
         id
+        email
         full_name
+        phone
         avatar_url
         role
         is_active
@@ -18,5 +20,15 @@ query GetProfile($userId: UUID!) {
     filter: { author_id: { eq: $userId } }
   ) {
     totalCount
+  }
+}
+
+mutation UpdateProfile($userId: UUID!, $set: usersUpdateInput!) {
+  updateusersCollection(filter: { id: { eq: $userId } }, set: $set, atMost: 1) {
+    records {
+      id
+      full_name
+      phone
+    }
   }
 }

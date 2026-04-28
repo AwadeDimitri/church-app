@@ -2175,7 +2175,15 @@ export type GetProfileQueryVariables = Exact<{
 }>;
 
 
-export type GetProfileQuery = { __typename?: 'Query', usersCollection?: { __typename?: 'usersConnection', edges: Array<{ __typename?: 'usersEdge', node: { __typename?: 'users', id: string, full_name: string, avatar_url?: string | null, role: string, is_active: boolean, created_at?: string | null } }> } | null, sermons_count?: { __typename?: 'sermonsConnection', totalCount: number } | null, user_prayers_count?: { __typename?: 'prayer_requestsConnection', totalCount: number } | null };
+export type GetProfileQuery = { __typename?: 'Query', usersCollection?: { __typename?: 'usersConnection', edges: Array<{ __typename?: 'usersEdge', node: { __typename?: 'users', id: string, email?: string | null, full_name: string, phone?: string | null, avatar_url?: string | null, role: string, is_active: boolean, created_at?: string | null } }> } | null, sermons_count?: { __typename?: 'sermonsConnection', totalCount: number } | null, user_prayers_count?: { __typename?: 'prayer_requestsConnection', totalCount: number } | null };
+
+export type UpdateProfileMutationVariables = Exact<{
+  userId: Scalars['UUID']['input'];
+  set: UsersUpdateInput;
+}>;
+
+
+export type UpdateProfileMutation = { __typename?: 'Mutation', updateusersCollection: { __typename?: 'usersUpdateResponse', records: Array<{ __typename?: 'users', id: string, full_name: string, phone?: string | null }> } };
 
 export const GetEventsDocument = gql`
     query GetEvents($limit: Int = 20, $offset: Int = 0) {
@@ -2365,7 +2373,7 @@ export const GetPrayerRequestDocument = gql`
   })
   export class GetPrayerRequestGQL extends Apollo.Query<GetPrayerRequestQuery, GetPrayerRequestQueryVariables> {
     override document = GetPrayerRequestDocument;
-
+    
     constructor(apollo: Apollo.Apollo) {
       super(apollo);
     }
@@ -2639,7 +2647,9 @@ export const GetProfileDocument = gql`
     edges {
       node {
         id
+        email
         full_name
+        phone
         avatar_url
         role
         is_active
@@ -2663,6 +2673,28 @@ export const GetProfileDocument = gql`
   })
   export class GetProfileGQL extends Apollo.Query<GetProfileQuery, GetProfileQueryVariables> {
     override document = GetProfileDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const UpdateProfileDocument = gql`
+    mutation UpdateProfile($userId: UUID!, $set: usersUpdateInput!) {
+  updateusersCollection(filter: {id: {eq: $userId}}, set: $set, atMost: 1) {
+    records {
+      id
+      full_name
+      phone
+    }
+  }
+}
+    `;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class UpdateProfileGQL extends Apollo.Mutation<UpdateProfileMutation, UpdateProfileMutationVariables> {
+    override document = UpdateProfileDocument;
     
     constructor(apollo: Apollo.Apollo) {
       super(apollo);

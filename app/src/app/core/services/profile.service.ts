@@ -1,8 +1,11 @@
 import { Injectable, inject, signal, effect } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 import { Router } from '@angular/router';
 import {
   GetProfileGQL,
+  UpdateProfileGQL,
   type GetProfileQuery,
+  type UsersUpdateInput,
 } from '@core/graphql/generated';
 import { unwrapNodes } from '@core/graphql/unwrap';
 import { AuthService } from '@core/services/auth.service';
@@ -24,6 +27,7 @@ export class ProfileService {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly getProfileGQL = inject(GetProfileGQL);
+  private readonly updateProfileGQL = inject(UpdateProfileGQL);
 
   private readonly _user = signal<ProfileUser | null>(null);
   private readonly _stats = signal<ProfileStats>(EMPTY_STATS);
@@ -42,23 +46,37 @@ export class ProfileService {
         this._loading.set(false);
         return;
       }
-
-      this._loading.set(true);
-      this.getProfileGQL.fetch({ variables: { userId: user.id } }).subscribe({
-        next: (r) => {
-          this._user.set(
-            unwrapNodes<ProfileUser>(r.data?.usersCollection)[0] ?? null,
-          );
-          this._stats.set({
-            sermons: r.data?.sermons_count?.totalCount ?? 0,
-            prayers: r.data?.user_prayers_count?.totalCount ?? 0,
-            donations: 0,
-          });
-          this._loading.set(false);
-        },
-        error: () => this._loading.set(false),
-      });
+      this.fetchProfile(user.id);
     });
+  }
+
+  private fetchProfile(userId: string): void {
+    this._loading.set(true);
+    this.getProfileGQL.fetch({ variables: { userId } }).subscribe({
+      next: (r) => {
+        this._user.set(
+          unwrapNodes<ProfileUser>(r.data?.usersCollection)[0] ?? null,
+        );
+        this._stats.set({
+          sermons: r.data?.sermons_count?.totalCount ?? 0,
+          prayers: r.data?.user_prayers_count?.totalCount ?? 0,
+          donations: 0,
+        });
+        this._loading.set(false);
+      },
+      error: () => this._loading.set(false),
+    });
+  }
+
+  async updateProfile(updates: UsersUpdateInput): Promise<void> {
+    const user = this.authService.user();
+    if (!user) throw new Error('Not authenticated');
+    await firstValueFrom(
+      this.updateProfileGQL.mutate({
+        variables: { userId: user.id, set: updates },
+      }),
+    );
+    this.fetchProfile(user.id);
   }
 
   async signOut() {
