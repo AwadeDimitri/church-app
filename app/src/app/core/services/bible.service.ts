@@ -1,6 +1,5 @@
-import { Injectable, computed, inject, signal } from '@angular/core';
-import { from, map, Observable } from 'rxjs';
-import { SupabaseService } from '@core/services/supabase.service';
+import { Injectable, computed, signal } from '@angular/core';
+import { Observable, of } from 'rxjs';
 
 export interface BibleBook {
   id: number;
@@ -14,6 +13,18 @@ export interface BibleBook {
 export interface BibleVerse {
   verse: number;
   text: string;
+}
+
+interface BibleVerseRow {
+  book_id: number;
+  chapter: number;
+  verse: number;
+  text: string;
+}
+
+interface BibleData {
+  books: BibleBook[];
+  verses: BibleVerseRow[];
 }
 
 export interface DailyVerse {
@@ -35,27 +46,45 @@ export interface LastReading {
 }
 
 const LS_KEY = 'bible:last-reading';
+const BUNDLE_URL = '/bible.json';
 
 @Injectable({ providedIn: 'root' })
 export class BibleService {
-  private readonly supabase = inject(SupabaseService).client;
-
   private readonly _books = signal<BibleBook[]>([]);
-  private readonly _dailyVerse = signal<DailyVerse | null>(null);
+  private readonly _verses = signal<BibleVerseRow[]>([]);
   private readonly _loading = signal(true);
   private readonly _error = signal<string | null>(null);
   private readonly _lastReading = signal<LastReading | null>(readLastReading());
 
   readonly books = this._books.asReadonly();
-  readonly dailyVerse = this._dailyVerse.asReadonly();
   readonly loading = this._loading.asReadonly();
   readonly error = this._error.asReadonly();
   readonly lastReading = this._lastReading.asReadonly();
 
+  private readonly versesByChapter = computed<Map<string, BibleVerse[]>>(() => {
+    const map = new Map<string, BibleVerse[]>();
+    for (const v of this._verses()) {
+      const key = `${v.book_id}.${v.chapter}`;
+      let chapter = map.get(key);
+      if (!chapter) {
+        chapter = [];
+        map.set(key, chapter);
+      }
+      chapter.push({ verse: v.verse, text: v.text });
+    }
+    return map;
+  });
+
+  readonly dailyVerse = computed<DailyVerse | null>(() => {
+    const verses = this._verses();
+    if (verses.length === 0) return null;
+    return verses[daysSinceEpochUTC() % verses.length];
+  });
+
   readonly dailyVerseDisplay = computed<DailyVerseDisplay | null>(() => {
-    const verse = this._dailyVerse();
+    const verse = this.dailyVerse();
     if (!verse) return null;
-    const book = this._books().find(b => b.id === verse.book_id);
+    const book = this._books().find((b) => b.id === verse.book_id);
     const reference = book
       ? `${book.name} ${verse.chapter}:${verse.verse}`
       : `${verse.chapter}:${verse.verse}`;
@@ -63,53 +92,27 @@ export class BibleService {
   });
 
   constructor() {
-    this.loadBooks();
-    this.loadDailyVerse();
+    this.loadBundle();
   }
 
-  private async loadBooks(): Promise<void> {
-    const { data, error } = await this.supabase
-      .from('bible_books')
-      .select('id, testament, position, name, slug, chapter_count')
-      .order('id');
-
-    if (error) {
-      this._error.set(error.message);
-    } else {
-      this._books.set((data ?? []) as BibleBook[]);
+  private async loadBundle(): Promise<void> {
+    try {
+      const res = await fetch(BUNDLE_URL);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = (await res.json()) as BibleData;
+      this._books.set(data.books);
+      this._verses.set(data.verses);
+    } catch (err) {
+      this._error.set(
+        err instanceof Error ? err.message : 'Erreur de chargement',
+      );
+    } finally {
+      this._loading.set(false);
     }
-    this._loading.set(false);
-  }
-
-  private async loadDailyVerse(): Promise<void> {
-    const { count } = await this.supabase
-      .from('bible_verses')
-      .select('*', { count: 'exact', head: true });
-
-    if (!count) return;
-
-    const offset = daysSinceEpochUTC() % count;
-    const { data } = await this.supabase
-      .from('bible_verses')
-      .select('book_id, chapter, verse, text')
-      .order('book_id')
-      .order('chapter')
-      .order('verse')
-      .range(offset, offset);
-
-    const verse = (data?.[0] as DailyVerse | undefined) ?? null;
-    this._dailyVerse.set(verse);
   }
 
   getChapter(bookId: number, chapter: number): Observable<BibleVerse[]> {
-    return from(
-      this.supabase
-        .from('bible_verses')
-        .select('verse, text')
-        .eq('book_id', bookId)
-        .eq('chapter', chapter)
-        .order('verse'),
-    ).pipe(map(r => (r.data ?? []) as BibleVerse[]));
+    return of(this.versesByChapter().get(`${bookId}.${chapter}`) ?? []);
   }
 
   setLastReading(reading: LastReading): void {

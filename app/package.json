@@ -3,6 +3,9 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
+    "build:bible": "node scripts/build-bible.mjs",
+    "prestart": "npm run build:bible",
+    "prebuild": "npm run build:bible",
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
