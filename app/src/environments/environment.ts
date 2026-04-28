@@ -9,12 +9,14 @@ export const environment = {
       operator: 'Moov Africa Togo',
       number: '+228 96 39 51 61',
       ussd: '*155#',
+      logo: '/logos/flooz.png',
     },
-    tmoney: {
-      label: 'TMoney',
-      operator: 'Togocom',
+    mixx: {
+      label: 'Mixx by Yas',
+      operator: 'Yas Togo',
       number: '+228 93 65 55 72',
       ussd: '*145#',
+      logo: '/logos/mixx.png',
     },
   },
 };

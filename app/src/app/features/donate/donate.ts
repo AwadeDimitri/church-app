@@ -4,19 +4,17 @@ import { PageHeader } from '@shared/components/page-header/page-header';
 import { environment } from '@env';
 
 interface Operator {
-  readonly key: 'flooz' | 'tmoney';
+  readonly key: 'flooz' | 'mixx';
   readonly label: string;
   readonly operator: string;
   readonly number: string;
   readonly ussd: string;
   readonly ussdHref: string;
+  readonly logo: string;
   readonly accentClass: string;
-  readonly iconColor: string;
-  readonly icon: string;
 }
 
-const toUssdHref = (ussd: string): string =>
-  `tel:${ussd.replace(/#/g, '%23')}`;
+const toUssdHref = (ussd: string): string => `tel:${ussd.replace(/#/g, '%23')}`;
 
 @Component({
   selector: 'app-donate',
@@ -25,8 +23,6 @@ const toUssdHref = (ussd: string): string =>
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class Donate {
-  readonly amounts = [1_000, 2_000, 5_000, 10_000, 25_000, 50_000];
-  readonly selectedAmount = signal<number | null>(null);
   readonly copiedKey = signal<string | null>(null);
 
   readonly operators: Operator[] = [
@@ -37,26 +33,20 @@ export default class Donate {
       number: environment.donations.flooz.number,
       ussd: environment.donations.flooz.ussd,
       ussdHref: toUssdHref(environment.donations.flooz.ussd),
+      logo: environment.donations.flooz.logo,
       accentClass: 'bg-amber-50 border-amber-200',
-      iconColor: 'text-church-gold',
-      icon: 'wallet',
     },
     {
-      key: 'tmoney',
-      label: environment.donations.tmoney.label,
-      operator: environment.donations.tmoney.operator,
-      number: environment.donations.tmoney.number,
-      ussd: environment.donations.tmoney.ussd,
-      ussdHref: toUssdHref(environment.donations.tmoney.ussd),
+      key: 'mixx',
+      label: environment.donations.mixx.label,
+      operator: environment.donations.mixx.operator,
+      number: environment.donations.mixx.number,
+      ussd: environment.donations.mixx.ussd,
+      ussdHref: toUssdHref(environment.donations.mixx.ussd),
+      logo: environment.donations.mixx.logo,
       accentClass: 'bg-church-blue-light border-church-blue/20',
-      iconColor: 'text-church-blue',
-      icon: 'mobile',
     },
   ];
-
-  selectAmount(amount: number): void {
-    this.selectedAmount.set(this.selectedAmount() === amount ? null : amount);
-  }
 
   async copyNumber(operator: Operator): Promise<void> {
     try {

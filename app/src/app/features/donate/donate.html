@@ -1,61 +1,34 @@
 <div class="px-5 safe-area-top">
   <app-page-header title="Faire un don" subtitle="Votre générosité fait la différence" backLink="/" />
 
-  <div class="bg-gradient-to-br from-church-red to-rose-500 rounded-church p-6 mb-6 text-white text-center relative overflow-hidden">
+  <div class="bg-gradient-to-br from-church-red to-rose-500 rounded-church p-4 mb-4 text-white text-center relative overflow-hidden">
     <div class="absolute top-0 left-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 -translate-x-1/2"></div>
-    <div class="absolute bottom-0 right-0 w-32 h-32 bg-white/5 rounded-full translate-y-1/2 translate-x-1/4"></div>
-    <nz-icon nzType="heart" nzTheme="outline" class="text-4xl mb-3" />
-    <p class="text-sm text-white/90 italic">
+    <div class="absolute bottom-0 right-0 w-24 h-24 bg-white/5 rounded-full translate-y-1/2 translate-x-1/4"></div>
+    <p class="text-xs text-white/90 italic relative">
       « Chacun donne comme il l'a résolu en son cœur, sans tristesse ni contrainte; car Dieu aime celui qui donne avec joie. »
     </p>
-    <p class="text-xs text-white/70 mt-2 font-medium">2 Corinthiens 9:7</p>
+    <p class="text-[10px] text-white/70 mt-1 font-medium relative">2 Corinthiens 9:7</p>
   </div>
 
-  <div class="mb-6">
-    <h3 class="text-sm font-semibold text-church-text mb-3">
-      Montants suggérés <span class="text-church-text-secondary font-normal">(FCFA)</span>
-    </h3>
-    <div class="grid grid-cols-3 gap-2">
-      @for (amount of amounts; track amount) {
-        <button
-          type="button"
-          (click)="selectAmount(amount)"
-          [class]="selectedAmount() === amount
-            ? 'bg-church-blue text-white border-church-blue'
-            : 'bg-white text-church-text border-slate-200'"
-          class="border rounded-xl py-3 text-sm font-semibold transition-colors active:opacity-70">
-          {{ amount.toLocaleString('fr-FR') }}
-        </button>
-      }
-    </div>
-    @if (selectedAmount(); as amt) {
-      <p class="text-xs text-church-text-secondary mt-3">
-        Vous avez choisi
-        <strong class="text-church-text">{{ amt.toLocaleString('fr-FR') }} FCFA</strong>.
-        Entrez ce montant dans votre app mobile money.
-      </p>
-    }
-  </div>
-
-  <div class="space-y-3 mb-6">
+  <div class="space-y-3">
     @for (op of operators; track op.key) {
-      <div [class]="op.accentClass" class="border rounded-2xl p-4">
+      <div [class]="op.accentClass" class="border rounded-2xl p-3">
         <div class="flex items-center gap-3 mb-3">
-          <div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center">
-            <nz-icon [nzType]="op.icon" nzTheme="outline" class="text-xl" [class]="op.iconColor" />
+          <div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center overflow-hidden shrink-0">
+            <img [src]="op.logo" [alt]="op.label" class="w-8 h-8 object-contain" />
           </div>
-          <div>
-            <h4 class="font-semibold text-church-text">{{ op.label }}</h4>
-            <p class="text-xs text-church-text-secondary">{{ op.operator }}</p>
+          <div class="min-w-0 flex-1">
+            <h4 class="font-semibold text-church-text leading-tight">{{ op.label }}</h4>
+            <p class="text-xs text-church-text-secondary leading-tight">{{ op.operator }}</p>
           </div>
         </div>
 
-        <div class="bg-white rounded-xl p-3 mb-3 flex items-center justify-between">
-          <span class="text-base font-mono font-semibold text-church-text">{{ op.number }}</span>
+        <div class="bg-white rounded-xl px-3 py-2 mb-2 flex items-center justify-between gap-2">
+          <span class="text-sm font-mono font-semibold text-church-text truncate">{{ op.number }}</span>
           <button
             type="button"
             (click)="copyNumber(op)"
-            class="text-xs font-semibold px-3 py-1.5 rounded-lg active:opacity-70 transition-colors"
+            class="text-xs font-semibold px-3 py-1.5 rounded-lg active:opacity-70 transition-colors shrink-0"
             [class]="copiedKey() === op.key
               ? 'bg-church-green/10 text-church-green'
               : 'bg-church-blue/10 text-church-blue'">
@@ -69,7 +42,7 @@
 
         <a
           [href]="op.ussdHref"
-          class="flex items-center justify-center gap-2 bg-church-blue text-white rounded-xl py-3 font-semibold active:opacity-80">
+          class="flex items-center justify-center gap-2 bg-church-blue text-white rounded-xl py-2.5 text-sm font-semibold active:opacity-80">
           <nz-icon nzType="phone" nzTheme="outline" />
           Composer {{ op.ussd }}
         </a>
@@ -77,9 +50,9 @@
     }
   </div>
 
-  <div class="bg-white rounded-2xl p-4 mb-8 shadow-church-card">
-    <h4 class="font-semibold text-church-text mb-3 text-sm">Comment donner</h4>
-    <ol class="text-xs text-church-text-secondary space-y-2 list-decimal list-inside">
+  <div class="bg-white rounded-2xl p-3 mt-3 shadow-church-card">
+    <h4 class="font-semibold text-church-text text-xs mb-2">Comment donner</h4>
+    <ol class="text-xs text-church-text-secondary space-y-1 list-decimal list-inside">
       <li>Tapez « Composer » pour ouvrir le menu de votre opérateur</li>
       <li>Sélectionnez Envoi d'argent (ou Send money)</li>
       <li>Entrez le numéro de l'église ci-dessus</li>
