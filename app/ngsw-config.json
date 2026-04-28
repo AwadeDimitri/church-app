@@ -35,20 +35,7 @@
       }
     }
   ],
-  "dataGroups": [
-    {
-      "name": "supabase-graphql",
-      "urls": [
-        "https://uoktiyfxlqzvoscusowd.supabase.co/graphql/v1**"
-      ],
-      "cacheConfig": {
-        "strategy": "freshness",
-        "maxSize": 200,
-        "maxAge": "7d",
-        "timeout": "5s"
-      }
-    }
-  ],
+  "dataGroups": [],
   "navigationUrls": [
     "/**",
     "!/**/*.*",
