@@ -1,34 +1,12 @@
 <div class="px-5 safe-area-top">
   <!-- Header -->
-  <div class="flex justify-between items-center mb-6">
-    <div>
-      <p class="text-church-text-secondary text-base">
-        Bienvenue 👋@if (firstName(); as name) {, {{ name }}}
-      </p>
-      <h1 class="text-2xl font-bold text-red text-church-text">Église CI-JCM</h1>
-    </div>
-    <div class="flex gap-3">
-      <app-button variant="icon" ariaLabel="Rechercher">
-        <nz-icon nzType="search" nzTheme="outline" class="text-church-text" />
-      </app-button>
-      <app-button variant="icon" ariaLabel="Notifications" customClass="relative">
-        <nz-icon nzType="bell" nzTheme="outline" class="text-church-text" />
-        <span class="absolute top-1 right-1 w-2.5 h-2.5 bg-church-red rounded-full border-2 border-white"></span>
-      </app-button>
-    </div>
+  <div class="mb-6">
+    <p class="text-church-text-secondary text-base">
+      Bienvenue 👋@if (firstName(); as name) {, {{ name }}}
+    </p>
+    <h1 class="text-2xl font-bold text-red text-church-text">Église CI-JCM</h1>
   </div>
 
-  <!-- Live Banner -->
-  <div class="bg-gradient-to-r from-church-blue to-church-blue-dark rounded-church p-5 mb-6 text-white relative overflow-hidden">
-    <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
-    <div class="flex items-center gap-2 mb-2">
-      <span class="w-2 h-2 bg-church-red rounded-full animate-pulse"></span>
-      <span class="text-xs font-semibold uppercase tracking-wider">En direct</span>
-    </div>
-    <h2 class="text-lg text-white/90! font-bold mb-1">Culte du Dimanche</h2>
-    <p class="text-sm text-white/80 mb-3">Pasteur Jean-Marc • La puissance de la foi</p>
-    <app-button variant="secondary">Rejoindre</app-button>
-  </div>
 
   <!-- Quick Actions -->
   <div class="grid grid-cols-4 gap-3 mb-6">
