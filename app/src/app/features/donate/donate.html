@@ -1,7 +1,6 @@
 <div class="px-5 safe-area-top">
   <app-page-header title="Faire un don" subtitle="Votre générosité fait la différence" backLink="/" />
 
-  <!-- Illustration Card -->
   <div class="bg-gradient-to-br from-church-red to-rose-500 rounded-church p-6 mb-6 text-white text-center relative overflow-hidden">
     <div class="absolute top-0 left-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 -translate-x-1/2"></div>
     <div class="absolute bottom-0 right-0 w-32 h-32 bg-white/5 rounded-full translate-y-1/2 translate-x-1/4"></div>
@@ -12,81 +11,80 @@
     <p class="text-xs text-white/70 mt-2 font-medium">2 Corinthiens 9:7</p>
   </div>
 
-  <!-- Frequency -->
   <div class="mb-6">
-    <h3 class="text-sm font-semibold text-church-text mb-3">Fréquence</h3>
+    <h3 class="text-sm font-semibold text-church-text mb-3">
+      Montants suggérés <span class="text-church-text-secondary font-normal">(FCFA)</span>
+    </h3>
     <div class="grid grid-cols-3 gap-2">
-      @for (freq of frequencies; track freq.value) {
-        <button
-          (click)="setFrequency(freq.value)"
-          [class]="frequency() === freq.value ? 'bg-church-blue text-white' : 'bg-white text-church-text-secondary shadow-church-card'"
-          class="py-2.5 rounded-full text-sm font-medium transition-colors">
-          {{ freq.label }}
-        </button>
-      }
-    </div>
-  </div>
-
-  <!-- Amount Selection -->
-  <div class="mb-6">
-    <h3 class="text-sm font-semibold text-church-text mb-3">Montant (€)</h3>
-    <div class="grid grid-cols-3 gap-3">
       @for (amount of amounts; track amount) {
         <button
+          type="button"
           (click)="selectAmount(amount)"
-          [class]="selectedAmount() === amount ? 'bg-church-blue text-white shadow-lg shadow-church-blue/30' : 'bg-white text-church-text shadow-church-card'"
-          class="py-4 rounded-2xl text-lg font-bold transition-all">
-          {{ amount }}€
+          [class]="selectedAmount() === amount
+            ? 'bg-church-blue text-white border-church-blue'
+            : 'bg-white text-church-text border-slate-200'"
+          class="border rounded-xl py-3 text-sm font-semibold transition-colors active:opacity-70">
+          {{ amount.toLocaleString('fr-FR') }}
         </button>
       }
     </div>
+    @if (selectedAmount(); as amt) {
+      <p class="text-xs text-church-text-secondary mt-3">
+        Vous avez choisi
+        <strong class="text-church-text">{{ amt.toLocaleString('fr-FR') }} FCFA</strong>.
+        Entrez ce montant dans votre app mobile money.
+      </p>
+    }
   </div>
 
-  <!-- Custom Amount -->
-  <div class="mb-6">
-    <div class="relative">
-      <span class="absolute left-4 top-1/2 -translate-y-1/2 text-church-text-secondary font-semibold">€</span>
-      <input
-        type="number"
-        placeholder="Autre montant"
-        class="w-full bg-white rounded-2xl pl-10 pr-4 py-4 text-lg font-semibold shadow-church-card border-none outline-none focus:ring-2 focus:ring-church-blue/20"
-      />
-    </div>
-  </div>
-
-  <!-- Payment Methods -->
-  <div class="mb-6">
-    <h3 class="text-sm font-semibold text-church-text mb-3">Mode de paiement</h3>
-    <div class="flex flex-col gap-2">
-      @for (option of paymentOptions; track option.icon) {
-        <button
-          (click)="selectedPayment.set(option.icon)"
-          class="bg-white rounded-church-sm p-4 shadow-church-card flex items-center gap-4"
-          [class.border-2]="selectedPayment() === option.icon"
-          [class.border-church-blue]="selectedPayment() === option.icon">
-          <div class="w-10 h-10 rounded-xl flex items-center justify-center" [class]="option.bgClass">
-            <nz-icon [nzType]="option.icon" nzTheme="outline" [class]="'text-lg ' + option.iconColor" />
+  <div class="space-y-3 mb-6">
+    @for (op of operators; track op.key) {
+      <div [class]="op.accentClass" class="border rounded-2xl p-4">
+        <div class="flex items-center gap-3 mb-3">
+          <div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center">
+            <nz-icon [nzType]="op.icon" nzTheme="outline" class="text-xl" [class]="op.iconColor" />
           </div>
-          <div class="flex-1 text-left">
-            <p class="text-sm font-semibold text-church-text">{{ option.label }}</p>
-            <p class="text-xs text-church-text-secondary">{{ option.description }}</p>
+          <div>
+            <h4 class="font-semibold text-church-text">{{ op.label }}</h4>
+            <p class="text-xs text-church-text-secondary">{{ op.operator }}</p>
           </div>
-          @if (selectedPayment() === option.icon) {
-            <nz-icon nzType="check-circle" nzTheme="fill" class="text-church-blue text-xl" />
-          }
-        </button>
-      }
-    </div>
+        </div>
+
+        <div class="bg-white rounded-xl p-3 mb-3 flex items-center justify-between">
+          <span class="text-base font-mono font-semibold text-church-text">{{ op.number }}</span>
+          <button
+            type="button"
+            (click)="copyNumber(op)"
+            class="text-xs font-semibold px-3 py-1.5 rounded-lg active:opacity-70 transition-colors"
+            [class]="copiedKey() === op.key
+              ? 'bg-church-green/10 text-church-green'
+              : 'bg-church-blue/10 text-church-blue'">
+            @if (copiedKey() === op.key) {
+              Copié ✓
+            } @else {
+              Copier
+            }
+          </button>
+        </div>
+
+        <a
+          [href]="op.ussdHref"
+          class="flex items-center justify-center gap-2 bg-church-blue text-white rounded-xl py-3 font-semibold active:opacity-80">
+          <nz-icon nzType="phone" nzTheme="outline" />
+          Composer {{ op.ussd }}
+        </a>
+      </div>
+    }
   </div>
 
-  <!-- Give Button -->
-  <div class="mb-8">
-    <app-button variant="danger" size="lg" [fullWidth]="true">
-      <nz-icon nzType="heart" nzTheme="fill" /> Donner maintenant
-    </app-button>
-    <p class="text-center text-xs text-church-text-secondary mt-3">
-      <nz-icon nzType="safety" nzTheme="outline" class="mr-1" />
-      Paiement 100% sécurisé
-    </p>
+  <div class="bg-white rounded-2xl p-4 mb-8 shadow-church-card">
+    <h4 class="font-semibold text-church-text mb-3 text-sm">Comment donner</h4>
+    <ol class="text-xs text-church-text-secondary space-y-2 list-decimal list-inside">
+      <li>Tapez « Composer » pour ouvrir le menu de votre opérateur</li>
+      <li>Sélectionnez Envoi d'argent (ou Send money)</li>
+      <li>Entrez le numéro de l'église ci-dessus</li>
+      <li>Entrez le montant souhaité</li>
+      <li>Confirmez avec votre code PIN</li>
+    </ol>
   </div>
 </div>
