@@ -13,10 +13,18 @@ import {
   Validators,
 } from '@angular/forms';
 import { NzIconDirective } from 'ng-zorro-antd/icon';
+import { AuthError } from '@supabase/supabase-js';
 import { Button } from '@shared/components/button/button';
 import { AuthService } from '@core/services/auth.service';
 
 type Stage = 'validating' | 'invalid' | 'form' | 'success';
+
+const UPDATE_PASSWORD_ERRORS: Record<string, string> = {
+  weak_password: 'Mot de passe trop faible',
+  same_password: "Le nouveau mot de passe est identique à l'ancien",
+};
+
+const GENERIC_UPDATE_PASSWORD_ERROR = 'Une erreur est survenue. Réessayez.';
 
 const passwordsMatch = (
   control: AbstractControl,
@@ -244,9 +252,10 @@ export default class ResetPassword {
       this.stage.set('success');
       setTimeout(() => this.router.navigateByUrl('/home'), 1500);
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : 'Une erreur est survenue';
-      this.errorMessage.set(message);
+      const code = err instanceof AuthError ? err.code : undefined;
+      this.errorMessage.set(
+        (code && UPDATE_PASSWORD_ERRORS[code]) ?? GENERIC_UPDATE_PASSWORD_ERROR,
+      );
     } finally {
       this.loading.set(false);
     }

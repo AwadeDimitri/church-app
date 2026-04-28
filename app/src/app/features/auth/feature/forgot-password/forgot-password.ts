@@ -11,8 +11,18 @@ import {
   Validators,
 } from '@angular/forms';
 import { NzIconDirective } from 'ng-zorro-antd/icon';
+import { AuthError } from '@supabase/supabase-js';
 import { Button } from '@shared/components/button/button';
 import { AuthService } from '@core/services/auth.service';
+
+const RESET_REQUEST_ERRORS: Record<string, string> = {
+  over_email_send_rate_limit:
+    'Trop de tentatives. Attendez quelques minutes avant de réessayer.',
+  email_address_invalid: "L'email n'est pas valide",
+};
+
+const GENERIC_RESET_REQUEST_ERROR =
+  "Impossible d'envoyer l'email. Réessayez plus tard.";
 
 @Component({
   selector: 'app-forgot-password',
@@ -149,9 +159,10 @@ export default class ForgotPassword {
     try {
       await this.authService.resetPassword(this.form.controls.email.value);
       this.sent.set(true);
-    } catch {
+    } catch (err) {
+      const code = err instanceof AuthError ? err.code : undefined;
       this.errorMessage.set(
-        "Impossible d'envoyer l'email. Réessayez plus tard.",
+        (code && RESET_REQUEST_ERRORS[code]) ?? GENERIC_RESET_REQUEST_ERROR,
       );
     } finally {
       this.loading.set(false);
