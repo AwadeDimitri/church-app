@@ -77,6 +77,13 @@ export class AuthService {
     if (error) throw error;
   }
 
+  async updatePassword(newPassword: string) {
+    const { error } = await this.supabase.auth.updateUser({
+      password: newPassword,
+    });
+    if (error) throw error;
+  }
+
   async getAccessToken(): Promise<string | null> {
     const { data } = await this.supabase.auth.getSession();
     return data.session?.access_token ?? null;
