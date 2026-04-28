@@ -14,7 +14,7 @@ type CallbackState = 'loading' | 'error';
   imports: [RouterLink],
   template: `
     <div
-      class="min-h-dvh bg-church-bg flex flex-col items-center justify-center px-6 py-10 max-w-md mx-auto w-full"
+      class="flex flex-col items-center justify-center px-6 py-8 max-w-md mx-auto w-full"
     >
       <img
         src="/logo-cijcm.png"

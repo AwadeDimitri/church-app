@@ -41,9 +41,9 @@ const passwordsMatch = (
   imports: [ReactiveFormsModule, RouterLink, NzIconDirective, Button],
   template: `
     <div
-      class="min-h-dvh bg-church-bg flex flex-col px-6 py-10 max-w-md mx-auto w-full"
+      class="flex flex-col px-6 py-8 max-w-md mx-auto w-full"
     >
-      <div class="flex flex-col items-center mt-12">
+      <div class="flex flex-col items-center mt-6">
         <img
           src="/logo-cijcm.png"
           alt="CI-JCM"

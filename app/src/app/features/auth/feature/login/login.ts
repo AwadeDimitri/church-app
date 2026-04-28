@@ -37,9 +37,9 @@ const REASON_MESSAGES: Record<string, string> = {
   ],
   template: `
     <div
-      class="min-h-dvh bg-church-bg flex flex-col px-6 py-10 max-w-md mx-auto w-full"
+      class="flex flex-col px-6 py-8 max-w-md mx-auto w-full"
     >
-      <div class="flex flex-col items-center mt-12">
+      <div class="flex flex-col items-center mt-6">
         <img
           src="/logo-cijcm.png"
           alt="CI-JCM"
@@ -166,9 +166,7 @@ const REASON_MESSAGES: Record<string, string> = {
         (click)="onGoogleSignIn()"
       />
 
-      <div class="flex-1"></div>
-
-      <p class="text-center text-sm text-church-text-secondary pt-8">
+      <p class="text-center text-sm text-church-text-secondary mt-8">
         Pas encore de compte ?
         <a routerLink="/signup" class="text-church-blue font-semibold">
           S'inscrire
