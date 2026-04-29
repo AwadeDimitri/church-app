@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "@angular/animations": "^21.2.4",
-    "ng-zorro-antd": "^21.1.1"
-  }
-}
