@@ -7,12 +7,13 @@ import { NzIconDirective } from 'ng-zorro-antd/icon';
 import { CategoryFilter } from '@shared/components/category-filter/category-filter';
 import { SermonCard } from '@shared/components/sermon-card/sermon-card';
 import { PageHeader } from '@shared/components/page-header/page-header';
+import { DurationPipe } from '@shared/pipes/duration.pipe';
 import { SermonService } from '@core/services/sermon.service';
 import { getYouTubeThumbnail } from '@core/utils/youtube.util';
 
 @Component({
   selector: 'app-sermons',
-  imports: [DatePipe, NzIconDirective, CategoryFilter, SermonCard, PageHeader],
+  imports: [DatePipe, NzIconDirective, CategoryFilter, SermonCard, PageHeader, DurationPipe],
   templateUrl: './sermons.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

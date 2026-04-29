@@ -11,7 +11,6 @@ interface Operator {
   readonly ussd: string;
   readonly ussdHref: string;
   readonly logo: string;
-  readonly accentClass: string;
 }
 
 const toUssdHref = (ussd: string): string => `tel:${ussd.replace(/#/g, '%23')}`;
@@ -34,7 +33,6 @@ export default class Donate {
       ussd: environment.donations.flooz.ussd,
       ussdHref: toUssdHref(environment.donations.flooz.ussd),
       logo: environment.donations.flooz.logo,
-      accentClass: 'bg-amber-50 border-amber-200',
     },
     {
       key: 'mixx',
@@ -44,7 +42,6 @@ export default class Donate {
       ussd: environment.donations.mixx.ussd,
       ussdHref: toUssdHref(environment.donations.mixx.ussd),
       logo: environment.donations.mixx.logo,
-      accentClass: 'bg-church-blue-light border-church-blue/20',
     },
   ];
 

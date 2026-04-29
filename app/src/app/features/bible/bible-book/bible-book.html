@@ -4,17 +4,23 @@
     [subtitle]="subtitle()"
     [backLink]="true" />
 
-  <!-- Loading -->
+  <!-- Loading : skeleton grid -->
   @if (loading()) {
-    <div class="flex flex-col items-center justify-center py-16">
-      <nz-icon nzType="clock-circle" nzTheme="outline" class="text-4xl text-church-blue animate-pulse mb-3" />
-      <p class="text-sm text-church-text-secondary">Chargement...</p>
+    <div class="mb-4">
+      <h3 class="text-sm font-semibold text-church-text-secondary uppercase tracking-wider">
+        Chapitres
+      </h3>
+    </div>
+    <div class="grid grid-cols-5 gap-3">
+      @for (i of [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]; track i) {
+        <div class="aspect-square bg-white rounded-church-sm shadow-church-card animate-pulse"></div>
+      }
     </div>
   }
 
   <!-- Not found -->
   @if (notFound()) {
-    <div class="bg-red-50 rounded-church-sm p-5 text-center">
+    <div class="bg-church-red-light rounded-church-sm p-5 text-center">
       <nz-icon nzType="info-circle" nzTheme="outline" class="text-2xl text-church-red mb-2" />
       <p class="text-sm text-church-red">Livre introuvable.</p>
     </div>
@@ -22,7 +28,7 @@
 
   <!-- Error -->
   @if (error(); as err) {
-    <div class="bg-red-50 rounded-church-sm p-5 text-center">
+    <div class="bg-church-red-light rounded-church-sm p-5 text-center">
       <nz-icon nzType="info-circle" nzTheme="outline" class="text-2xl text-church-red mb-2" />
       <p class="text-sm text-church-red">{{ err }}</p>
     </div>

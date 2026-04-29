@@ -36,9 +36,7 @@ const REASON_MESSAGES: Record<string, string> = {
     GoogleSignInButton,
   ],
   template: `
-    <div
-      class="flex flex-col px-6 py-8 max-w-md mx-auto w-full"
-    >
+    <div class="flex flex-col px-6 py-8 max-w-md mx-auto w-full">
       <div class="flex flex-col items-center mt-6">
         <img
           src="/logo-cijcm.png"
@@ -72,7 +70,7 @@ const REASON_MESSAGES: Record<string, string> = {
             placeholder="Email"
             formControlName="email"
             autocomplete="email"
-            class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3.5 text-base text-church-text placeholder:text-slate-400 outline-none transition-colors focus:border-church-blue"
+            class="w-full bg-white border border-church-text/10 rounded-xl px-4 py-3.5 text-base text-church-text placeholder:text-church-text-secondary/60 outline-none transition-colors focus:border-church-blue"
           />
           @if (form.controls.email.touched && form.controls.email.invalid) {
             <p class="text-xs text-church-red mt-1.5 px-1">
@@ -92,12 +90,12 @@ const REASON_MESSAGES: Record<string, string> = {
               placeholder="Mot de passe"
               formControlName="password"
               autocomplete="current-password"
-              class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3.5 pr-12 text-base text-church-text placeholder:text-slate-400 outline-none transition-colors focus:border-church-blue"
+              class="w-full bg-white border border-church-text/10 rounded-xl px-4 py-3.5 pr-12 text-base text-church-text placeholder:text-church-text-secondary/60 outline-none transition-colors focus:border-church-blue"
             />
             <button
               type="button"
               (click)="showPassword.set(!showPassword())"
-              class="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 active:text-church-blue mt-4"
+              class="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-church-text-secondary active:text-church-blue"
               [attr.aria-label]="
                 showPassword()
                   ? 'Masquer le mot de passe'
@@ -150,9 +148,9 @@ const REASON_MESSAGES: Record<string, string> = {
       </form>
 
       <div class="flex items-center gap-4 my-6">
-        <hr class="flex-1 border-slate-200" />
+        <hr class="flex-1 border-church-text/10" />
         <span class="text-sm text-church-text-secondary">Ou</span>
-        <hr class="flex-1 border-slate-200" />
+        <hr class="flex-1 border-church-text/10" />
       </div>
 
       @if (authStore.googleSignInErrorMessage()) {
@@ -166,7 +164,7 @@ const REASON_MESSAGES: Record<string, string> = {
         (click)="onGoogleSignIn()"
       />
 
-      <p class="text-center text-sm text-church-text-secondary mt-8">
+      <p class="text-center text-sm text-church-text-secondary mt-2!">
         Pas encore de compte ?
         <a routerLink="/signup" class="text-church-blue font-semibold">
           S'inscrire
@@ -175,7 +173,7 @@ const REASON_MESSAGES: Record<string, string> = {
 
       <a
         routerLink="/home"
-        class="text-center text-xs text-church-text-secondary mt-4 active:text-church-blue"
+        class="text-center text-xs text-church-text-secondary mt-3 active:text-church-blue"
       >
         Continuer sans compte →
       </a>
@@ -194,7 +192,7 @@ export default class Login {
 
   readonly reasonMessage = (() => {
     const reason = this.route.snapshot.queryParamMap.get('reason');
-    return reason ? REASON_MESSAGES[reason] ?? null : null;
+    return reason ? (REASON_MESSAGES[reason] ?? null) : null;
   })();
 
   readonly form = this.fb.group({

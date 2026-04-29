@@ -34,7 +34,7 @@ const GENERIC_RESET_REQUEST_ERROR =
       <button
         type="button"
         (click)="goBack()"
-        class="self-start w-10 h-10 flex items-center justify-center rounded-full bg-white shadow-church-card text-church-blue active:bg-slate-50"
+        class="self-start w-10 h-10 flex items-center justify-center rounded-full bg-white shadow-church-card text-church-blue active:bg-church-bg"
         aria-label="Retour"
       >
         <nz-icon nzType="arrow-left" class="text-lg" />
@@ -60,9 +60,9 @@ const GENERIC_RESET_REQUEST_ERROR =
           class="flex flex-col items-center gap-4 bg-white rounded-2xl p-6 shadow-church-card mt-4"
         >
           <div
-            class="w-14 h-14 rounded-full bg-church-gold-light flex items-center justify-center"
+            class="w-14 h-14 rounded-full bg-church-green/10 flex items-center justify-center"
           >
-            <nz-icon nzType="check-circle" class="text-3xl text-church-gold" />
+            <nz-icon nzType="check-circle" class="text-3xl text-church-green" />
           </div>
           <p class="text-center text-sm text-church-text">
             Un email a été envoyé à<br />
@@ -90,7 +90,7 @@ const GENERIC_RESET_REQUEST_ERROR =
               placeholder="Email"
               formControlName="email"
               autocomplete="email"
-              class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3.5 text-base text-church-text placeholder:text-slate-400 outline-none transition-colors focus:border-church-blue"
+              class="w-full bg-white border border-church-text/10 rounded-xl px-4 py-3.5 text-base text-church-text placeholder:text-church-text-secondary/60 outline-none transition-colors focus:border-church-blue"
             />
             @if (form.controls.email.touched && form.controls.email.invalid) {
               <p class="text-xs text-church-red mt-1.5 px-1">

@@ -13,15 +13,15 @@ import { PrayerService } from '@core/services/prayer.service';
 const PALETTE: Record<string, { bg: string; text: string }> = {
   red:    { bg: 'bg-church-red-light',  text: 'text-church-red' },
   blue:   { bg: 'bg-church-blue-light', text: 'text-church-blue' },
-  green:  { bg: 'bg-green-50',          text: 'text-church-green' },
-  gold:   { bg: 'bg-amber-50',          text: 'text-church-gold' },
-  purple: { bg: 'bg-purple-50',         text: 'text-purple-500' },
-  gray:   { bg: 'bg-gray-100',          text: 'text-gray-600' },
+  green:  { bg: 'bg-church-green/10',   text: 'text-church-green' },
+  gold:   { bg: 'bg-church-gold-light', text: 'text-church-gold' },
+  purple: { bg: 'bg-church-blue-light', text: 'text-church-blue' },
+  gray:   { bg: 'bg-church-text/5',     text: 'text-church-text-secondary' },
 };
 const FALLBACK_COLOR = PALETTE['gray']!;
 
-const AVATAR_COLORS: Array<'blue' | 'red' | 'green' | 'gold' | 'purple'> = [
-  'blue', 'red', 'green', 'gold', 'purple',
+const AVATAR_COLORS: Array<'blue' | 'red' | 'green' | 'gold'> = [
+  'blue', 'red', 'green', 'gold',
 ];
 
 @Component({
@@ -72,8 +72,8 @@ export default class Prayer {
     return PALETTE[colorKey] ?? FALLBACK_COLOR;
   }
 
-  getAvatarColor(index: number) {
-    return AVATAR_COLORS[index % AVATAR_COLORS.length];
+  getAvatarColor(index: number): 'blue' | 'red' | 'green' | 'gold' {
+    return AVATAR_COLORS[index % AVATAR_COLORS.length] ?? 'blue';
   }
 
   isLikedByMe(prayer: { my_likes?: { edges: ReadonlyArray<unknown> } | null }): boolean {

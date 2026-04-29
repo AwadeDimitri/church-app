@@ -103,12 +103,12 @@ const passwordsMatch = (
                   placeholder="Nouveau mot de passe"
                   formControlName="password"
                   autocomplete="new-password"
-                  class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3.5 pr-12 text-base text-church-text placeholder:text-slate-400 outline-none transition-colors focus:border-church-blue"
+                  class="w-full bg-white border border-church-text/10 rounded-xl px-4 py-3.5 pr-12 text-base text-church-text placeholder:text-church-text-secondary/60 outline-none transition-colors focus:border-church-blue"
                 />
                 <button
                   type="button"
                   (click)="showPassword.set(!showPassword())"
-                  class="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 active:text-church-blue"
+                  class="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-church-text-secondary active:text-church-blue"
                   [attr.aria-label]="
                     showPassword()
                       ? 'Masquer le mot de passe'
@@ -141,7 +141,7 @@ const passwordsMatch = (
                 placeholder="Confirmer le mot de passe"
                 formControlName="confirm"
                 autocomplete="new-password"
-                class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3.5 text-base text-church-text placeholder:text-slate-400 outline-none transition-colors focus:border-church-blue"
+                class="w-full bg-white border border-church-text/10 rounded-xl px-4 py-3.5 text-base text-church-text placeholder:text-church-text-secondary/60 outline-none transition-colors focus:border-church-blue"
               />
               @if (
                 form.controls.confirm.touched &&
@@ -182,9 +182,9 @@ const passwordsMatch = (
             class="flex flex-col items-center gap-4 bg-white rounded-2xl p-6 shadow-church-card mt-4"
           >
             <div
-              class="w-14 h-14 rounded-full bg-church-gold-light flex items-center justify-center"
+              class="w-14 h-14 rounded-full bg-church-green/10 flex items-center justify-center"
             >
-              <nz-icon nzType="check-circle" class="text-3xl text-church-gold" />
+              <nz-icon nzType="check-circle" class="text-3xl text-church-green" />
             </div>
             <p class="text-center text-sm text-church-text">
               Mot de passe mis à jour.

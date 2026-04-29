@@ -1,9 +1,9 @@
 <div class="px-5 safe-area-top">
   <app-page-header title="Nouvelle prière" backLink="/prayer" />
 
-  <form [formGroup]="form" (ngSubmit)="submit()" class="bg-gradient-to-r from-church-blue-light to-blue-50 rounded-church p-5 mb-6">
-    <div class="flex items-center gap-3 mb-4">
-      <div class="w-10 h-10 bg-church-blue rounded-full flex items-center justify-center">
+  <form [formGroup]="form" (ngSubmit)="submit()" class="bg-gradient-to-br from-church-blue-light to-church-blue-light/40 rounded-church p-5 mb-6">
+    <div class="flex items-center gap-3 mb-5">
+      <div class="w-10 h-10 bg-church-blue rounded-full flex items-center justify-center shrink-0">
         <nz-icon nzType="edit" nzTheme="outline" class="text-white" />
       </div>
       <div>
@@ -15,30 +15,30 @@
     <label class="block text-xs font-medium text-church-text-secondary mb-1.5 px-1">Catégorie</label>
     <select
       formControlName="categoryId"
-      class="w-full text-sm bg-white rounded-xl px-3 py-2.5 border border-gray-200 outline-none mb-4">
+      class="w-full text-sm bg-white rounded-xl px-3 py-2.5 border border-church-text/10 outline-none mb-4 focus:border-church-blue transition-colors">
       @for (cat of categories(); track cat.id) {
         <option [value]="cat.id">{{ cat.name }}</option>
       }
     </select>
 
-    <label class="block text-xs font-medium text-church-text-secondary mb-1.5 mt-3 px-1">Votre sujet de prière</label>
+    <label class="block text-xs font-medium text-church-text-secondary mb-1.5 px-1">Votre sujet de prière</label>
     <textarea
-      placeholder="Écrivez votre sujet de prière..."
+      placeholder="Écrivez votre sujet de prière…"
       rows="6"
       formControlName="content"
-      class="w-full bg-white rounded-xl p-3 text-sm border-none outline-none resize-none focus:ring-2 focus:ring-church-blue/20"
+      class="w-full bg-white rounded-xl p-3 text-sm border border-church-text/10 outline-none resize-none focus:border-church-blue transition-colors"
     ></textarea>
     @if (form.controls.content.touched && form.controls.content.invalid) {
-      <p class="text-xs text-church-red mt-1 px-1">Merci d'écrire votre sujet de prière</p>
+      <p class="text-xs text-church-red mt-1.5 px-1">Merci d'écrire votre sujet de prière</p>
     }
 
-    <label class="flex items-center gap-2 text-xs text-church-text-secondary mt-3">
+    <label class="flex items-center gap-2 text-xs text-church-text-secondary mt-4">
       <input type="checkbox" formControlName="isAnonymous" class="rounded accent-church-blue" />
       Publier de façon anonyme
     </label>
 
-    <div class="flex justify-end mt-5">
-      <app-button variant="primary" type="submit" [disabled]="submitting()">
+    <div class="mt-5">
+      <app-button variant="primary" size="lg" shape="rounded" [fullWidth]="true" type="submit" [disabled]="submitting()">
         <nz-icon nzType="send" nzTheme="outline" /> Envoyer
       </app-button>
     </div>

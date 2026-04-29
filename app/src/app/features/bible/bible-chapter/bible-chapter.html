@@ -4,17 +4,19 @@
     [subtitle]="headerSubtitle()"
     [backLink]="true" />
 
-  <!-- Loading livres -->
+  <!-- Loading livres : skeleton article -->
   @if (booksLoading()) {
-    <div class="flex flex-col items-center justify-center py-16">
-      <nz-icon nzType="clock-circle" nzTheme="outline" class="text-4xl text-church-blue animate-pulse mb-3" />
-      <p class="text-sm text-church-text-secondary">Chargement...</p>
+    <div class="bg-white rounded-church-sm p-5 shadow-church-card space-y-3">
+      <div class="h-16 bg-church-text/10 rounded animate-pulse w-1/4"></div>
+      @for (i of [0, 1, 2, 3, 4, 5, 6]; track i) {
+        <div class="h-4 bg-church-text/10 rounded animate-pulse"></div>
+      }
     </div>
   }
 
   <!-- Not found -->
   @if (notFound()) {
-    <div class="bg-red-50 rounded-church-sm p-5 text-center">
+    <div class="bg-church-red-light rounded-church-sm p-5 text-center">
       <nz-icon nzType="info-circle" nzTheme="outline" class="text-2xl text-church-red mb-2" />
       <p class="text-sm text-church-red">Livre introuvable.</p>
     </div>
@@ -22,7 +24,7 @@
 
   <!-- Error -->
   @if (error(); as err) {
-    <div class="bg-red-50 rounded-church-sm p-5 text-center">
+    <div class="bg-church-red-light rounded-church-sm p-5 text-center">
       <nz-icon nzType="info-circle" nzTheme="outline" class="text-2xl text-church-red mb-2" />
       <p class="text-sm text-church-red">{{ err }}</p>
     </div>
@@ -35,12 +37,12 @@
         @for (v of verses(); track v.verse; let first = $first) {
           @if (first) {
             <p class="mb-2 flex items-center gap-3">
-              <span class="text-church-red font-serif text-7xl leading-none select-none shrink-0">{{ chapter() }}</span>
+              <span class="text-church-gold font-serif text-7xl leading-none select-none shrink-0">{{ chapter() }}</span>
               <span>{{ v.text }}</span>
             </p>
           } @else {
             <p class="mb-2 last:mb-0">
-              <sup class="text-church-red font-bold text-xs mr-1 select-none">{{ v.verse }}</sup>{{ v.text }}
+              <sup class="text-church-gold font-bold text-xs mr-1 select-none">{{ v.verse }}</sup>{{ v.text }}
             </p>
           }
         }
@@ -48,11 +50,13 @@
     </article>
   }
 
-  <!-- Empty state versets -->
+  <!-- Empty state versets : skeleton -->
   @if (book() && !booksLoading() && verses().length === 0) {
-    <div class="flex flex-col items-center justify-center py-12">
-      <nz-icon nzType="clock-circle" nzTheme="outline" class="text-3xl text-church-blue animate-pulse mb-2" />
-      <p class="text-sm text-church-text-secondary">Chargement du chapitre...</p>
+    <div class="bg-white rounded-church-sm p-5 shadow-church-card space-y-3">
+      <div class="h-16 bg-church-text/10 rounded animate-pulse w-1/4"></div>
+      @for (i of [0, 1, 2, 3, 4, 5, 6]; track i) {
+        <div class="h-4 bg-church-text/10 rounded animate-pulse"></div>
+      }
     </div>
   }
 
@@ -62,7 +66,7 @@
       @if (prevNav(); as prev) {
         <a
           [routerLink]="['/bible', prev.slug, prev.chapter]"
-          class="flex-1 flex items-center gap-2 bg-white rounded-church-sm px-4 py-3 shadow-church-card active:bg-slate-50">
+          class="flex-1 flex items-center gap-2 bg-white rounded-church-sm px-4 py-3 shadow-church-card active:bg-church-bg">
           <nz-icon nzType="left" nzTheme="outline" class="text-church-blue" />
           <div class="min-w-0">
             <p class="text-[10px] text-church-text-secondary uppercase tracking-wider">Précédent</p>
@@ -78,7 +82,7 @@
       @if (nextNav(); as next) {
         <a
           [routerLink]="['/bible', next.slug, next.chapter]"
-          class="flex-1 flex items-center justify-end gap-2 bg-white rounded-church-sm px-4 py-3 shadow-church-card active:bg-slate-50 text-right">
+          class="flex-1 flex items-center justify-end gap-2 bg-white rounded-church-sm px-4 py-3 shadow-church-card active:bg-church-bg text-right">
           <div class="min-w-0">
             <p class="text-[10px] text-church-text-secondary uppercase tracking-wider">Suivant</p>
             <p class="text-sm font-semibold text-church-text truncate">

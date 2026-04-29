@@ -5,10 +5,11 @@ import {
   output,
 } from '@angular/core';
 import { NzIconDirective } from 'ng-zorro-antd/icon';
+import { DurationPipe } from '@shared/pipes/duration.pipe';
 
 @Component({
   selector: 'app-sermon-card',
-  imports: [NzIconDirective],
+  imports: [NzIconDirective, DurationPipe],
   template: `
     <button
       (click)="play.emit()"
@@ -27,24 +28,23 @@ import { NzIconDirective } from 'ng-zorro-antd/icon';
         </div>
       } @else {
         <div
-          class="w-20 h-20 rounded-xl flex items-center justify-center shrink-0"
-          [class]="bgClass()"
+          class="w-20 h-20 rounded-xl flex items-center justify-center shrink-0 bg-church-blue-light"
         >
           <nz-icon
             [nzType]="audioUrl() ? 'audio' : 'play-circle'"
             nzTheme="outline"
-            [class]="'text-3xl ' + textClass()"
+            class="text-3xl text-church-blue"
           />
         </div>
       }
 
       <div class="flex-1 min-w-0">
         <h4
-          class="font-semibold text-church-text text-base truncate leading-tight"
+          class="font-semibold text-church-text text-sm leading-snug line-clamp-2"
         >
           {{ title() }}
         </h4>
-        <p class="text-sm text-church-text-secondary mt-1 truncate">
+        <p class="text-xs text-church-text-secondary mt-1 truncate">
           {{ speaker() }}
         </p>
         <div
@@ -52,12 +52,11 @@ import { NzIconDirective } from 'ng-zorro-antd/icon';
         >
           <span class="flex items-center gap-1">
             <nz-icon nzType="clock-circle" nzTheme="outline" />
-            {{ duration() }} min
+            {{ duration() | duration }}
           </span>
           @if (tag()) {
             <span
-              class="px-2 py-0.5 rounded-full text-[10px] font-medium"
-              [class]="bgClass() + ' ' + textClass()"
+              class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-church-blue-light text-church-blue"
             >
               {{ tag() }}
             </span>
@@ -72,7 +71,7 @@ import { NzIconDirective } from 'ng-zorro-antd/icon';
         <nz-icon
           nzType="play-circle"
           nzTheme="outline"
-          class="text-church-text-secondary text-xl shrink-0"
+          class="text-church-blue text-2xl shrink-0"
         />
       }
     </button>
@@ -85,20 +84,8 @@ export class SermonCard {
   readonly duration = input.required<number>();
   readonly date = input('');
   readonly tag = input<string>();
-  readonly color = input<'blue' | 'red' | 'green' | 'gold' | 'purple'>('blue');
   readonly thumbnailUrl = input<string | null>();
   readonly audioUrl = input<string | null>();
   readonly showPlayButton = input(false);
   readonly play = output<void>();
-
-  private static readonly colorMap = {
-    blue: { bg: 'bg-church-blue-light', text: 'text-church-blue' },
-    red: { bg: 'bg-church-red-light', text: 'text-church-red' },
-    green: { bg: 'bg-green-50', text: 'text-church-green' },
-    gold: { bg: 'bg-amber-50', text: 'text-church-gold' },
-    purple: { bg: 'bg-purple-50', text: 'text-purple-500' },
-  };
-
-  protected bgClass = () => SermonCard.colorMap[this.color()].bg;
-  protected textClass = () => SermonCard.colorMap[this.color()].text;
 }
