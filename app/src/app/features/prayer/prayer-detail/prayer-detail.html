@@ -1,4 +1,4 @@
-<div class="px-5 safe-area-top">
+<div class="px-5 safe-area-top h-full flex flex-col">
   <app-page-header title="Prière" backLink="/prayer" />
 
   @if (!prayer()) {
@@ -24,18 +24,24 @@
   }
 
   @if (prayer(); as p) {
-    <div
-      class="bg-white rounded-church p-5 shadow-church-card mb-5"
-      [class.border-l-4]="p.is_answered"
-      [class.border-church-green]="p.is_answered">
-
-      <div class="flex items-center gap-3 mb-4">
+    <div class="mb-5 shrink-0 max-h-[55vh] overflow-y-auto">
+      <div class="flex items-start gap-3 mb-4">
         <app-avatar [name]="authorName()" color="blue" size="md" />
         <div class="flex-1">
-          <p class="text-base font-semibold text-church-text">{{ authorName() }}</p>
-          <p class="text-xs text-church-text-secondary">{{ p.created_at | date:'d MMMM yyyy' }}</p>
+          <p class="text-base font-semibold text-church-text mb-0.5!">{{ authorName() }}</p>
+          <p class="text-sm text-church-text leading-relaxed whitespace-pre-line mb-8">{{ p.content }}</p>
+          <div class="flex justify-between items-center">
+            <p class="block text-sm text-church-text-secondary my-0!">{{ p.created_at | date:'d MMMM yyyy' }}</p>
+            <div class="flex justify-between gap-5 text-xl">
+              <nz-icon nzType="like" nzTheme="outline" />
+              <nz-icon nzType="share-alt" nzTheme="outline" />
+            </div>
+          </div>
+          <!-- <p class="text-xs text-church-text-secondary">{{ p.created_at | date:'d MMMM yyyy' }}</p> -->
         </div>
-        @if (p.category; as cat) {
+
+      </div>
+      <!-- @if (p.category; as cat) {
           <span
             class="text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1"
             [class]="categoryColor().bg + ' ' + categoryColor().text">
@@ -44,12 +50,11 @@
             }
             {{ cat.name }}
           </span>
-        }
-      </div>
+        } -->
 
-      <p class="text-base text-church-text leading-relaxed whitespace-pre-line mb-5">{{ p.content }}</p>
+      <!-- <p class="text-base text-church-text leading-relaxed whitespace-pre-line mb-5">{{ p.content }}</p> -->
 
-      <div class="flex items-center justify-between border-t border-church-text/5 pt-4">
+      <!-- <div class="flex items-center justify-between border-t border-church-text/5 pt-4">
         <button
           type="button"
           (click)="togglePray()"
@@ -66,7 +71,192 @@
           class="flex items-center gap-2 text-sm text-church-text-secondary">
           <nz-icon nzType="share-alt" nzTheme="outline" /> Partager
         </button>
-      </div>
+      </div> -->
     </div>
+
+    <section class="bg-amber-50 p-5 flex-1 overflow-y-auto min-h-0">
+        <div class="mb-4">
+          <h2 class="text-sm font-semibold text-church-text">12 Intercessions</h2>
+          <p class="text-xs text-church-text-secondary mt-0.5">Laisse un mot de soutien à ce frère/cette sœur</p>
+        </div>
+
+      <div class="flex gap-3 mb-6">
+        <app-avatar name="Dimitri Awade" color="blue" size="sm" />
+        <div class="flex-1">
+          <textarea
+            rows="2"
+            placeholder="Écris un mot d'intercession..."
+            class="w-full bg-white rounded-church-sm px-3 py-2 text-church-text placeholder:text-church-text-secondary border-0 focus:outline-none ring-2 ring-amber-200 focus:ring-amber-400 resize-none"></textarea>
+          <div class="flex items-center justify-between mt-2">
+            <label class="flex items-center gap-2 text-xs text-church-text-secondary">
+              <input type="checkbox" class="accent-church-blue" />
+              Anonyme
+            </label>
+            <button type="button"
+              class="bg-church-blue text-white! text-xs font-semibold px-4 py-1.5 rounded-full disabled:opacity-50 disabled:cursor-not-allowed">
+              Publier
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="space-y-5">
+        <article class="flex gap-3">
+          <app-avatar name="Marie Konan" color="purple" size="sm" />
+          <div class="flex-1 min-w-0">
+            <div class="flex items-baseline gap-2 mb-1">
+              <p class="text-sm font-semibold text-church-text">Marie Konan</p>
+              <p class="text-[11px] text-church-text-secondary">il y a 2h</p>
+            </div>
+            <p class="text-sm text-church-text leading-relaxed mb-2">
+              Je prie avec toi cher frère. Que la paix de Christ t'inonde.
+            </p>
+            <button type="button"
+              class="flex items-center gap-1.5 text-xs font-medium text-church-text-secondary">
+              <nz-icon nzType="check-circle" nzTheme="outline" />
+              Amen · 5
+            </button>
+          </div>
+        </article>
+
+        <article class="flex gap-3">
+          <app-avatar name="A" color="gold" size="sm" />
+          <div class="flex-1 min-w-0">
+            <div class="flex items-baseline gap-2 mb-1">
+              <p class="text-sm font-semibold text-church-text">Anonyme</p>
+              <p class="text-[11px] text-church-text-secondary">il y a 5h</p>
+            </div>
+            <p class="text-sm text-church-text leading-relaxed mb-2">
+              Psaume 34:18 — « L'Éternel est près de ceux qui ont le cœur brisé. »
+            </p>
+            <button type="button"
+              class="flex items-center gap-1.5 text-xs font-medium text-church-blue">
+              <nz-icon nzType="check-circle" nzTheme="fill" />
+              Amen · 12
+            </button>
+          </div>
+        </article>
+
+        <article class="flex gap-3">
+          <app-avatar name="Jean Kouamé" color="green" size="sm" />
+          <div class="flex-1 min-w-0">
+            <div class="flex items-baseline gap-2 mb-1">
+              <p class="text-sm font-semibold text-church-text">Jean Kouamé</p>
+              <p class="text-[11px] text-church-text-secondary">il y a 8h</p>
+            </div>
+            <p class="text-sm text-church-text leading-relaxed mb-2">
+              Garde courage frère, le Seigneur combat pour toi. Romains 8:28.
+            </p>
+            <button type="button"
+              class="flex items-center gap-1.5 text-xs font-medium text-church-text-secondary">
+              <nz-icon nzType="check-circle" nzTheme="outline" />
+              Amen · 3
+            </button>
+          </div>
+        </article>
+
+        <article class="flex gap-3">
+          <app-avatar name="Esther Yao" color="red" size="sm" />
+          <div class="flex-1 min-w-0">
+            <div class="flex items-baseline gap-2 mb-1">
+              <p class="text-sm font-semibold text-church-text">Esther Yao</p>
+              <p class="text-[11px] text-church-text-secondary">il y a 12h</p>
+            </div>
+            <p class="text-sm text-church-text leading-relaxed mb-2">
+              Que l'Éternel te bénisse et te garde. Je m'unis à toi dans cette prière.
+            </p>
+            <button type="button"
+              class="flex items-center gap-1.5 text-xs font-medium text-church-text-secondary">
+              <nz-icon nzType="check-circle" nzTheme="outline" />
+              Amen · 7
+            </button>
+          </div>
+        </article>
+
+        <article class="flex gap-3">
+          <app-avatar name="Pasteur David" color="blue" size="sm" />
+          <div class="flex-1 min-w-0">
+            <div class="flex items-baseline gap-2 mb-1">
+              <p class="text-sm font-semibold text-church-text">Pasteur David</p>
+              <p class="text-[11px] text-church-text-secondary">hier</p>
+            </div>
+            <p class="text-sm text-church-text leading-relaxed mb-2">
+              Je prends ce sujet en intercession personnelle cette semaine. À Dieu seul la gloire.
+            </p>
+            <button type="button"
+              class="flex items-center gap-1.5 text-xs font-medium text-church-blue">
+              <nz-icon nzType="check-circle" nzTheme="fill" />
+              Amen · 24
+            </button>
+          </div>
+        </article>
+
+        <article class="flex gap-3">
+          <app-avatar name="Grace Bamba" color="purple" size="sm" />
+          <div class="flex-1 min-w-0">
+            <div class="flex items-baseline gap-2 mb-1">
+              <p class="text-sm font-semibold text-church-text">Grace Bamba</p>
+              <p class="text-[11px] text-church-text-secondary">hier</p>
+            </div>
+            <p class="text-sm text-church-text leading-relaxed mb-2">
+              Sois fort et courageux. Josué 1:9 — « L'Éternel ton Dieu est avec toi partout où tu iras. »
+            </p>
+            <button type="button"
+              class="flex items-center gap-1.5 text-xs font-medium text-church-text-secondary">
+              <nz-icon nzType="check-circle" nzTheme="outline" />
+              Amen · 6
+            </button>
+          </div>
+        </article>
+
+        <article class="flex gap-3">
+          <app-avatar name="A" color="gold" size="sm" />
+          <div class="flex-1 min-w-0">
+            <div class="flex items-baseline gap-2 mb-1">
+              <p class="text-sm font-semibold text-church-text">Anonyme</p>
+              <p class="text-[11px] text-church-text-secondary">il y a 2 jours</p>
+            </div>
+            <p class="text-sm text-church-text leading-relaxed mb-2">
+              Je prie pour toi avec foi. Que Dieu transforme cette épreuve en témoignage.
+            </p>
+            <button type="button"
+              class="flex items-center gap-1.5 text-xs font-medium text-church-text-secondary">
+              <nz-icon nzType="check-circle" nzTheme="outline" />
+              Amen · 4
+            </button>
+          </div>
+        </article>
+
+        <article class="flex gap-3">
+          <app-avatar name="Samuel Diallo" color="green" size="sm" />
+          <div class="flex-1 min-w-0">
+            <div class="flex items-baseline gap-2 mb-1">
+              <p class="text-sm font-semibold text-church-text">Samuel Diallo</p>
+              <p class="text-[11px] text-church-text-secondary">il y a 3 jours</p>
+            </div>
+            <p class="text-sm text-church-text leading-relaxed mb-2">
+              Amen ! Je crois avec toi pour la manifestation de la gloire de Dieu dans ta vie.
+            </p>
+            <button type="button"
+              class="flex items-center gap-1.5 text-xs font-medium text-church-text-secondary">
+              <nz-icon nzType="check-circle" nzTheme="outline" />
+              Amen · 2
+            </button>
+          </div>
+        </article>
+      </div>
+
+      <!--
+        EMPTY STATE — décommente ce bloc et commente la <div class="space-y-5"> ci-dessus pour voir le rendu sans intercessions.
+        <div class="flex flex-col items-center text-center py-6">
+          <div class="w-12 h-12 rounded-full bg-church-blue-light flex items-center justify-center mb-3">
+            <nz-icon nzType="message" nzTheme="outline" class="text-church-blue text-xl" />
+          </div>
+          <p class="text-sm font-medium text-church-text mb-1">Aucune intercession encore</p>
+          <p class="text-xs text-church-text-secondary">Sois le premier à intercéder pour cette prière.</p>
+        </div>
+      -->
+
+    </section>
   }
 </div>
