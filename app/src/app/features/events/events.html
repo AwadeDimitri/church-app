@@ -1,17 +1,25 @@
 <div class="px-5 safe-area-top">
   <app-page-header title="Événements" backLink="/" />
 
-  <!-- Loading initial -->
+  <!-- Loading initial : skeletons -->
   @if (loading() && events().length === 0) {
-    <div class="flex flex-col items-center justify-center py-16">
-      <nz-icon nzType="calendar" nzTheme="outline" class="text-4xl text-church-blue animate-pulse mb-3" />
-      <p class="text-sm text-church-text-secondary">Chargement des événements...</p>
+    <div class="flex flex-col gap-4">
+      @for (i of [0, 1, 2]; track i) {
+        <div class="bg-white rounded-church shadow-church-card overflow-hidden">
+          <div class="h-36 bg-church-text/10 animate-pulse"></div>
+          <div class="p-4 space-y-2">
+            <div class="h-4 bg-church-text/10 rounded animate-pulse w-3/4"></div>
+            <div class="h-3 bg-church-text/10 rounded animate-pulse w-1/2"></div>
+            <div class="h-3 bg-church-text/10 rounded animate-pulse w-2/3"></div>
+          </div>
+        </div>
+      }
     </div>
   }
 
   <!-- Error -->
   @if (error(); as err) {
-    <div class="bg-red-50 rounded-church-sm p-5 text-center">
+    <div class="bg-church-red-light rounded-church-sm p-5 text-center">
       <nz-icon nzType="info-circle" nzTheme="outline" class="text-2xl text-church-red mb-2" />
       <p class="text-sm text-church-red">{{ err }}</p>
     </div>
@@ -31,7 +39,7 @@
       @for (event of events(); track event.id) {
         <article class="bg-white rounded-church shadow-church-card overflow-hidden">
           @if (event.coverUrl) {
-            <div class="relative h-36 bg-slate-100">
+            <div class="relative h-36 bg-church-text/5">
               <img
                 [src]="event.coverUrl"
                 [alt]="event.title"
@@ -39,7 +47,7 @@
                 loading="lazy"
               />
               <div class="absolute top-3 left-3 bg-white/95 backdrop-blur rounded-xl px-3 py-1.5 shadow text-center">
-                <div class="text-[10px] font-semibold text-church-red leading-none">{{ event.month }}</div>
+                <div class="text-[10px] font-semibold text-church-blue leading-none">{{ event.month }}</div>
                 <div class="text-lg font-bold text-church-text leading-tight">{{ event.dayNumber }}</div>
               </div>
             </div>
@@ -70,15 +78,17 @@
     </div>
 
     @if (hasMore()) {
-      <div class="flex justify-end mb-6">
+      <div class="flex justify-center mb-6">
         <button
           type="button"
           (click)="loadMore()"
           [disabled]="loading()"
-          class="inline-flex items-center gap-1 !text-church-blue text-xs underline underline-offset-2 disabled:opacity-50 disabled:pointer-events-none"
+          class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-white border border-church-blue/20 text-church-blue text-sm font-semibold shadow-church-card active:opacity-80 transition-opacity disabled:opacity-50 disabled:pointer-events-none"
         >
-          {{ loading() ? 'Chargement...' : 'Charger plus' }}
-          <nz-icon nzType="arrow-right" nzTheme="outline" />
+          {{ loading() ? 'Chargement…' : 'Voir plus' }}
+          @if (!loading()) {
+            <nz-icon nzType="arrow-right" nzTheme="outline" class="text-xs" />
+          }
         </button>
       </div>
     }

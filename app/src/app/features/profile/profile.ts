@@ -30,7 +30,9 @@ export default class Profile {
   protected readonly memberSince = computed(() => {
     const createdAt = this.user()?.created_at;
     if (!createdAt) return '';
-    return `Membre depuis ${new Date(createdAt).getFullYear()}`;
+    const date = new Date(createdAt);
+    const formatted = new Intl.DateTimeFormat('fr-FR', { month: 'long', year: 'numeric' }).format(date);
+    return `Membre depuis ${formatted}`;
   });
 
   readonly mainMenu: MenuEntry[] = [

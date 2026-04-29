@@ -15,17 +15,25 @@
   <!-- Category Filter -->
   <app-category-filter [categories]="categories()" [(selected)]="selectedCategory" />
 
-  <!-- Loading initial (liste encore vide) -->
+  <!-- Loading initial : skeletons (cohérent avec home) -->
   @if (loading() && allSermons().length === 0) {
-    <div class="flex flex-col items-center justify-center py-16">
-      <nz-icon nzType="clock-circle" nzTheme="outline" class="text-4xl text-church-blue animate-pulse mb-3" />
-      <p class="text-sm text-church-text-secondary">Chargement des sermons...</p>
+    <div class="flex flex-col gap-3">
+      @for (i of [0, 1, 2, 3]; track i) {
+        <div class="bg-white rounded-2xl p-4 shadow-church-card flex gap-4 items-center">
+          <div class="w-20 h-20 bg-church-text/10 rounded-xl animate-pulse shrink-0"></div>
+          <div class="flex-1 space-y-2">
+            <div class="h-4 bg-church-text/10 rounded animate-pulse w-3/4"></div>
+            <div class="h-3 bg-church-text/10 rounded animate-pulse w-1/2"></div>
+            <div class="h-3 bg-church-text/10 rounded animate-pulse w-1/3"></div>
+          </div>
+        </div>
+      }
     </div>
   }
 
   <!-- Error -->
   @if (error(); as err) {
-    <div class="bg-red-50 rounded-church-sm p-5 text-center">
+    <div class="bg-church-red-light rounded-church-sm p-5 text-center">
       <nz-icon nzType="info-circle" nzTheme="outline" class="text-2xl text-church-red mb-2" />
       <p class="text-sm text-church-red">{{ err }}</p>
     </div>
@@ -47,23 +55,30 @@
   @if (allSermons().length > 0 && !error()) {
     <!-- Featured Sermon -->
     @if (featured(); as sermon) {
-      <button (click)="openSermon(sermon.id)" class="w-full text-left bg-gradient-to-br from-church-blue to-church-blue-dark rounded-church p-5 mb-6 text-white relative overflow-hidden z-0">
+      <button
+        type="button"
+        (click)="openSermon(sermon.id)"
+        class="w-full text-left text-white bg-gradient-to-br from-church-blue to-church-blue-dark rounded-church p-5 mb-6 relative overflow-hidden active:opacity-95 transition-opacity">
         <div class="absolute bottom-0 right-0 w-40 h-40 bg-white/5 rounded-full translate-y-1/2 translate-x-8 pointer-events-none"></div>
-        <span class="text-[10px] font-bold uppercase tracking-wider bg-church-gold text-white px-2 py-0.5 rounded-full">À la une</span>
-        <h3 class="text-lg font-bold text-white/90! mt-5 mb-1">{{ sermon.title }}</h3>
-        <p class="text-sm text-white/70 mb-1">{{ sermon.preacher_name }}</p>
-        <div class="flex items-center gap-3 text-xs text-white/60 mb-4">
-          @if (sermon.duration) {
-            <span class="flex items-center gap-1">
-              <nz-icon nzType="clock-circle" nzTheme="outline" /> {{ sermon.duration }} min
-            </span>
-          }
-          @if (sermon.published_at) {
-            <span>{{ sermon.published_at | date:'d MMMM yyyy' }}</span>
-          }
-        </div>
-        <div class="inline-flex items-center gap-2 bg-white/20 rounded-full px-4 py-2 text-sm font-medium">
-          <nz-icon nzType="play-circle" nzTheme="outline" /> Écouter
+        <div class="relative flex flex-col gap-3">
+          <span class="inline-flex self-start text-[10px] font-bold uppercase tracking-wider bg-church-gold px-2 py-0.5 rounded-full">À la une</span>
+          <div>
+            <h3 class="text-white! text-lg font-bold leading-tight mb-1">{{ sermon.title }}</h3>
+            <p class="text-sm text-white/80! opacity-80">{{ sermon.preacher_name }}</p>
+          </div>
+          <div class="flex text-white/70! items-center gap-3 text-xs opacity-70">
+            @if (sermon.duration) {
+              <span class="flex items-center gap-1">
+                <nz-icon nzType="clock-circle" nzTheme="outline" /> {{ sermon.duration | duration }}
+              </span>
+            }
+            @if (sermon.published_at) {
+              <span>{{ sermon.published_at | date:'d MMMM yyyy' }}</span>
+            }
+          </div>
+          <span class="inline-flex self-start items-center gap-2 bg-white/20 rounded-full px-4 py-2 text-sm font-medium mt-1">
+            <nz-icon nzType="play-circle" nzTheme="outline" /> Écouter
+          </span>
         </div>
       </button>
     }
@@ -92,15 +107,17 @@
     </div>
 
     @if (hasMore()) {
-      <div class="flex justify-end mb-6">
+      <div class="flex justify-center mb-6">
         <button
           type="button"
           (click)="loadMore()"
           [disabled]="loading()"
-          class="inline-flex items-center gap-1 !text-church-blue text-xs underline underline-offset-2 disabled:opacity-50 disabled:pointer-events-none"
+          class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-white border border-church-blue/20 text-church-blue text-sm font-semibold shadow-church-card active:opacity-80 transition-opacity disabled:opacity-50 disabled:pointer-events-none"
         >
-          {{ loading() ? 'Chargement...' : 'Charger plus' }}
-          <nz-icon nzType="arrow-right" nzTheme="outline" />
+          {{ loading() ? 'Chargement…' : 'Voir plus' }}
+          @if (!loading()) {
+            <nz-icon nzType="arrow-right" nzTheme="outline" class="text-xs" />
+          }
         </button>
       </div>
     }

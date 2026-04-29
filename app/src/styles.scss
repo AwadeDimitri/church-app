@@ -38,6 +38,14 @@ body {
   --ant-font-family: var(--font-sans);
 }
 
+/* Neutralise le reset ng-zorro qui force une couleur sombre sur h1–h6.
+   ng-zorro CSS n'est pas dans une layer Tailwind v4 → il l'emporte sur les
+   utilities sans !important. On force ici la cascade pour rendre `text-XXX`
+   utilisable directement sur les headings. */
+h1, h2, h3, h4, h5, h6 {
+  color: inherit !important;
+}
+
 /* Glass morphism */
 .glass {
   background: rgba(255, 255, 255, 0.7);

@@ -2,9 +2,16 @@
   <app-page-header title="Sermon" [backLink]="true" />
 
   @if (!sermon()) {
-    <div class="flex flex-col items-center justify-center py-16">
-      <nz-icon nzType="clock-circle" nzTheme="outline" class="text-4xl text-church-blue animate-pulse mb-3" />
-      <p class="text-sm text-church-text-secondary">Chargement...</p>
+    <div class="space-y-5">
+      <div class="w-full bg-church-text/10 rounded-church animate-pulse" style="padding-top: 56.25%"></div>
+      <div class="space-y-2">
+        <div class="h-6 bg-church-text/10 rounded animate-pulse w-3/4"></div>
+        <div class="h-4 bg-church-text/10 rounded animate-pulse w-1/2"></div>
+      </div>
+      <div class="flex gap-3">
+        <div class="h-3 bg-church-text/10 rounded animate-pulse w-20"></div>
+        <div class="h-3 bg-church-text/10 rounded animate-pulse w-24"></div>
+      </div>
     </div>
   }
 
@@ -35,14 +42,14 @@
     }
 
     <!-- Sermon Info -->
-    <div class="mb-5">
-      <h1 class="text-xl font-bold text-church-text mb-1">{{ sermon.title }}</h1>
+    <div class="mb-6">
+      <h1 class="text-2xl font-bold text-church-text leading-tight mb-1">{{ sermon.title }}</h1>
       <p class="text-sm text-church-text-secondary mb-3">{{ sermon.preacher_name }}</p>
 
       <div class="flex items-center gap-4 text-xs text-church-text-secondary">
         @if (sermon.duration) {
           <span class="flex items-center gap-1">
-            <nz-icon nzType="clock-circle" nzTheme="outline" /> {{ sermon.duration }} min
+            <nz-icon nzType="clock-circle" nzTheme="outline" /> {{ sermon.duration | duration }}
           </span>
         }
         @if (sermon.published_at) {
@@ -60,7 +67,7 @@
 
     <!-- Description -->
     @if (sermon.description) {
-      <div class="mb-8">
+      <div class="mb-6">
         <h3 class="text-sm font-semibold text-church-text mb-2">Description</h3>
         <p class="text-sm text-church-text-secondary leading-relaxed">{{ sermon.description }}</p>
       </div>

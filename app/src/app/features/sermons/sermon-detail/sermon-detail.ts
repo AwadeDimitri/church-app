@@ -7,10 +7,11 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { SermonService } from '@core/services/sermon.service';
 import { getYouTubeId } from '@core/utils/youtube.util';
 import { PageHeader } from '@shared/components/page-header/page-header';
+import { DurationPipe } from '@shared/pipes/duration.pipe';
 
 @Component({
   selector: 'app-sermon-detail',
-  imports: [DatePipe, NzIconDirective, PageHeader],
+  imports: [DatePipe, NzIconDirective, PageHeader, DurationPipe],
   templateUrl: './sermon-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

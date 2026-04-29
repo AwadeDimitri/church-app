@@ -6,7 +6,6 @@ import { SermonService } from '@core/services/sermon.service';
 import { EventService } from '@core/services/event.service';
 import { ProfileService } from '@core/services/profile.service';
 import { getYouTubeThumbnail } from '@core/utils/youtube.util';
-import { Button } from '@shared/components/button/button';
 import { SectionHeader } from '@shared/components/section-header/section-header';
 import { SermonCard } from '@shared/components/sermon-card/sermon-card';
 
@@ -14,31 +13,16 @@ interface QuickAction {
   readonly icon: string;
   readonly label: string;
   readonly route: string;
-  readonly bg: string;
-  readonly text: string;
-}
-
-interface EventColor {
-  readonly bg: string;
-  readonly text: string;
 }
 
 const DAY_FMT = new Intl.DateTimeFormat('fr-FR', { weekday: 'short' });
-const DATE_FMT = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long' });
+const MONTH_FMT = new Intl.DateTimeFormat('fr-FR', { month: 'short' });
 const TIME_FMT = new Intl.DateTimeFormat('fr-FR', { hour: '2-digit', minute: '2-digit' });
 const SERMON_DATE_FMT = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
 
-const EVENT_COLORS: readonly EventColor[] = [
-  { bg: 'bg-church-blue-light', text: 'text-church-blue' },
-  { bg: 'bg-church-red-light',  text: 'text-church-red' },
-  { bg: 'bg-amber-50',          text: 'text-church-gold' },
-];
-
-const SERMON_COLORS = ['blue', 'red', 'green'] as const;
-
 @Component({
   selector: 'app-home',
-  imports: [NzIconDirective, RouterLink, Button, SectionHeader, SermonCard],
+  imports: [NzIconDirective, RouterLink, SectionHeader, SermonCard],
   templateUrl: './home.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -50,6 +34,9 @@ export default class Home {
   private readonly profileService = inject(ProfileService);
 
   readonly dailyVerse = this.bibleService.dailyVerseDisplay;
+  readonly lastReading = this.bibleService.lastReading;
+  readonly eventsLoading = computed(() => this.eventService.events().length === 0);
+  readonly sermonsLoading = this.sermonService.loading;
 
   readonly firstName = computed(() => {
     const full = this.profileService.user()?.full_name?.trim();
@@ -57,24 +44,23 @@ export default class Home {
   });
 
   readonly upcomingEvents = computed(() =>
-    this.eventService.events().slice(0, 3).map((e, i) => {
+    this.eventService.events().slice(0, 3).map(e => {
       const start = new Date(e.starts_at);
-      const color = EVENT_COLORS[i % EVENT_COLORS.length];
       return {
         id: e.id,
         title: e.title,
         description: e.description ?? '',
         location: e.location ?? '',
         day: DAY_FMT.format(start).replace('.', '').toUpperCase().slice(0, 3),
-        date: `${DATE_FMT.format(start)} • ${TIME_FMT.format(start)}`,
-        dayBg: color.bg,
-        dayText: color.text,
+        dayNum: start.getDate(),
+        month: MONTH_FMT.format(start).replace('.', '').toUpperCase(),
+        time: TIME_FMT.format(start),
       };
     }),
   );
 
   readonly latestSermons = computed(() =>
-    this.sermonService.sermons().slice(0, 3).map((s, i) => ({
+    this.sermonService.sermons().slice(0, 3).map(s => ({
       id: s.id,
       title: s.title,
       speaker: s.preacher_name,
@@ -82,15 +68,14 @@ export default class Home {
       date: s.published_at ? SERMON_DATE_FMT.format(new Date(s.published_at)) : '',
       thumbnailUrl: getYouTubeThumbnail(s.video_url),
       audioUrl: s.audio_url,
-      color: SERMON_COLORS[i % SERMON_COLORS.length],
     })),
   );
 
   readonly quickActions: QuickAction[] = [
-    { icon: 'dollar-circle', label: 'Donner',      route: '/donate', bg: 'bg-church-blue-light', text: 'text-church-blue' },
-    { icon: 'heart',         label: 'Prière',       route: '/prayer', bg: 'bg-church-red-light',  text: 'text-church-red' },
-    { icon: 'calendar',      label: 'Événements',   route: '/events', bg: 'bg-amber-50',          text: 'text-church-gold' },
-    { icon: 'play-circle',   label: 'Sermons',      route: '/sermons', bg: 'bg-green-50',         text: 'text-church-green' },
+    { icon: 'play-circle', label: 'Sermons',     route: '/sermons' },
+    { icon: 'calendar',    label: 'Événements',  route: '/events' },
+    { icon: 'heart',       label: 'Prière',      route: '/prayer' },
+    { icon: 'book',        label: 'À propos',    route: '/about' },
   ];
 
   openSermon(id: string): void {

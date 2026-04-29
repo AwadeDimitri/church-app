@@ -1,58 +1,115 @@
 <div class="px-5 safe-area-top">
   <!-- Header -->
-  <div class="mb-6">
-    <p class="text-church-text-secondary text-base">
-      Bienvenue 👋@if (firstName(); as name) {, {{ name }}}
-    </p>
-    <h1 class="text-2xl font-bold text-red text-church-text">Église CI-JCM</h1>
-  </div>
+  <header class="mb-6">
+    <h1 class="text-2xl font-bold text-church-text leading-tight">
+      Bonjour@if (firstName(); as name) { {{ name }}} 👋
+    </h1>
+    <p class="text-sm text-church-text-secondary mt-1">Église CI-JCM</p>
+  </header>
 
+  <!-- Verset du jour : seul élément "sacré" — accent gold rare (cf. la croix dorée du logo) -->
+  @if (dailyVerse(); as verse) {
+    <a
+      [routerLink]="verse.route"
+      class="block relative bg-gradient-to-br from-church-gold-light to-amber-50 rounded-church-sm p-5 pl-6 mb-6 border-l-4 border-church-gold active:opacity-80 transition-opacity"
+    >
+      <div class="flex items-center gap-2 mb-3">
+        <nz-icon nzType="fire" nzTheme="outline" class="text-base text-church-gold" />
+        <span class="text-[11px] font-semibold uppercase tracking-wider text-church-gold">Verset du jour</span>
+      </div>
+      <p class="text-sm text-church-text italic leading-relaxed">« {{ verse.text }} »</p>
+      <p class="text-xs text-church-text-secondary mt-2 font-medium">{{ verse.reference }}</p>
+    </a>
+  } @else {
+    <div class="bg-gradient-to-br from-church-gold-light to-amber-50 rounded-church-sm p-5 pl-6 mb-6 border-l-4 border-church-gold">
+      <div class="flex items-center gap-2 mb-3">
+        <nz-icon nzType="fire" nzTheme="outline" class="text-base text-church-gold" />
+        <span class="text-[11px] font-semibold uppercase tracking-wider text-church-gold">Verset du jour</span>
+      </div>
+      <div class="h-4 bg-church-text/10 rounded animate-pulse mb-2"></div>
+      <div class="h-4 bg-church-text/10 rounded animate-pulse w-3/4"></div>
+    </div>
+  }
 
-  <!-- Quick Actions -->
-  <div class="grid grid-cols-4 gap-3 mb-6">
+  <!-- Quick Actions : couleur primaire (bleu marine du sceau du logo) -->
+  <nav class="grid grid-cols-4 gap-3 mb-6" aria-label="Accès rapides">
     @for (action of quickActions; track action.icon) {
-      <a [routerLink]="action.route" class="flex flex-col items-center gap-2">
-        <div class="w-14 h-14 rounded-2xl flex items-center justify-center" [class]="action.bg">
-          <nz-icon [nzType]="action.icon" nzTheme="outline" [class]="'text-2xl ' + action.text" />
+      <a [routerLink]="action.route" class="flex flex-col items-center gap-2 active:scale-95 transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-church-blue/40 rounded-2xl">
+        <div class="w-14 h-14 rounded-2xl flex items-center justify-center bg-church-blue-light">
+          <nz-icon [nzType]="action.icon" nzTheme="outline" class="text-2xl text-church-blue" />
         </div>
         <span class="text-xs text-church-text font-medium">{{ action.label }}</span>
       </a>
     }
-  </div>
+  </nav>
+
+  <!-- Reprendre lecture biblique -->
+  @if (lastReading(); as reading) {
+    <a
+      [routerLink]="['/bible', reading.bookSlug, reading.chapter]"
+      class="flex items-center gap-3 bg-white rounded-church-sm p-4 mb-6 shadow-church-card active:opacity-80 transition-opacity"
+    >
+      <div class="w-11 h-11 rounded-xl bg-church-blue-light flex items-center justify-center shrink-0">
+        <nz-icon nzType="book" nzTheme="outline" class="text-xl text-church-blue" />
+      </div>
+      <div class="flex-1 min-w-0">
+        <p class="text-[11px] font-semibold uppercase tracking-wider text-church-text-secondary">Reprendre la lecture</p>
+        <p class="text-sm font-semibold text-church-text truncate">{{ reading.bookName }} {{ reading.chapter }}</p>
+      </div>
+      <nz-icon nzType="right" nzTheme="outline" class="text-church-text-secondary shrink-0" />
+    </a>
+  }
 
   <!-- Upcoming Events -->
-  @if (upcomingEvents().length > 0) {
-    <div class="mb-6">
-      <app-section-header title="Événements à venir" actionLabel="Voir tout" (action)="goToEvents()" />
+  <section class="mb-6">
+    <app-section-header title="Événements à venir" actionLabel="Voir tout" (action)="goToEvents()" />
+    @if (upcomingEvents().length > 0) {
       <div class="scroll-snap-x flex gap-3">
         @for (event of upcomingEvents(); track event.id) {
-          <div class="min-w-[260px] bg-white rounded-church-sm p-4 shadow-church-card">
-            <div class="flex items-center gap-2 mb-2">
-              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full" [class]="event.dayBg + ' ' + event.dayText">
-                {{ event.day }}
-              </span>
-              <span class="text-xs text-church-text-secondary">{{ event.date }}</span>
+          <article class="min-w-[260px] bg-white rounded-church-sm p-4 shadow-church-card flex gap-3">
+            <div class="flex flex-col items-center justify-center shrink-0 bg-church-blue-light text-church-blue rounded-xl px-3 py-2 min-w-[56px]">
+              <span class="text-[10px] font-bold uppercase leading-none">{{ event.day }}</span>
+              <span class="text-xl font-bold leading-tight mt-0.5">{{ event.dayNum }}</span>
+              <span class="text-[10px] font-medium uppercase leading-none mt-0.5">{{ event.month }}</span>
             </div>
-            <h4 class="font-semibold text-church-text mb-1">{{ event.title }}</h4>
-            @if (event.description) {
-              <p class="text-xs text-church-text-secondary">{{ event.description }}</p>
-            }
-            @if (event.location) {
-              <div class="flex items-center gap-1 mt-3 text-church-text-secondary">
-                <nz-icon nzType="environment" nzTheme="outline" class="text-sm" />
-                <span class="text-xs">{{ event.location }}</span>
-              </div>
-            }
+            <div class="flex-1 min-w-0">
+              <h4 class="font-semibold text-church-text leading-tight line-clamp-2">{{ event.title }}</h4>
+              <p class="text-xs text-church-text-secondary mt-1 flex items-center gap-1">
+                <nz-icon nzType="clock-circle" nzTheme="outline" />
+                {{ event.time }}
+              </p>
+              @if (event.location) {
+                <p class="text-xs text-church-text-secondary mt-1 flex items-center gap-1 truncate">
+                  <nz-icon nzType="environment" nzTheme="outline" class="shrink-0" />
+                  <span class="truncate">{{ event.location }}</span>
+                </p>
+              }
+            </div>
+          </article>
+        }
+      </div>
+    } @else if (eventsLoading()) {
+      <div class="flex gap-3 overflow-hidden">
+        @for (i of [0, 1]; track i) {
+          <div class="min-w-[260px] bg-white rounded-church-sm p-4 shadow-church-card flex gap-3">
+            <div class="w-14 h-16 bg-church-text/10 rounded-xl animate-pulse shrink-0"></div>
+            <div class="flex-1 space-y-2 py-1">
+              <div class="h-4 bg-church-text/10 rounded animate-pulse"></div>
+              <div class="h-3 bg-church-text/10 rounded animate-pulse w-1/2"></div>
+              <div class="h-3 bg-church-text/10 rounded animate-pulse w-3/4"></div>
+            </div>
           </div>
         }
       </div>
-    </div>
-  }
+    } @else {
+      <p class="text-sm text-church-text-secondary py-4">Aucun événement à venir.</p>
+    }
+  </section>
 
   <!-- Latest Sermons -->
-  @if (latestSermons().length > 0) {
-    <div class="mb-6">
-      <app-section-header title="Derniers sermons" actionLabel="Voir tout" (action)="goToSermons()" />
+  <section class="mb-6">
+    <app-section-header title="Derniers sermons" actionLabel="Voir tout" (action)="goToSermons()" />
+    @if (latestSermons().length > 0) {
       <div class="flex flex-col gap-3">
         @for (sermon of latestSermons(); track sermon.id) {
           <app-sermon-card
@@ -60,40 +117,27 @@
             [speaker]="sermon.speaker"
             [duration]="sermon.duration"
             [date]="sermon.date"
-            [color]="sermon.color"
             [thumbnailUrl]="sermon.thumbnailUrl"
             [audioUrl]="sermon.audioUrl"
             [showPlayButton]="true"
             (play)="openSermon(sermon.id)" />
         }
       </div>
-    </div>
-  }
-
-  <!-- Community -->
-  <div class="mb-8">
-    <app-section-header title="Communauté" />
-    @if (dailyVerse(); as verse) {
-      <a
-        [routerLink]="verse.route"
-        class="block bg-gradient-to-r from-church-gold/10 to-amber-50 rounded-church-sm p-5 active:opacity-80 transition-opacity"
-      >
-        <div class="flex items-center gap-3 mb-3">
-          <nz-icon nzType="fire" nzTheme="outline" class="text-2xl text-church-gold" />
-          <h4 class="font-semibold text-church-text">Verset du jour</h4>
-        </div>
-        <p class="text-sm text-church-text italic leading-relaxed">« {{ verse.text }} »</p>
-        <p class="text-xs text-church-text-secondary mt-2 font-medium">{{ verse.reference }}</p>
-      </a>
-    } @else {
-      <div class="bg-gradient-to-r from-church-gold/10 to-amber-50 rounded-church-sm p-5">
-        <div class="flex items-center gap-3 mb-3">
-          <nz-icon nzType="fire" nzTheme="outline" class="text-2xl text-church-gold" />
-          <h4 class="font-semibold text-church-text">Verset du jour</h4>
-        </div>
-        <div class="h-4 bg-church-text/10 rounded animate-pulse mb-2"></div>
-        <div class="h-4 bg-church-text/10 rounded animate-pulse w-3/4"></div>
+    } @else if (sermonsLoading()) {
+      <div class="flex flex-col gap-3">
+        @for (i of [0, 1, 2]; track i) {
+          <div class="bg-white rounded-2xl p-4 shadow-church-card flex gap-4 items-center">
+            <div class="w-20 h-20 bg-church-text/10 rounded-xl animate-pulse shrink-0"></div>
+            <div class="flex-1 space-y-2">
+              <div class="h-4 bg-church-text/10 rounded animate-pulse w-3/4"></div>
+              <div class="h-3 bg-church-text/10 rounded animate-pulse w-1/2"></div>
+              <div class="h-3 bg-church-text/10 rounded animate-pulse w-1/3"></div>
+            </div>
+          </div>
+        }
       </div>
+    } @else {
+      <p class="text-sm text-church-text-secondary py-4">Aucun sermon disponible.</p>
     }
-  </div>
+  </section>
 </div>

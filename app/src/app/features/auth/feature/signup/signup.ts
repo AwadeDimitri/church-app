@@ -36,7 +36,7 @@ import {
       <button
         type="button"
         (click)="goBack()"
-        class="self-start w-10 h-10 flex items-center justify-center rounded-full bg-white shadow-church-card text-church-blue active:bg-slate-50"
+        class="self-start w-10 h-10 flex items-center justify-center rounded-full bg-white shadow-church-card text-church-blue active:bg-church-bg"
         aria-label="Retour"
       >
         <nz-icon nzType="arrow-left" class="text-lg" />
@@ -67,7 +67,7 @@ import {
             placeholder="Nom complet"
             formControlName="fullName"
             autocomplete="name"
-            class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3.5 text-base text-church-text placeholder:text-slate-400 outline-none transition-colors focus:border-church-blue"
+            class="w-full bg-white border border-church-text/10 rounded-xl px-4 py-3.5 text-base text-church-text placeholder:text-church-text-secondary/60 outline-none transition-colors focus:border-church-blue"
           />
           @if (
             form.controls.fullName.touched && form.controls.fullName.invalid
@@ -88,7 +88,7 @@ import {
             placeholder="Email"
             formControlName="email"
             autocomplete="email"
-            class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3.5 text-base text-church-text placeholder:text-slate-400 outline-none transition-colors focus:border-church-blue"
+            class="w-full bg-white border border-church-text/10 rounded-xl px-4 py-3.5 text-base text-church-text placeholder:text-church-text-secondary/60 outline-none transition-colors focus:border-church-blue"
           />
           @if (form.controls.email.touched && form.controls.email.invalid) {
             <p class="text-xs text-church-red mt-1.5 px-1">
@@ -108,12 +108,12 @@ import {
               placeholder="Mot de passe"
               formControlName="password"
               autocomplete="new-password"
-              class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3.5 pr-12 text-base text-church-text placeholder:text-slate-400 outline-none transition-colors focus:border-church-blue"
+              class="w-full bg-white border border-church-text/10 rounded-xl px-4 py-3.5 pr-12 text-base text-church-text placeholder:text-church-text-secondary/60 outline-none transition-colors focus:border-church-blue"
             />
             <button
               type="button"
               (click)="showPassword.set(!showPassword())"
-              class="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 active:text-church-blue"
+              class="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-church-text-secondary active:text-church-blue"
               [attr.aria-label]="
                 showPassword()
                   ? 'Masquer le mot de passe'
@@ -162,9 +162,9 @@ import {
       </form>
 
       <div class="flex items-center gap-4 my-6">
-        <hr class="flex-1 border-slate-200" />
+        <hr class="flex-1 border-church-text/10" />
         <span class="text-sm text-church-text-secondary">Ou</span>
-        <hr class="flex-1 border-slate-200" />
+        <hr class="flex-1 border-church-text/10" />
       </div>
 
       @if (authStore.googleSignInErrorMessage()) {
@@ -181,7 +181,7 @@ import {
 
       <div class="flex-1"></div>
 
-      <p class="text-center text-sm text-church-text-secondary pt-8">
+      <p class="text-center text-sm text-church-text-secondary pt-10">
         Déjà un compte ?
         <a routerLink="/login" class="text-church-blue font-semibold">
           Se connecter

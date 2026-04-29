@@ -1,63 +1,73 @@
 <div class="px-5 safe-area-top">
-  <app-page-header title="Faire un don" subtitle="Votre générosité fait la différence" backLink="/" />
+  <app-page-header title="Faire un don" backLink="/" />
 
-  <div class="bg-gradient-to-br from-church-red to-rose-500 rounded-church p-4 mb-4 text-white text-center relative overflow-hidden">
-    <div class="absolute top-0 left-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 -translate-x-1/2"></div>
-    <div class="absolute bottom-0 right-0 w-24 h-24 bg-white/5 rounded-full translate-y-1/2 translate-x-1/4"></div>
-    <p class="text-xs text-white/90 italic relative">
-      « Chacun donne comme il l'a résolu en son cœur, sans tristesse ni contrainte; car Dieu aime celui qui donne avec joie. »
+  <!-- Verset (palette only, blockquote sémantique) -->
+  <blockquote class="block bg-gradient-to-br from-church-red to-church-red-dark rounded-church p-5 mb-6 text-white text-center relative overflow-hidden">
+    <div class="absolute top-0 left-0 w-24 h-24 bg-white/10 rounded-full -translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
+    <div class="absolute bottom-0 right-0 w-24 h-24 bg-white/5 rounded-full translate-y-1/2 translate-x-1/4 pointer-events-none"></div>
+    <p class="text-sm text-white/95 italic relative leading-relaxed">
+      « Chacun donne comme il l'a résolu en son cœur, sans tristesse ni contrainte ; car Dieu aime celui qui donne avec joie. »
     </p>
-    <p class="text-[10px] text-white/70 mt-1 font-medium relative">2 Corinthiens 9:7</p>
-  </div>
+    <cite class="block text-[11px] text-white/70 mt-2 font-medium relative not-italic">2 Corinthiens 9:7</cite>
+  </blockquote>
 
-  <div class="space-y-3">
+  <!-- Operators -->
+  <div class="space-y-3 mb-6">
     @for (op of operators; track op.key) {
-      <div [class]="op.accentClass" class="border rounded-2xl p-3">
-        <div class="flex items-center gap-3 mb-3">
-          <div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center overflow-hidden shrink-0">
+      <article class="bg-white rounded-2xl p-4 shadow-church-card">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-11 h-11 rounded-xl bg-white border border-slate-100 flex items-center justify-center overflow-hidden shrink-0">
             <img [src]="op.logo" [alt]="op.label" class="w-8 h-8 object-contain" />
           </div>
           <div class="min-w-0 flex-1">
-            <h4 class="font-semibold text-church-text leading-tight">{{ op.label }}</h4>
-            <p class="text-xs text-church-text-secondary leading-tight">{{ op.operator }}</p>
+            <h3 class="font-semibold text-church-text leading-tight">{{ op.label }}</h3>
+            <p class="text-xs text-church-text-secondary leading-tight mt-0.5">{{ op.operator }}</p>
           </div>
         </div>
 
-        <div class="bg-white rounded-xl px-3 py-2 mb-2 flex items-center justify-between gap-2">
+        <!-- Numéro + bouton Copier (action secondaire) -->
+        <div class="bg-church-bg rounded-xl px-3 py-2.5 mb-3 flex items-center justify-between gap-2">
           <span class="text-sm font-mono font-semibold text-church-text truncate">{{ op.number }}</span>
           <button
             type="button"
             (click)="copyNumber(op)"
-            class="text-xs font-semibold px-3 py-1.5 rounded-lg active:opacity-70 transition-colors shrink-0"
+            [attr.aria-label]="copiedKey() === op.key ? 'Numéro copié' : 'Copier le numéro'"
+            class="text-xs font-semibold px-3 py-2 rounded-lg active:opacity-70 transition-colors shrink-0 inline-flex items-center gap-1"
             [class]="copiedKey() === op.key
               ? 'bg-church-green/10 text-church-green'
               : 'bg-church-blue/10 text-church-blue'">
             @if (copiedKey() === op.key) {
-              Copié ✓
+              <nz-icon nzType="check-circle" nzTheme="outline" />
+              Copié
             } @else {
               Copier
             }
           </button>
         </div>
 
+        <!-- CTA principal : Composer USSD (rouge plein, action qui finalise le don) -->
         <a
           [href]="op.ussdHref"
-          class="flex items-center justify-center gap-2 bg-church-blue text-white rounded-xl py-2.5 text-sm font-semibold active:opacity-80">
-          <nz-icon nzType="phone" nzTheme="outline" />
+          class="flex items-center justify-center gap-2 bg-church-red text-white rounded-xl py-3 text-sm font-semibold active:opacity-90 transition-opacity">
+          <nz-icon nzType="phone" nzTheme="outline" class="text-base" />
           Composer {{ op.ussd }}
         </a>
-      </div>
+      </article>
     }
   </div>
 
-  <div class="bg-white rounded-2xl p-3 mt-3 shadow-church-card">
-    <h4 class="font-semibold text-church-text text-xs mb-2">Comment donner</h4>
-    <ol class="text-xs text-church-text-secondary space-y-1 list-decimal list-inside">
+  <!-- Comment donner -->
+  <section class="bg-white rounded-2xl p-4 mb-6 shadow-church-card">
+    <div class="flex items-center gap-2 mb-3">
+      <nz-icon nzType="info-circle" nzTheme="outline" class="text-church-blue text-base" />
+      <h3 class="font-semibold text-church-text text-sm">Marche à suivre</h3>
+    </div>
+    <ol class="text-xs text-church-text-secondary space-y-2 list-decimal pl-5 marker:text-church-blue marker:font-bold">
       <li>Tapez « Composer » pour ouvrir le menu de votre opérateur</li>
       <li>Sélectionnez Envoi d'argent (ou Send money)</li>
       <li>Entrez le numéro de l'église ci-dessus</li>
       <li>Entrez le montant souhaité</li>
       <li>Confirmez avec votre code PIN</li>
     </ol>
-  </div>
+  </section>
 </div>

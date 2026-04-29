@@ -19,7 +19,7 @@ import { PageHeader } from '@shared/components/page-header/page-header';
         <p class="text-sm text-church-text-secondary">Lomé, Togo</p>
       </div>
 
-      <section class="bg-white rounded-2xl p-4 mb-4 shadow-church-card">
+      <section class="bg-white rounded-2xl p-4 mb-6 shadow-church-card">
         <h3 class="text-sm font-semibold text-church-text mb-2">
           Notre mission
         </h3>
@@ -30,7 +30,7 @@ import { PageHeader } from '@shared/components/page-header/page-header';
         </p>
       </section>
 
-      <section class="bg-white rounded-2xl p-4 mb-4 shadow-church-card">
+      <section class="bg-white rounded-2xl p-4 mb-6 shadow-church-card">
         <h3 class="text-sm font-semibold text-church-text mb-3">
           Nous contacter
         </h3>
@@ -68,7 +68,7 @@ import { PageHeader } from '@shared/components/page-header/page-header';
         </div>
       </section>
 
-      <section class="bg-white rounded-2xl p-4 mb-4 shadow-church-card">
+      <section class="bg-white rounded-2xl p-4 mb-6 shadow-church-card">
         <h3 class="text-sm font-semibold text-church-text mb-3">Nous suivre</h3>
         <div class="flex items-center justify-around">
           <a
@@ -113,7 +113,7 @@ import { PageHeader } from '@shared/components/page-header/page-header';
         </div>
       </section>
 
-      <section class="bg-white rounded-2xl p-4 mb-4 shadow-church-card">
+      <section class="bg-white rounded-2xl p-4 mb-6 shadow-church-card">
         <h3 class="text-sm font-semibold text-church-text mb-3">
           L'application
         </h3>
@@ -127,7 +127,7 @@ import { PageHeader } from '@shared/components/page-header/page-header';
         </p>
       </section>
 
-      <p class="text-center text-xs text-church-text-secondary mb-4">
+      <p class="text-center text-xs text-church-text-secondary mb-6">
         © 2026 Église CI-JCM
       </p>
     </div>
