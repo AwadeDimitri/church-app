@@ -1,19 +1,26 @@
 import { Component, ChangeDetectionStrategy, input, computed } from '@angular/core';
+import { NzIconDirective } from 'ng-zorro-antd/icon';
 
-type Variant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'icon';
+type Variant = 'primary' | 'secondary' | 'success' | 'danger' | 'ghost' | 'icon' | 'outline' | 'subtle';
 type Size = 'sm' | 'md' | 'lg';
 type Shape = 'pill' | 'rounded';
 
 @Component({
   selector: 'app-button',
+  imports: [NzIconDirective],
   host: { '[class.block]': 'fullWidth()' },
   template: `
     <button
       [type]="type()"
-      [disabled]="disabled()"
+      [disabled]="disabled() || loading()"
       [class]="classes()"
       [attr.aria-label]="ariaLabel()">
-      <ng-content />
+      @if (loading()) {
+        <nz-icon nzType="loading" nzTheme="outline" [nzSpin]="true" />
+        @if (loadingText(); as t) { {{ t }} }
+      } @else {
+        <ng-content />
+      }
     </button>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -24,6 +31,8 @@ export class Button {
   readonly shape = input<Shape>('pill');
   readonly fullWidth = input(false);
   readonly disabled = input(false);
+  readonly loading = input(false);
+  readonly loadingText = input<string>();
   readonly type = input<'button' | 'submit'>('button');
   readonly ariaLabel = input<string>();
   readonly customClass = input('');
@@ -47,9 +56,12 @@ export class Button {
   private static readonly variantMap: Record<Variant, string> = {
     primary:   'bg-church-blue text-white! shadow-sm active:bg-church-blue-dark',
     secondary: 'bg-white text-church-blue! shadow-church-card active:bg-slate-50',
+    success:   'bg-church-green text-white! shadow-sm active:opacity-90',
     danger:    'bg-church-red text-white! shadow-lg shadow-church-red/30 active:bg-red-600',
     ghost:     'text-church-text-secondary! active:text-church-text',
     icon:      'bg-white rounded-full shadow-church-card active:bg-slate-50',
+    outline:   'bg-white text-church-blue! border border-church-blue/20 shadow-church-card active:bg-slate-50',
+    subtle:    'bg-church-text/5 text-church-text active:bg-church-text/10',
   };
 
   private static readonly sizeMap: Record<Size, string> = {

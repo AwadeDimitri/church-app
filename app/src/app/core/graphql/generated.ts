@@ -1856,6 +1856,7 @@ export type Prayer_LikesUpdateResponse = {
 
 export type Prayer_Requests = Node & {
   __typename?: 'prayer_requests';
+  answered_at?: Maybe<Scalars['Datetime']['output']>;
   author_id: Scalars['UUID']['output'];
   categories?: Maybe<Categories>;
   category_id: Scalars['UUID']['output'];
@@ -1868,6 +1869,7 @@ export type Prayer_Requests = Node & {
   nodeId: Scalars['ID']['output'];
   prayer_intercessionsCollection?: Maybe<Prayer_IntercessionsConnection>;
   prayer_likesCollection?: Maybe<Prayer_LikesConnection>;
+  testimony?: Maybe<Scalars['String']['output']>;
   updated_at: Scalars['Datetime']['output'];
   users?: Maybe<Users>;
 };
@@ -1919,6 +1921,7 @@ export type Prayer_RequestsEdge = {
 export type Prayer_RequestsFilter = {
   /** Returns true only if all its inner filters are true, otherwise returns false */
   and?: InputMaybe<Array<Prayer_RequestsFilter>>;
+  answered_at?: InputMaybe<DatetimeFilter>;
   author_id?: InputMaybe<UuidFilter>;
   category_id?: InputMaybe<UuidFilter>;
   content?: InputMaybe<StringFilter>;
@@ -1931,10 +1934,12 @@ export type Prayer_RequestsFilter = {
   not?: InputMaybe<Prayer_RequestsFilter>;
   /** Returns true if at least one of its inner filters is true, otherwise returns false */
   or?: InputMaybe<Array<Prayer_RequestsFilter>>;
+  testimony?: InputMaybe<StringFilter>;
   updated_at?: InputMaybe<DatetimeFilter>;
 };
 
 export type Prayer_RequestsInsertInput = {
+  answered_at?: InputMaybe<Scalars['Datetime']['input']>;
   author_id?: InputMaybe<Scalars['UUID']['input']>;
   category_id?: InputMaybe<Scalars['UUID']['input']>;
   content?: InputMaybe<Scalars['String']['input']>;
@@ -1942,6 +1947,7 @@ export type Prayer_RequestsInsertInput = {
   id?: InputMaybe<Scalars['UUID']['input']>;
   is_anonymous?: InputMaybe<Scalars['Boolean']['input']>;
   is_answered?: InputMaybe<Scalars['Boolean']['input']>;
+  testimony?: InputMaybe<Scalars['String']['input']>;
   updated_at?: InputMaybe<Scalars['Datetime']['input']>;
 };
 
@@ -1954,6 +1960,7 @@ export type Prayer_RequestsInsertResponse = {
 };
 
 export type Prayer_RequestsOrderBy = {
+  answered_at?: InputMaybe<OrderByDirection>;
   author_id?: InputMaybe<OrderByDirection>;
   category_id?: InputMaybe<OrderByDirection>;
   content?: InputMaybe<OrderByDirection>;
@@ -1961,10 +1968,12 @@ export type Prayer_RequestsOrderBy = {
   id?: InputMaybe<OrderByDirection>;
   is_anonymous?: InputMaybe<OrderByDirection>;
   is_answered?: InputMaybe<OrderByDirection>;
+  testimony?: InputMaybe<OrderByDirection>;
   updated_at?: InputMaybe<OrderByDirection>;
 };
 
 export type Prayer_RequestsUpdateInput = {
+  answered_at?: InputMaybe<Scalars['Datetime']['input']>;
   author_id?: InputMaybe<Scalars['UUID']['input']>;
   category_id?: InputMaybe<Scalars['UUID']['input']>;
   content?: InputMaybe<Scalars['String']['input']>;
@@ -1972,6 +1981,7 @@ export type Prayer_RequestsUpdateInput = {
   id?: InputMaybe<Scalars['UUID']['input']>;
   is_anonymous?: InputMaybe<Scalars['Boolean']['input']>;
   is_answered?: InputMaybe<Scalars['Boolean']['input']>;
+  testimony?: InputMaybe<Scalars['String']['input']>;
   updated_at?: InputMaybe<Scalars['Datetime']['input']>;
 };
 
@@ -2442,7 +2452,7 @@ export type GetPrayerRequestsQueryVariables = Exact<{
 }>;
 
 
-export type GetPrayerRequestsQuery = { __typename?: 'Query', prayer_requestsCollection?: { __typename?: 'prayer_requestsConnection', edges: Array<{ __typename?: 'prayer_requestsEdge', node: { __typename?: 'prayer_requests', id: string, content: string, is_anonymous: boolean, is_answered: boolean, created_at: string, category?: { __typename?: 'categories', id: string, slug: string, name: string, color: string } | null, author?: { __typename?: 'users', id: string, full_name: string } | null, likes?: { __typename?: 'prayer_likesConnection', totalCount: number } | null, my_likes?: { __typename?: 'prayer_likesConnection', edges: Array<{ __typename?: 'prayer_likesEdge', node: { __typename?: 'prayer_likes', user_id: string } }> } | null } }> } | null };
+export type GetPrayerRequestsQuery = { __typename?: 'Query', prayer_requestsCollection?: { __typename?: 'prayer_requestsConnection', edges: Array<{ __typename?: 'prayer_requestsEdge', node: { __typename?: 'prayer_requests', id: string, content: string, is_anonymous: boolean, is_answered: boolean, testimony?: string | null, answered_at?: string | null, created_at: string, category?: { __typename?: 'categories', id: string, slug: string, name: string, color: string } | null, author?: { __typename?: 'users', id: string, full_name: string } | null, likes?: { __typename?: 'prayer_likesConnection', totalCount: number } | null, my_likes?: { __typename?: 'prayer_likesConnection', edges: Array<{ __typename?: 'prayer_likesEdge', node: { __typename?: 'prayer_likes', user_id: string } }> } | null } }> } | null };
 
 export type GetPrayerRequestQueryVariables = Exact<{
   id: Scalars['UUID']['input'];
@@ -2450,7 +2460,7 @@ export type GetPrayerRequestQueryVariables = Exact<{
 }>;
 
 
-export type GetPrayerRequestQuery = { __typename?: 'Query', prayer_requestsCollection?: { __typename?: 'prayer_requestsConnection', edges: Array<{ __typename?: 'prayer_requestsEdge', node: { __typename?: 'prayer_requests', id: string, content: string, is_anonymous: boolean, is_answered: boolean, created_at: string, category?: { __typename?: 'categories', id: string, slug: string, name: string, color: string } | null, author?: { __typename?: 'users', id: string, full_name: string } | null, likes?: { __typename?: 'prayer_likesConnection', totalCount: number } | null, my_likes?: { __typename?: 'prayer_likesConnection', edges: Array<{ __typename?: 'prayer_likesEdge', node: { __typename?: 'prayer_likes', user_id: string } }> } | null } }> } | null };
+export type GetPrayerRequestQuery = { __typename?: 'Query', prayer_requestsCollection?: { __typename?: 'prayer_requestsConnection', edges: Array<{ __typename?: 'prayer_requestsEdge', node: { __typename?: 'prayer_requests', id: string, content: string, is_anonymous: boolean, is_answered: boolean, testimony?: string | null, answered_at?: string | null, created_at: string, category?: { __typename?: 'categories', id: string, slug: string, name: string, color: string } | null, author?: { __typename?: 'users', id: string, full_name: string } | null, likes?: { __typename?: 'prayer_likesConnection', totalCount: number } | null, my_likes?: { __typename?: 'prayer_likesConnection', edges: Array<{ __typename?: 'prayer_likesEdge', node: { __typename?: 'prayer_likes', user_id: string } }> } | null } }> } | null };
 
 export type GetMyPrayerRequestsQueryVariables = Exact<{
   userId: Scalars['UUID']['input'];
@@ -2459,12 +2469,14 @@ export type GetMyPrayerRequestsQueryVariables = Exact<{
 }>;
 
 
-export type GetMyPrayerRequestsQuery = { __typename?: 'Query', prayer_requestsCollection?: { __typename?: 'prayer_requestsConnection', edges: Array<{ __typename?: 'prayer_requestsEdge', node: { __typename?: 'prayer_requests', id: string, content: string, is_anonymous: boolean, is_answered: boolean, created_at: string, category?: { __typename?: 'categories', id: string, slug: string, name: string, color: string } | null, author?: { __typename?: 'users', id: string, full_name: string } | null, likes?: { __typename?: 'prayer_likesConnection', totalCount: number } | null, my_likes?: { __typename?: 'prayer_likesConnection', edges: Array<{ __typename?: 'prayer_likesEdge', node: { __typename?: 'prayer_likes', user_id: string } }> } | null } }> } | null };
+export type GetMyPrayerRequestsQuery = { __typename?: 'Query', prayer_requestsCollection?: { __typename?: 'prayer_requestsConnection', edges: Array<{ __typename?: 'prayer_requestsEdge', node: { __typename?: 'prayer_requests', id: string, content: string, is_anonymous: boolean, is_answered: boolean, testimony?: string | null, answered_at?: string | null, created_at: string, category?: { __typename?: 'categories', id: string, slug: string, name: string, color: string } | null, author?: { __typename?: 'users', id: string, full_name: string } | null, likes?: { __typename?: 'prayer_likesConnection', totalCount: number } | null, my_likes?: { __typename?: 'prayer_likesConnection', edges: Array<{ __typename?: 'prayer_likesEdge', node: { __typename?: 'prayer_likes', user_id: string } }> } | null } }> } | null };
 
-export type GetPrayerStatsQueryVariables = Exact<{ [key: string]: never; }>;
+export type GetPrayerStatsQueryVariables = Exact<{
+  userId: Scalars['UUID']['input'];
+}>;
 
 
-export type GetPrayerStatsQuery = { __typename?: 'Query', intercessors?: number | null, active?: { __typename?: 'prayer_requestsConnection', totalCount: number } | null, answered?: { __typename?: 'prayer_requestsConnection', totalCount: number } | null };
+export type GetPrayerStatsQuery = { __typename?: 'Query', intercessors?: number | null, active?: { __typename?: 'prayer_requestsConnection', totalCount: number } | null, answered?: { __typename?: 'prayer_requestsConnection', totalCount: number } | null, mine?: { __typename?: 'prayer_requestsConnection', totalCount: number } | null };
 
 export type GetPrayerCategoriesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2493,6 +2505,14 @@ export type UnlikePrayerMutationVariables = Exact<{
 
 
 export type UnlikePrayerMutation = { __typename?: 'Mutation', deleteFromprayer_likesCollection: { __typename?: 'prayer_likesDeleteResponse', records: Array<{ __typename?: 'prayer_likes', prayer_id: string }> } };
+
+export type MarkPrayerAsAnsweredMutationVariables = Exact<{
+  id: Scalars['UUID']['input'];
+  testimony: Scalars['String']['input'];
+}>;
+
+
+export type MarkPrayerAsAnsweredMutation = { __typename?: 'Mutation', updateprayer_requestsCollection: { __typename?: 'prayer_requestsUpdateResponse', records: Array<{ __typename?: 'prayer_requests', id: string, is_answered: boolean, testimony?: string | null, answered_at?: string | null }> } };
 
 export type GetSermonsQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -2776,6 +2796,8 @@ export const GetPrayerRequestsDocument = gql`
         content
         is_anonymous
         is_answered
+        testimony
+        answered_at
         created_at
         category: categories {
           id
@@ -2822,6 +2844,8 @@ export const GetPrayerRequestDocument = gql`
         content
         is_anonymous
         is_answered
+        testimony
+        answered_at
         created_at
         category: categories {
           id
@@ -2873,6 +2897,8 @@ export const GetMyPrayerRequestsDocument = gql`
         content
         is_anonymous
         is_answered
+        testimony
+        answered_at
         created_at
         category: categories {
           id
@@ -2911,11 +2937,14 @@ export const GetMyPrayerRequestsDocument = gql`
     }
   }
 export const GetPrayerStatsDocument = gql`
-    query GetPrayerStats {
+    query GetPrayerStats($userId: UUID!) {
   active: prayer_requestsCollection(filter: {is_answered: {eq: false}}) {
     totalCount
   }
   answered: prayer_requestsCollection(filter: {is_answered: {eq: true}}) {
+    totalCount
+  }
+  mine: prayer_requestsCollection(filter: {author_id: {eq: $userId}}) {
     totalCount
   }
   intercessors: intercessors_count
@@ -3020,6 +3049,32 @@ export const UnlikePrayerDocument = gql`
   })
   export class UnlikePrayerGQL extends Apollo.Mutation<UnlikePrayerMutation, UnlikePrayerMutationVariables> {
     override document = UnlikePrayerDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const MarkPrayerAsAnsweredDocument = gql`
+    mutation MarkPrayerAsAnswered($id: UUID!, $testimony: String!) {
+  updateprayer_requestsCollection(
+    set: {is_answered: true, testimony: $testimony}
+    filter: {id: {eq: $id}}
+  ) {
+    records {
+      id
+      is_answered
+      testimony
+      answered_at
+    }
+  }
+}
+    `;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class MarkPrayerAsAnsweredGQL extends Apollo.Mutation<MarkPrayerAsAnsweredMutation, MarkPrayerAsAnsweredMutationVariables> {
+    override document = MarkPrayerAsAnsweredDocument;
     
     constructor(apollo: Apollo.Apollo) {
       super(apollo);

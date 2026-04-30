@@ -7,13 +7,15 @@ import { NzIconDirective } from 'ng-zorro-antd/icon';
 import { CategoryFilter } from '@shared/components/category-filter/category-filter';
 import { SermonCard } from '@shared/components/sermon-card/sermon-card';
 import { PageHeader } from '@shared/components/page-header/page-header';
+import { Button } from '@shared/components/button/button';
+import { PullToRefresh } from '@shared/components/pull-to-refresh/pull-to-refresh';
 import { DurationPipe } from '@shared/pipes/duration.pipe';
 import { SermonService } from '@core/services/sermon.service';
 import { getYouTubeThumbnail } from '@core/utils/youtube.util';
 
 @Component({
   selector: 'app-sermons',
-  imports: [DatePipe, NzIconDirective, CategoryFilter, SermonCard, PageHeader, DurationPipe],
+  imports: [DatePipe, NzIconDirective, CategoryFilter, SermonCard, PageHeader, Button, PullToRefresh, DurationPipe],
   templateUrl: './sermons.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -34,6 +36,8 @@ export default class Sermons {
     () => !!this.activeSearch() || this.selectedCategory() !== 'Tous',
   );
 
+  readonly pullRefreshing = signal(false);
+
   constructor() {
     toObservable(this.searchQuery)
       .pipe(debounceTime(300), distinctUntilChanged(), takeUntilDestroyed())
@@ -48,10 +52,21 @@ export default class Sermons {
       const cat = this.sermonService.categories().find(c => c.name === name);
       if (cat) this.sermonService.setCategoryId(cat.id);
     });
+
+    effect(() => {
+      if (this.pullRefreshing() && !this.sermonService.loading()) {
+        this.pullRefreshing.set(false);
+      }
+    });
   }
 
   loadMore(): void {
     this.sermonService.loadMore();
+  }
+
+  onPullRefresh(): void {
+    this.pullRefreshing.set(true);
+    this.sermonService.refresh();
   }
 
   readonly categories = computed(() =>

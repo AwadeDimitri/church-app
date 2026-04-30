@@ -1,3 +1,4 @@
+<app-pull-to-refresh [refreshing]="pullRefreshing()" (refresh)="onPullRefresh()">
 <div class="px-5 safe-area-top">
   <app-page-header title="Sermons" backLink="/" />
 
@@ -108,18 +109,16 @@
 
     @if (hasMore()) {
       <div class="flex justify-center mb-6">
-        <button
+        <app-button
+          variant="outline"
           type="button"
           (click)="loadMore()"
-          [disabled]="loading()"
-          class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-white border border-church-blue/20 text-church-blue text-sm font-semibold shadow-church-card active:opacity-80 transition-opacity disabled:opacity-50 disabled:pointer-events-none"
-        >
-          {{ loading() ? 'Chargement…' : 'Voir plus' }}
-          @if (!loading()) {
-            <nz-icon nzType="arrow-right" nzTheme="outline" class="text-xs" />
-          }
-        </button>
+          [loading]="loading()"
+          loadingText="Chargement…">
+          Voir plus <nz-icon nzType="arrow-right" nzTheme="outline" class="text-xs" />
+        </app-button>
       </div>
     }
   }
 </div>
+</app-pull-to-refresh>

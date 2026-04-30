@@ -17,6 +17,7 @@ import {
 import { NzIconDirective } from 'ng-zorro-antd/icon';
 import { PageHeader } from '@shared/components/page-header/page-header';
 import { Avatar } from '@shared/components/avatar/avatar';
+import { Button } from '@shared/components/button/button';
 import { RelativeTimePipe } from '@shared/pipes/relative-time.pipe';
 import { PrayerService } from '@core/services/prayer.service';
 import { IntercessionService } from '@core/services/intercession.service';
@@ -53,6 +54,7 @@ type IntercessionItem = {
     NzIconDirective,
     PageHeader,
     Avatar,
+    Button,
     RelativeTimePipe,
   ],
   templateUrl: './prayer-detail.html',
@@ -104,11 +106,23 @@ export default class PrayerDetail {
   );
 
   readonly form = this.fb.group({
-    content: ['', [Validators.required, Validators.pattern(/\S/)]],
+    content: ['', [Validators.required, Validators.pattern(/\S/), Validators.maxLength(300)]],
     isAnonymous: [false],
   });
 
+  readonly testimonyForm = this.fb.group({
+    testimony: ['', [Validators.required, Validators.pattern(/\S/), Validators.maxLength(1000)]],
+  });
+
   readonly submitting = signal(false);
+  readonly markDialogOpen = signal(false);
+  readonly marking = signal(false);
+
+  readonly canMarkAsAnswered = computed(() => {
+    const p = this.prayer();
+    const meId = this.auth.user()?.id;
+    return !!p && !!meId && p.author?.id === meId && !p.is_answered;
+  });
 
   authorNameOf(item: IntercessionItem): string {
     if (item.is_anonymous) return 'Anonyme';
@@ -177,9 +191,33 @@ export default class PrayerDetail {
   async onShare(): Promise<void> {
     const p = this.prayer();
     if (!p) return;
-    const text = `Prière : ${p.content}`;
+    const title = p.is_answered ? 'Prière exaucée' : 'Demande de prière';
+    const text = p.is_answered ? `Prière exaucée : ${p.content}` : `Prière : ${p.content}`;
     if (navigator.share) {
-      await navigator.share({ title: 'Demande de prière', text });
+      await navigator.share({ title, text });
     }
+  }
+
+  openMarkDialog(): void {
+    this.testimonyForm.reset({ testimony: '' });
+    this.markDialogOpen.set(true);
+  }
+
+  closeMarkDialog(): void {
+    if (this.marking()) return;
+    this.markDialogOpen.set(false);
+  }
+
+  confirmMarkAsAnswered(): void {
+    if (this.testimonyForm.invalid || this.marking()) return;
+    const { testimony } = this.testimonyForm.getRawValue();
+    this.marking.set(true);
+    this.prayerService.markAsAnswered(this.id(), testimony.trim()).subscribe({
+      next: () => {
+        this.marking.set(false);
+        this.markDialogOpen.set(false);
+      },
+      error: () => this.marking.set(false),
+    });
   }
 }

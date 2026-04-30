@@ -2,11 +2,11 @@
   class="bg-white rounded-church-sm p-4 shadow-church-card"
   [class.border-l-4]="isAnswered()"
   [class.border-church-green]="isAnswered()">
-  <div class="flex items-center gap-3 mb-3">
+  <div class="flex items-start gap-3 mb-3">
     <app-avatar [name]="author()" [color]="avatarColor()" />
     <div class="flex-1">
-      <p class="text-sm font-semibold text-church-text">{{ author() }}</p>
-      <p class="text-[10px] text-church-text-secondary">{{ date() }}</p>
+      <p class="text-sm font-semibold text-church-text mb-1!">{{ author() }}</p>
+      <p class="text-[10px] text-church-text-secondary mb-1!">{{ date() }}</p>
     </div>
     <span
       class="text-[10px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-1"
@@ -18,16 +18,11 @@
     </span>
   </div>
   <p class="text-sm text-church-text leading-relaxed mb-3">{{ content() }}</p>
-  <div class="flex items-center justify-between">
-    <button type="button" (click)="$event.stopPropagation(); $event.preventDefault(); pray.emit()" class="flex items-center gap-1.5 text-xs font-medium transition-colors"
-      [class]="isAnswered() ? 'text-church-green' : isLiked() ? 'text-church-red' : 'text-church-blue'">
-      <nz-icon
-        [nzType]="isAnswered() ? 'like' : 'heart'"
-        [nzTheme]="isLiked() && !isAnswered() ? 'fill' : 'outline'" />
-      {{ prayerCount() }} {{ isAnswered() ? 'louent Dieu' : 'prient' }}
-    </button>
-    <button type="button" (click)="$event.stopPropagation(); $event.preventDefault(); share.emit()" class="flex items-center gap-1.5 text-church-text-secondary text-xs">
-      <nz-icon nzType="share-alt" nzTheme="outline" /> Partager
-    </button>
+  <div class="flex items-center gap-1.5 text-xs font-medium"
+    [class]="isAnswered() ? 'text-church-green' : 'text-church-blue'">
+    <nz-icon
+      [nzType]="isAnswered() ? 'like' : 'heart'"
+      nzTheme="outline" />
+    {{ prayerCount() }} {{ isAnswered() ? 'ont prié' : 'prient' }}
   </div>
 </div>

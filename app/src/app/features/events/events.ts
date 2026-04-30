@@ -1,7 +1,9 @@
-import { Component, ChangeDetectionStrategy, inject, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, computed, signal, effect } from '@angular/core';
 import { NzIconDirective } from 'ng-zorro-antd/icon';
 import { EventService } from '@core/services/event.service';
 import { PageHeader } from '@shared/components/page-header/page-header';
+import { Button } from '@shared/components/button/button';
+import { PullToRefresh } from '@shared/components/pull-to-refresh/pull-to-refresh';
 
 const DAY_FMT = new Intl.DateTimeFormat('fr-FR', { weekday: 'short' });
 const DAY_NUM_FMT = new Intl.DateTimeFormat('fr-FR', { day: '2-digit' });
@@ -15,7 +17,7 @@ const FULL_DATE_FMT = new Intl.DateTimeFormat('fr-FR', {
 
 @Component({
   selector: 'app-events',
-  imports: [NzIconDirective, PageHeader],
+  imports: [NzIconDirective, PageHeader, Button, PullToRefresh],
   templateUrl: './events.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -25,6 +27,16 @@ export default class Events {
   readonly loading = this.eventService.loading;
   readonly error = this.eventService.error;
   readonly hasMore = this.eventService.hasMore;
+
+  readonly pullRefreshing = signal(false);
+
+  constructor() {
+    effect(() => {
+      if (this.pullRefreshing() && !this.eventService.loading()) {
+        this.pullRefreshing.set(false);
+      }
+    });
+  }
 
   readonly events = computed(() =>
     this.eventService.events().map(e => {
@@ -49,6 +61,11 @@ export default class Events {
 
   loadMore(): void {
     this.eventService.loadMore();
+  }
+
+  onPullRefresh(): void {
+    this.pullRefreshing.set(true);
+    this.eventService.refresh();
   }
 
   private capitalize(s: string): string {

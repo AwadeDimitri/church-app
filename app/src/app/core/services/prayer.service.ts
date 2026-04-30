@@ -3,12 +3,14 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { map, tap } from 'rxjs';
 import {
   GetPrayerRequestsGQL,
+  GetMyPrayerRequestsGQL,
   GetPrayerRequestGQL,
   GetPrayerStatsGQL,
   GetPrayerCategoriesGQL,
   CreatePrayerRequestGQL,
   LikePrayerGQL,
   UnlikePrayerGQL,
+  MarkPrayerAsAnsweredGQL,
   type GetPrayerRequestsQuery,
   type GetPrayerCategoriesQuery,
 } from '@core/graphql/generated';
@@ -26,6 +28,8 @@ type PrayerCategory = NonNullable<
 interface PrayerStats {
   active: number;
   answered: number;
+  total: number;
+  mine: number;
   intercessors: number;
 }
 
@@ -37,25 +41,31 @@ const EMPTY_UUID = '00000000-0000-0000-0000-000000000000';
 export class PrayerService {
   private readonly authService = inject(AuthService);
   private readonly getPrayersGQL = inject(GetPrayerRequestsGQL);
+  private readonly getMyPrayersGQL = inject(GetMyPrayerRequestsGQL);
   private readonly getPrayerGQL = inject(GetPrayerRequestGQL);
   private readonly getStatsGQL = inject(GetPrayerStatsGQL);
   private readonly getCategoriesGQL = inject(GetPrayerCategoriesGQL);
   private readonly createPrayerGQL = inject(CreatePrayerRequestGQL);
   private readonly likePrayerGQL = inject(LikePrayerGQL);
   private readonly unlikePrayerGQL = inject(UnlikePrayerGQL);
+  private readonly markAnsweredGQL = inject(MarkPrayerAsAnsweredGQL);
 
   private readonly _prayers = signal<PrayerRequest[]>([]);
   private readonly _loading = signal(false);
   private readonly _hasMore = signal(true);
   private readonly _error = signal<string | null>(null);
   private readonly _offset = signal(0);
+  private readonly _scope = signal<'all' | 'mine'>('all');
 
   readonly prayers = this._prayers.asReadonly();
   readonly loading = this._loading.asReadonly();
   readonly hasMore = this._hasMore.asReadonly();
   readonly error = this._error.asReadonly();
+  readonly scope = this._scope.asReadonly();
 
-  private readonly statsResult = this.getStatsGQL.watch().valueChanges;
+  private readonly statsResult = this.getStatsGQL
+    .watch({ variables: { userId: this.authService.user()?.id ?? EMPTY_UUID } })
+    .valueChanges;
   private readonly categoriesResult = this.getCategoriesGQL.watch().valueChanges;
 
   readonly categories = toSignal(
@@ -67,13 +77,19 @@ export class PrayerService {
 
   readonly stats = toSignal(
     this.statsResult.pipe(
-      map((r): PrayerStats => ({
-        active: r.data?.active?.totalCount ?? 0,
-        answered: r.data?.answered?.totalCount ?? 0,
-        intercessors: r.data?.intercessors ?? 0,
-      })),
+      map((r): PrayerStats => {
+        const active = r.data?.active?.totalCount ?? 0;
+        const answered = r.data?.answered?.totalCount ?? 0;
+        return {
+          active,
+          answered,
+          total: active + answered,
+          mine: r.data?.mine?.totalCount ?? 0,
+          intercessors: r.data?.intercessors ?? 0,
+        };
+      }),
     ),
-    { initialValue: { active: 0, answered: 0, intercessors: 0 } as PrayerStats },
+    { initialValue: { active: 0, answered: 0, total: 0, mine: 0, intercessors: 0 } as PrayerStats },
   );
 
   constructor() {
@@ -86,22 +102,24 @@ export class PrayerService {
     this._error.set(null);
 
     const userId = this.authService.user()?.id ?? EMPTY_UUID;
+    const variables = { userId, limit: PAGE_SIZE, offset: this._offset() };
+    const query$ = this._scope() === 'mine'
+      ? this.getMyPrayersGQL.fetch({ variables, fetchPolicy: 'network-only' })
+      : this.getPrayersGQL.fetch({ variables, fetchPolicy: 'network-only' });
 
-    this.getPrayersGQL
-      .fetch({ variables: { userId, limit: PAGE_SIZE, offset: this._offset() } })
-      .subscribe({
-        next: r => {
-          const batch = unwrapNodes<PrayerRequest>(r.data?.prayer_requestsCollection);
-          this._prayers.update(list => [...list, ...batch]);
-          this._offset.update(o => o + batch.length);
-          this._hasMore.set(batch.length === PAGE_SIZE);
-          this._loading.set(false);
-        },
-        error: (err: Error) => {
-          this._error.set(err.message ?? 'Erreur de chargement');
-          this._loading.set(false);
-        },
-      });
+    query$.subscribe({
+      next: r => {
+        const batch = unwrapNodes<PrayerRequest>(r.data?.prayer_requestsCollection);
+        this._prayers.update(list => [...list, ...batch]);
+        this._offset.update(o => o + batch.length);
+        this._hasMore.set(batch.length === PAGE_SIZE);
+        this._loading.set(false);
+      },
+      error: (err: Error) => {
+        this._error.set(err.message ?? 'Erreur de chargement');
+        this._loading.set(false);
+      },
+    });
   }
 
   refresh(): void {
@@ -109,6 +127,12 @@ export class PrayerService {
     this._offset.set(0);
     this._hasMore.set(true);
     this.loadMore();
+  }
+
+  setScope(scope: 'all' | 'mine'): void {
+    if (this._scope() === scope) return;
+    this._scope.set(scope);
+    this.refresh();
   }
 
   getById(id: string) {
@@ -134,13 +158,28 @@ export class PrayerService {
 
   like(prayerId: string) {
     return this.likePrayerGQL
-      .mutate({ variables: { prayerId } })
+      .mutate({
+        variables: { prayerId },
+        refetchQueries: ['GetPrayerRequest'],
+      })
       .pipe(tap(() => this.refresh()));
   }
 
   unlike(prayerId: string) {
     return this.unlikePrayerGQL
-      .mutate({ variables: { prayerId } })
+      .mutate({
+        variables: { prayerId },
+        refetchQueries: ['GetPrayerRequest'],
+      })
+      .pipe(tap(() => this.refresh()));
+  }
+
+  markAsAnswered(id: string, testimony: string) {
+    return this.markAnsweredGQL
+      .mutate({
+        variables: { id, testimony },
+        refetchQueries: ['GetPrayerStats', 'GetPrayerRequest'],
+      })
       .pipe(tap(() => this.refresh()));
   }
 }

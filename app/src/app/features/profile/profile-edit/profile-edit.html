@@ -7,7 +7,7 @@
       <div class="bg-church-bg border border-church-text/10 rounded-xl px-4 py-3.5 text-base text-church-text-secondary">
         {{ user()?.email || '—' }}
       </div>
-      <p class="text-xs text-church-text-secondary mt-1.5 px-1">
+      <p class="text-xs text-church-text-secondary mt-1.5 mb-0! px-1">
         Pour modifier l'email, contactez l'administration.
       </p>
     </div>
@@ -52,9 +52,10 @@
       shape="rounded"
       [fullWidth]="true"
       type="submit"
-      [disabled]="loading()"
+      [loading]="loading()"
+      loadingText="Enregistrement…"
     >
-      {{ loading() ? 'Enregistrement...' : 'Enregistrer' }}
+      Enregistrer
     </app-button>
   </form>
 </div>

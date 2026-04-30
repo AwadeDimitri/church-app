@@ -10,6 +10,8 @@ query GetPrayerRequests($userId: UUID!, $limit: Int = 10, $offset: Int = 0) {
         content
         is_anonymous
         is_answered
+        testimony
+        answered_at
         created_at
         category: categories {
           id
@@ -47,6 +49,8 @@ query GetPrayerRequest($id: UUID!, $userId: UUID!) {
         content
         is_anonymous
         is_answered
+        testimony
+        answered_at
         created_at
         category: categories {
           id
@@ -93,6 +97,8 @@ query GetMyPrayerRequests(
         content
         is_anonymous
         is_answered
+        testimony
+        answered_at
         created_at
         category: categories {
           id
@@ -122,11 +128,14 @@ query GetMyPrayerRequests(
   }
 }
 
-query GetPrayerStats {
+query GetPrayerStats($userId: UUID!) {
   active: prayer_requestsCollection(filter: { is_answered: { eq: false } }) {
     totalCount
   }
   answered: prayer_requestsCollection(filter: { is_answered: { eq: true } }) {
+    totalCount
+  }
+  mine: prayer_requestsCollection(filter: { author_id: { eq: $userId } }) {
     totalCount
   }
   intercessors: intercessors_count
@@ -187,6 +196,20 @@ mutation UnlikePrayer($prayerId: UUID!) {
   ) {
     records {
       prayer_id
+    }
+  }
+}
+
+mutation MarkPrayerAsAnswered($id: UUID!, $testimony: String!) {
+  updateprayer_requestsCollection(
+    set: { is_answered: true, testimony: $testimony }
+    filter: { id: { eq: $id } }
+  ) {
+    records {
+      id
+      is_answered
+      testimony
+      answered_at
     }
   }
 }

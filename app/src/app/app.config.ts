@@ -73,6 +73,10 @@ import {
   CaretRightFill,
   PlayCircleFill,
   AudioOutline,
+  MessageOutline,
+  DeleteOutline,
+  LoadingOutline,
+  ArrowDownOutline,
 } from '@ant-design/icons-angular/icons';
 
 const icons = [
@@ -86,7 +90,8 @@ const icons = [
   WalletOutline, CheckCircleOutline, CheckCircleFill, InfoCircleOutline,
   FilterOutline, DownOutline, CameraOutline, BookOutline,
   EyeOutline, EyeInvisibleOutline, ArrowLeftOutline, ArrowRightOutline,
-  CaretRightFill, PlayCircleFill, AudioOutline,
+  CaretRightFill, PlayCircleFill, AudioOutline, MessageOutline, DeleteOutline,
+  LoadingOutline, ArrowDownOutline,
 ];
 
 export const appConfig: ApplicationConfig = {

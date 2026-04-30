@@ -1,3 +1,4 @@
+<app-pull-to-refresh [refreshing]="pullRefreshing()" (refresh)="onPullRefresh()">
 <div class="px-5 safe-area-top">
   <app-page-header title="Prières" backLink="/" />
 
@@ -40,10 +41,36 @@
 
   @if (!error() && (!loading() || allPrayers().length > 0)) {
     <!-- CTA ajouter une prière -->
-    <div class="mb-6" (click)="goToNew()">
+    <div class="mb-4" (click)="goToNew()">
       <app-button variant="primary" size="lg" shape="rounded" [fullWidth]="true">
         <nz-icon nzType="plus" nzTheme="outline" /> Ajouter une prière
       </app-button>
+    </div>
+
+    <!-- Scope toggle -->
+    <div class="flex gap-1 bg-church-text/5 rounded-full p-1 mb-4">
+      <button
+        type="button"
+        (click)="setScope('all')"
+        [class]="
+          scope() === 'all'
+            ? 'flex-1 py-2 rounded-full bg-white text-church-blue text-xs font-semibold shadow-church-card transition-colors'
+            : 'flex-1 py-2 rounded-full text-church-text-secondary text-xs font-semibold transition-colors'
+        "
+      >
+        Toutes ({{ stats().total }})
+      </button>
+      <button
+        type="button"
+        (click)="setScope('mine')"
+        [class]="
+          scope() === 'mine'
+            ? 'flex-1 py-2 rounded-full bg-white text-church-blue text-xs font-semibold shadow-church-card transition-colors'
+            : 'flex-1 py-2 rounded-full text-church-text-secondary text-xs font-semibold transition-colors'
+        "
+      >
+        Mes prières ({{ stats().mine }})
+      </button>
     </div>
 
     <!-- Filter -->
@@ -51,9 +78,27 @@
 
     <!-- Empty state -->
     @if (prayers().length === 0) {
-      <div class="flex flex-col items-center justify-center py-16">
+      <div class="flex flex-col items-center justify-center py-16 px-6 text-center">
         <nz-icon nzType="heart" nzTheme="outline" class="text-4xl text-church-text-secondary mb-3" />
-        <p class="text-sm text-church-text-secondary">Aucune demande de prière pour le moment.</p>
+        @if (scope() === 'mine') {
+          <p class="text-sm text-church-text-secondary mb-1">
+            Vous n'avez pas encore partagé de prière.
+          </p>
+          <p class="text-xs text-church-text-secondary mb-4">
+            Partagez votre première demande avec la communauté.
+          </p>
+          <button
+            type="button"
+            (click)="setScope('all')"
+            class="text-sm text-church-blue font-semibold py-2"
+          >
+            Voir toutes les prières
+          </button>
+        } @else {
+          <p class="text-sm text-church-text-secondary">
+            Aucune demande de prière pour le moment.
+          </p>
+        }
       </div>
     }
 
@@ -68,29 +113,24 @@
             [category]="prayer.category?.name ?? ''"
             [prayerCount]="prayer.likes?.totalCount ?? 0"
             [isAnswered]="prayer.is_answered"
-            [isLiked]="isLikedByMe(prayer)"
             [avatarColor]="getAvatarColor(i)"
-            [categoryColor]="getCategoryColor(prayer.category?.color ?? '')"
-            (pray)="togglePray(prayer)"
-            (share)="onShare(prayer)" />
+            [categoryColor]="getCategoryColor(prayer.category?.color ?? '')" />
         </a>
       }
     </div>
 
     @if (hasMore()) {
       <div class="flex justify-center mb-6">
-        <button
+        <app-button
+          variant="outline"
           type="button"
           (click)="loadMore()"
-          [disabled]="loading()"
-          class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-white border border-church-blue/20 text-church-blue text-sm font-semibold shadow-church-card active:opacity-80 transition-opacity disabled:opacity-50 disabled:pointer-events-none"
-        >
-          {{ loading() ? 'Chargement…' : 'Voir plus' }}
-          @if (!loading()) {
-            <nz-icon nzType="arrow-right" nzTheme="outline" class="text-xs" />
-          }
-        </button>
+          [loading]="loading()"
+          loadingText="Chargement…">
+          Voir plus <nz-icon nzType="arrow-right" nzTheme="outline" class="text-xs" />
+        </app-button>
       </div>
     }
   }
 </div>
+</app-pull-to-refresh>

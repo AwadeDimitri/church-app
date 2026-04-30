@@ -22,7 +22,7 @@ export default class PrayerNew {
 
   readonly form = this.fb.group({
     categoryId: ['', Validators.required],
-    content: ['', [Validators.required, Validators.pattern(/\S/)]],
+    content: ['', [Validators.required, Validators.pattern(/\S/), Validators.maxLength(500)]],
     isAnonymous: [false],
   });
 

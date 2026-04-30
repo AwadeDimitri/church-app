@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, computed, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, computed, signal, effect } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { NzIconDirective } from 'ng-zorro-antd/icon';
@@ -7,6 +7,7 @@ import { StatCard } from '@shared/components/stat-card/stat-card';
 import { CategoryFilter } from '@shared/components/category-filter/category-filter';
 import { PrayerCard } from '@shared/components/prayer-card/prayer-card';
 import { PageHeader } from '@shared/components/page-header/page-header';
+import { PullToRefresh } from '@shared/components/pull-to-refresh/pull-to-refresh';
 import { PrayerService } from '@core/services/prayer.service';
 
 // Mapping clé couleur DB -> classes Tailwind (palette de theming, pas de donnée)
@@ -26,7 +27,7 @@ const AVATAR_COLORS: Array<'blue' | 'red' | 'green' | 'gold'> = [
 
 @Component({
   selector: 'app-prayer',
-  imports: [DatePipe, RouterLink, NzIconDirective, Button, StatCard, CategoryFilter, PrayerCard, PageHeader],
+  imports: [DatePipe, RouterLink, NzIconDirective, Button, StatCard, CategoryFilter, PrayerCard, PageHeader, PullToRefresh],
   templateUrl: './prayer.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -47,9 +48,30 @@ export default class Prayer {
   readonly hasMore = this.prayerService.hasMore;
   readonly allPrayers = this.prayerService.prayers;
   readonly stats = this.prayerService.stats;
+  readonly scope = this.prayerService.scope;
+
+  readonly pullRefreshing = signal(false);
+
+  constructor() {
+    // Clear pull-refresh state quand le service termine son fetch
+    effect(() => {
+      if (this.pullRefreshing() && !this.prayerService.loading()) {
+        this.pullRefreshing.set(false);
+      }
+    });
+  }
 
   loadMore(): void {
     this.prayerService.loadMore();
+  }
+
+  setScope(scope: 'all' | 'mine'): void {
+    this.prayerService.setScope(scope);
+  }
+
+  onPullRefresh(): void {
+    this.pullRefreshing.set(true);
+    this.prayerService.refresh();
   }
 
   goToNew(): void {
@@ -74,24 +96,5 @@ export default class Prayer {
 
   getAvatarColor(index: number): 'blue' | 'red' | 'green' | 'gold' {
     return AVATAR_COLORS[index % AVATAR_COLORS.length] ?? 'blue';
-  }
-
-  isLikedByMe(prayer: { my_likes?: { edges: ReadonlyArray<unknown> } | null }): boolean {
-    return (prayer.my_likes?.edges.length ?? 0) > 0;
-  }
-
-  togglePray(prayer: { id: string; my_likes?: { edges: ReadonlyArray<unknown> } | null }) {
-    if (this.isLikedByMe(prayer)) {
-      this.prayerService.unlike(prayer.id).subscribe();
-    } else {
-      this.prayerService.like(prayer.id).subscribe();
-    }
-  }
-
-  async onShare(prayer: { content: string }) {
-    const text = `Prière : ${prayer.content}`;
-    if (navigator.share) {
-      await navigator.share({ title: 'Demande de prière', text });
-    }
   }
 }
