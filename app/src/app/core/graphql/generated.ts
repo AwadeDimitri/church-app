@@ -201,8 +201,12 @@ export type Mutation = {
   deleteFromeventsCollection: EventsDeleteResponse;
   /** Deletes zero or more records from the `groups` collection */
   deleteFromgroupsCollection: GroupsDeleteResponse;
+  /** Deletes zero or more records from the `intercession_likes` collection */
+  deleteFromintercession_likesCollection: Intercession_LikesDeleteResponse;
   /** Deletes zero or more records from the `posts` collection */
   deleteFrompostsCollection: PostsDeleteResponse;
+  /** Deletes zero or more records from the `prayer_intercessions` collection */
+  deleteFromprayer_intercessionsCollection: Prayer_IntercessionsDeleteResponse;
   /** Deletes zero or more records from the `prayer_likes` collection */
   deleteFromprayer_likesCollection: Prayer_LikesDeleteResponse;
   /** Deletes zero or more records from the `prayer_requests` collection */
@@ -225,8 +229,12 @@ export type Mutation = {
   insertIntoeventsCollection?: Maybe<EventsInsertResponse>;
   /** Adds one or more `groups` records to the collection */
   insertIntogroupsCollection?: Maybe<GroupsInsertResponse>;
+  /** Adds one or more `intercession_likes` records to the collection */
+  insertIntointercession_likesCollection?: Maybe<Intercession_LikesInsertResponse>;
   /** Adds one or more `posts` records to the collection */
   insertIntopostsCollection?: Maybe<PostsInsertResponse>;
+  /** Adds one or more `prayer_intercessions` records to the collection */
+  insertIntoprayer_intercessionsCollection?: Maybe<Prayer_IntercessionsInsertResponse>;
   /** Adds one or more `prayer_likes` records to the collection */
   insertIntoprayer_likesCollection?: Maybe<Prayer_LikesInsertResponse>;
   /** Adds one or more `prayer_requests` records to the collection */
@@ -249,8 +257,12 @@ export type Mutation = {
   updateeventsCollection: EventsUpdateResponse;
   /** Updates zero or more records in the `groups` collection */
   updategroupsCollection: GroupsUpdateResponse;
+  /** Updates zero or more records in the `intercession_likes` collection */
+  updateintercession_likesCollection: Intercession_LikesUpdateResponse;
   /** Updates zero or more records in the `posts` collection */
   updatepostsCollection: PostsUpdateResponse;
+  /** Updates zero or more records in the `prayer_intercessions` collection */
+  updateprayer_intercessionsCollection: Prayer_IntercessionsUpdateResponse;
   /** Updates zero or more records in the `prayer_likes` collection */
   updateprayer_likesCollection: Prayer_LikesUpdateResponse;
   /** Updates zero or more records in the `prayer_requests` collection */
@@ -307,9 +319,23 @@ export type MutationDeleteFromgroupsCollectionArgs = {
 
 
 /** The root type for creating and mutating data */
+export type MutationDeleteFromintercession_LikesCollectionArgs = {
+  atMost?: Scalars['Int']['input'];
+  filter?: InputMaybe<Intercession_LikesFilter>;
+};
+
+
+/** The root type for creating and mutating data */
 export type MutationDeleteFrompostsCollectionArgs = {
   atMost?: Scalars['Int']['input'];
   filter?: InputMaybe<PostsFilter>;
+};
+
+
+/** The root type for creating and mutating data */
+export type MutationDeleteFromprayer_IntercessionsCollectionArgs = {
+  atMost?: Scalars['Int']['input'];
+  filter?: InputMaybe<Prayer_IntercessionsFilter>;
 };
 
 
@@ -385,8 +411,20 @@ export type MutationInsertIntogroupsCollectionArgs = {
 
 
 /** The root type for creating and mutating data */
+export type MutationInsertIntointercession_LikesCollectionArgs = {
+  objects: Array<Intercession_LikesInsertInput>;
+};
+
+
+/** The root type for creating and mutating data */
 export type MutationInsertIntopostsCollectionArgs = {
   objects: Array<PostsInsertInput>;
+};
+
+
+/** The root type for creating and mutating data */
+export type MutationInsertIntoprayer_IntercessionsCollectionArgs = {
+  objects: Array<Prayer_IntercessionsInsertInput>;
 };
 
 
@@ -469,10 +507,26 @@ export type MutationUpdategroupsCollectionArgs = {
 
 
 /** The root type for creating and mutating data */
+export type MutationUpdateintercession_LikesCollectionArgs = {
+  atMost?: Scalars['Int']['input'];
+  filter?: InputMaybe<Intercession_LikesFilter>;
+  set: Intercession_LikesUpdateInput;
+};
+
+
+/** The root type for creating and mutating data */
 export type MutationUpdatepostsCollectionArgs = {
   atMost?: Scalars['Int']['input'];
   filter?: InputMaybe<PostsFilter>;
   set: PostsUpdateInput;
+};
+
+
+/** The root type for creating and mutating data */
+export type MutationUpdateprayer_IntercessionsCollectionArgs = {
+  atMost?: Scalars['Int']['input'];
+  filter?: InputMaybe<Prayer_IntercessionsFilter>;
+  set: Prayer_IntercessionsUpdateInput;
 };
 
 
@@ -561,11 +615,15 @@ export type Query = {
   eventsCollection?: Maybe<EventsConnection>;
   /** A pagable collection of type `groups` */
   groupsCollection?: Maybe<GroupsConnection>;
+  /** A pagable collection of type `intercession_likes` */
+  intercession_likesCollection?: Maybe<Intercession_LikesConnection>;
   intercessors_count?: Maybe<Scalars['Int']['output']>;
   /** Retrieve a record by its `ID` */
   node?: Maybe<Node>;
   /** A pagable collection of type `posts` */
   postsCollection?: Maybe<PostsConnection>;
+  /** A pagable collection of type `prayer_intercessions` */
+  prayer_intercessionsCollection?: Maybe<Prayer_IntercessionsConnection>;
   /** A pagable collection of type `prayer_likes` */
   prayer_likesCollection?: Maybe<Prayer_LikesConnection>;
   /** A pagable collection of type `prayer_requests` */
@@ -652,6 +710,18 @@ export type QueryGroupsCollectionArgs = {
 
 
 /** The root type for querying data */
+export type QueryIntercession_LikesCollectionArgs = {
+  after?: InputMaybe<Scalars['Cursor']['input']>;
+  before?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<Intercession_LikesFilter>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<Array<Intercession_LikesOrderBy>>;
+};
+
+
+/** The root type for querying data */
 export type QueryNodeArgs = {
   nodeId: Scalars['ID']['input'];
 };
@@ -666,6 +736,18 @@ export type QueryPostsCollectionArgs = {
   last?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
   orderBy?: InputMaybe<Array<PostsOrderBy>>;
+};
+
+
+/** The root type for querying data */
+export type QueryPrayer_IntercessionsCollectionArgs = {
+  after?: InputMaybe<Scalars['Cursor']['input']>;
+  before?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<Prayer_IntercessionsFilter>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<Array<Prayer_IntercessionsOrderBy>>;
 };
 
 
@@ -1404,6 +1486,86 @@ export type GroupsUpdateResponse = {
   records: Array<Groups>;
 };
 
+export type Intercession_Likes = Node & {
+  __typename?: 'intercession_likes';
+  created_at: Scalars['Datetime']['output'];
+  intercession_id: Scalars['UUID']['output'];
+  /** Globally Unique Record Identifier */
+  nodeId: Scalars['ID']['output'];
+  prayer_intercessions?: Maybe<Prayer_Intercessions>;
+  user_id: Scalars['UUID']['output'];
+  users?: Maybe<Users>;
+};
+
+export type Intercession_LikesConnection = {
+  __typename?: 'intercession_likesConnection';
+  edges: Array<Intercession_LikesEdge>;
+  pageInfo: PageInfo;
+  /** The total number of records matching the `filter` criteria */
+  totalCount: Scalars['Int']['output'];
+};
+
+export type Intercession_LikesDeleteResponse = {
+  __typename?: 'intercession_likesDeleteResponse';
+  /** Count of the records impacted by the mutation */
+  affectedCount: Scalars['Int']['output'];
+  /** Array of records impacted by the mutation */
+  records: Array<Intercession_Likes>;
+};
+
+export type Intercession_LikesEdge = {
+  __typename?: 'intercession_likesEdge';
+  cursor: Scalars['String']['output'];
+  node: Intercession_Likes;
+};
+
+export type Intercession_LikesFilter = {
+  /** Returns true only if all its inner filters are true, otherwise returns false */
+  and?: InputMaybe<Array<Intercession_LikesFilter>>;
+  created_at?: InputMaybe<DatetimeFilter>;
+  intercession_id?: InputMaybe<UuidFilter>;
+  nodeId?: InputMaybe<IdFilter>;
+  /** Negates a filter */
+  not?: InputMaybe<Intercession_LikesFilter>;
+  /** Returns true if at least one of its inner filters is true, otherwise returns false */
+  or?: InputMaybe<Array<Intercession_LikesFilter>>;
+  user_id?: InputMaybe<UuidFilter>;
+};
+
+export type Intercession_LikesInsertInput = {
+  created_at?: InputMaybe<Scalars['Datetime']['input']>;
+  intercession_id?: InputMaybe<Scalars['UUID']['input']>;
+  user_id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+export type Intercession_LikesInsertResponse = {
+  __typename?: 'intercession_likesInsertResponse';
+  /** Count of the records impacted by the mutation */
+  affectedCount: Scalars['Int']['output'];
+  /** Array of records impacted by the mutation */
+  records: Array<Intercession_Likes>;
+};
+
+export type Intercession_LikesOrderBy = {
+  created_at?: InputMaybe<OrderByDirection>;
+  intercession_id?: InputMaybe<OrderByDirection>;
+  user_id?: InputMaybe<OrderByDirection>;
+};
+
+export type Intercession_LikesUpdateInput = {
+  created_at?: InputMaybe<Scalars['Datetime']['input']>;
+  intercession_id?: InputMaybe<Scalars['UUID']['input']>;
+  user_id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+export type Intercession_LikesUpdateResponse = {
+  __typename?: 'intercession_likesUpdateResponse';
+  /** Count of the records impacted by the mutation */
+  affectedCount: Scalars['Int']['output'];
+  /** Array of records impacted by the mutation */
+  records: Array<Intercession_Likes>;
+};
+
 export type Posts = Node & {
   __typename?: 'posts';
   category?: Maybe<Scalars['String']['output']>;
@@ -1505,6 +1667,113 @@ export type PostsUpdateResponse = {
   records: Array<Posts>;
 };
 
+export type Prayer_Intercessions = Node & {
+  __typename?: 'prayer_intercessions';
+  author_id: Scalars['UUID']['output'];
+  content: Scalars['String']['output'];
+  created_at: Scalars['Datetime']['output'];
+  id: Scalars['UUID']['output'];
+  intercession_likesCollection?: Maybe<Intercession_LikesConnection>;
+  is_anonymous: Scalars['Boolean']['output'];
+  /** Globally Unique Record Identifier */
+  nodeId: Scalars['ID']['output'];
+  prayer_id: Scalars['UUID']['output'];
+  prayer_requests?: Maybe<Prayer_Requests>;
+  users?: Maybe<Users>;
+};
+
+
+export type Prayer_IntercessionsIntercession_LikesCollectionArgs = {
+  after?: InputMaybe<Scalars['Cursor']['input']>;
+  before?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<Intercession_LikesFilter>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<Array<Intercession_LikesOrderBy>>;
+};
+
+export type Prayer_IntercessionsConnection = {
+  __typename?: 'prayer_intercessionsConnection';
+  edges: Array<Prayer_IntercessionsEdge>;
+  pageInfo: PageInfo;
+  /** The total number of records matching the `filter` criteria */
+  totalCount: Scalars['Int']['output'];
+};
+
+export type Prayer_IntercessionsDeleteResponse = {
+  __typename?: 'prayer_intercessionsDeleteResponse';
+  /** Count of the records impacted by the mutation */
+  affectedCount: Scalars['Int']['output'];
+  /** Array of records impacted by the mutation */
+  records: Array<Prayer_Intercessions>;
+};
+
+export type Prayer_IntercessionsEdge = {
+  __typename?: 'prayer_intercessionsEdge';
+  cursor: Scalars['String']['output'];
+  node: Prayer_Intercessions;
+};
+
+export type Prayer_IntercessionsFilter = {
+  /** Returns true only if all its inner filters are true, otherwise returns false */
+  and?: InputMaybe<Array<Prayer_IntercessionsFilter>>;
+  author_id?: InputMaybe<UuidFilter>;
+  content?: InputMaybe<StringFilter>;
+  created_at?: InputMaybe<DatetimeFilter>;
+  id?: InputMaybe<UuidFilter>;
+  is_anonymous?: InputMaybe<BooleanFilter>;
+  nodeId?: InputMaybe<IdFilter>;
+  /** Negates a filter */
+  not?: InputMaybe<Prayer_IntercessionsFilter>;
+  /** Returns true if at least one of its inner filters is true, otherwise returns false */
+  or?: InputMaybe<Array<Prayer_IntercessionsFilter>>;
+  prayer_id?: InputMaybe<UuidFilter>;
+};
+
+export type Prayer_IntercessionsInsertInput = {
+  author_id?: InputMaybe<Scalars['UUID']['input']>;
+  content?: InputMaybe<Scalars['String']['input']>;
+  created_at?: InputMaybe<Scalars['Datetime']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  is_anonymous?: InputMaybe<Scalars['Boolean']['input']>;
+  prayer_id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+export type Prayer_IntercessionsInsertResponse = {
+  __typename?: 'prayer_intercessionsInsertResponse';
+  /** Count of the records impacted by the mutation */
+  affectedCount: Scalars['Int']['output'];
+  /** Array of records impacted by the mutation */
+  records: Array<Prayer_Intercessions>;
+};
+
+export type Prayer_IntercessionsOrderBy = {
+  author_id?: InputMaybe<OrderByDirection>;
+  content?: InputMaybe<OrderByDirection>;
+  created_at?: InputMaybe<OrderByDirection>;
+  id?: InputMaybe<OrderByDirection>;
+  is_anonymous?: InputMaybe<OrderByDirection>;
+  prayer_id?: InputMaybe<OrderByDirection>;
+};
+
+export type Prayer_IntercessionsUpdateInput = {
+  author_id?: InputMaybe<Scalars['UUID']['input']>;
+  content?: InputMaybe<Scalars['String']['input']>;
+  created_at?: InputMaybe<Scalars['Datetime']['input']>;
+  id?: InputMaybe<Scalars['UUID']['input']>;
+  is_anonymous?: InputMaybe<Scalars['Boolean']['input']>;
+  prayer_id?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+export type Prayer_IntercessionsUpdateResponse = {
+  __typename?: 'prayer_intercessionsUpdateResponse';
+  /** Count of the records impacted by the mutation */
+  affectedCount: Scalars['Int']['output'];
+  /** Array of records impacted by the mutation */
+  records: Array<Prayer_Intercessions>;
+};
+
 export type Prayer_Likes = Node & {
   __typename?: 'prayer_likes';
   created_at: Scalars['Datetime']['output'];
@@ -1597,9 +1866,21 @@ export type Prayer_Requests = Node & {
   is_answered: Scalars['Boolean']['output'];
   /** Globally Unique Record Identifier */
   nodeId: Scalars['ID']['output'];
+  prayer_intercessionsCollection?: Maybe<Prayer_IntercessionsConnection>;
   prayer_likesCollection?: Maybe<Prayer_LikesConnection>;
   updated_at: Scalars['Datetime']['output'];
   users?: Maybe<Users>;
+};
+
+
+export type Prayer_RequestsPrayer_IntercessionsCollectionArgs = {
+  after?: InputMaybe<Scalars['Cursor']['input']>;
+  before?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<Prayer_IntercessionsFilter>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<Array<Prayer_IntercessionsOrderBy>>;
 };
 
 
@@ -1704,7 +1985,7 @@ export type Prayer_RequestsUpdateResponse = {
 
 export type Sermons = Node & {
   __typename?: 'sermons';
-  audio_url: Scalars['String']['output'];
+  audio_url?: Maybe<Scalars['String']['output']>;
   categories?: Maybe<Categories>;
   category_id?: Maybe<Scalars['UUID']['output']>;
   created_at?: Maybe<Scalars['Datetime']['output']>;
@@ -1908,10 +2189,12 @@ export type Users = Node & {
   eventsCollection?: Maybe<EventsConnection>;
   full_name: Scalars['String']['output'];
   id: Scalars['UUID']['output'];
+  intercession_likesCollection?: Maybe<Intercession_LikesConnection>;
   is_active: Scalars['Boolean']['output'];
   /** Globally Unique Record Identifier */
   nodeId: Scalars['ID']['output'];
   phone?: Maybe<Scalars['String']['output']>;
+  prayer_intercessionsCollection?: Maybe<Prayer_IntercessionsConnection>;
   prayer_likesCollection?: Maybe<Prayer_LikesConnection>;
   prayer_requestsCollection?: Maybe<Prayer_RequestsConnection>;
   role: Scalars['String']['output'];
@@ -1939,6 +2222,28 @@ export type UsersEventsCollectionArgs = {
   last?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
   orderBy?: InputMaybe<Array<EventsOrderBy>>;
+};
+
+
+export type UsersIntercession_LikesCollectionArgs = {
+  after?: InputMaybe<Scalars['Cursor']['input']>;
+  before?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<Intercession_LikesFilter>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<Array<Intercession_LikesOrderBy>>;
+};
+
+
+export type UsersPrayer_IntercessionsCollectionArgs = {
+  after?: InputMaybe<Scalars['Cursor']['input']>;
+  before?: InputMaybe<Scalars['Cursor']['input']>;
+  filter?: InputMaybe<Prayer_IntercessionsFilter>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<Array<Prayer_IntercessionsOrderBy>>;
 };
 
 
@@ -2082,6 +2387,46 @@ export type GetUpcomingEventsQueryVariables = Exact<{
 
 export type GetUpcomingEventsQuery = { __typename?: 'Query', eventsCollection?: { __typename?: 'eventsConnection', edges: Array<{ __typename?: 'eventsEdge', node: { __typename?: 'events', id: string, title: string, description?: string | null, location?: string | null, cover_url: string, starts_at: string, ends_at?: string | null } }> } | null };
 
+export type GetPrayerIntercessionsQueryVariables = Exact<{
+  prayerId: Scalars['UUID']['input'];
+  userId: Scalars['UUID']['input'];
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetPrayerIntercessionsQuery = { __typename?: 'Query', prayer_intercessionsCollection?: { __typename?: 'prayer_intercessionsConnection', totalCount: number, edges: Array<{ __typename?: 'prayer_intercessionsEdge', node: { __typename?: 'prayer_intercessions', id: string, content: string, is_anonymous: boolean, created_at: string, author?: { __typename?: 'users', id: string, full_name: string } | null, likes?: { __typename?: 'intercession_likesConnection', totalCount: number } | null, my_likes?: { __typename?: 'intercession_likesConnection', edges: Array<{ __typename?: 'intercession_likesEdge', node: { __typename?: 'intercession_likes', user_id: string } }> } | null } }> } | null };
+
+export type CreatePrayerIntercessionMutationVariables = Exact<{
+  prayer_id: Scalars['UUID']['input'];
+  content: Scalars['String']['input'];
+  is_anonymous: Scalars['Boolean']['input'];
+}>;
+
+
+export type CreatePrayerIntercessionMutation = { __typename?: 'Mutation', insertIntoprayer_intercessionsCollection?: { __typename?: 'prayer_intercessionsInsertResponse', records: Array<{ __typename?: 'prayer_intercessions', id: string, created_at: string }> } | null };
+
+export type DeletePrayerIntercessionMutationVariables = Exact<{
+  id: Scalars['UUID']['input'];
+}>;
+
+
+export type DeletePrayerIntercessionMutation = { __typename?: 'Mutation', deleteFromprayer_intercessionsCollection: { __typename?: 'prayer_intercessionsDeleteResponse', records: Array<{ __typename?: 'prayer_intercessions', id: string }> } };
+
+export type LikeIntercessionMutationVariables = Exact<{
+  intercessionId: Scalars['UUID']['input'];
+}>;
+
+
+export type LikeIntercessionMutation = { __typename?: 'Mutation', insertIntointercession_likesCollection?: { __typename?: 'intercession_likesInsertResponse', records: Array<{ __typename?: 'intercession_likes', intercession_id: string, user_id: string }> } | null };
+
+export type UnlikeIntercessionMutationVariables = Exact<{
+  intercessionId: Scalars['UUID']['input'];
+}>;
+
+
+export type UnlikeIntercessionMutation = { __typename?: 'Mutation', deleteFromintercession_likesCollection: { __typename?: 'intercession_likesDeleteResponse', records: Array<{ __typename?: 'intercession_likes', intercession_id: string }> } };
+
 export type GetPostsQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -2156,14 +2501,14 @@ export type GetSermonsQueryVariables = Exact<{
 }>;
 
 
-export type GetSermonsQuery = { __typename?: 'Query', sermonsCollection?: { __typename?: 'sermonsConnection', edges: Array<{ __typename?: 'sermonsEdge', node: { __typename?: 'sermons', id: string, title: string, preacher_name: string, audio_url: string, video_url?: string | null, description?: string | null, duration?: number | null, published_at?: string | null, category?: { __typename?: 'categories', id: string, name: string } | null } }> } | null };
+export type GetSermonsQuery = { __typename?: 'Query', sermonsCollection?: { __typename?: 'sermonsConnection', edges: Array<{ __typename?: 'sermonsEdge', node: { __typename?: 'sermons', id: string, title: string, preacher_name: string, audio_url?: string | null, video_url?: string | null, description?: string | null, duration?: number | null, published_at?: string | null, category?: { __typename?: 'categories', id: string, name: string } | null } }> } | null };
 
 export type GetSermonByIdQueryVariables = Exact<{
   id: Scalars['UUID']['input'];
 }>;
 
 
-export type GetSermonByIdQuery = { __typename?: 'Query', sermonsCollection?: { __typename?: 'sermonsConnection', edges: Array<{ __typename?: 'sermonsEdge', node: { __typename?: 'sermons', id: string, title: string, preacher_name: string, audio_url: string, video_url?: string | null, description?: string | null, duration?: number | null, published_at?: string | null, category?: { __typename?: 'categories', id: string, name: string } | null } }> } | null };
+export type GetSermonByIdQuery = { __typename?: 'Query', sermonsCollection?: { __typename?: 'sermonsConnection', edges: Array<{ __typename?: 'sermonsEdge', node: { __typename?: 'sermons', id: string, title: string, preacher_name: string, audio_url?: string | null, video_url?: string | null, description?: string | null, duration?: number | null, published_at?: string | null, category?: { __typename?: 'categories', id: string, name: string } | null } }> } | null };
 
 export type GetSermonCategoriesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2245,6 +2590,142 @@ export const GetUpcomingEventsDocument = gql`
   })
   export class GetUpcomingEventsGQL extends Apollo.Query<GetUpcomingEventsQuery, GetUpcomingEventsQueryVariables> {
     override document = GetUpcomingEventsDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const GetPrayerIntercessionsDocument = gql`
+    query GetPrayerIntercessions($prayerId: UUID!, $userId: UUID!, $limit: Int = 20, $offset: Int = 0) {
+  prayer_intercessionsCollection(
+    filter: {prayer_id: {eq: $prayerId}}
+    first: $limit
+    offset: $offset
+    orderBy: [{created_at: DescNullsLast}]
+  ) {
+    totalCount
+    edges {
+      node {
+        id
+        content
+        is_anonymous
+        created_at
+        author: users {
+          id
+          full_name
+        }
+        likes: intercession_likesCollection {
+          totalCount
+        }
+        my_likes: intercession_likesCollection(
+          filter: {user_id: {eq: $userId}}
+          first: 1
+        ) {
+          edges {
+            node {
+              user_id
+            }
+          }
+        }
+      }
+    }
+  }
+}
+    `;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class GetPrayerIntercessionsGQL extends Apollo.Query<GetPrayerIntercessionsQuery, GetPrayerIntercessionsQueryVariables> {
+    override document = GetPrayerIntercessionsDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const CreatePrayerIntercessionDocument = gql`
+    mutation CreatePrayerIntercession($prayer_id: UUID!, $content: String!, $is_anonymous: Boolean!) {
+  insertIntoprayer_intercessionsCollection(
+    objects: [{prayer_id: $prayer_id, content: $content, is_anonymous: $is_anonymous}]
+  ) {
+    records {
+      id
+      created_at
+    }
+  }
+}
+    `;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class CreatePrayerIntercessionGQL extends Apollo.Mutation<CreatePrayerIntercessionMutation, CreatePrayerIntercessionMutationVariables> {
+    override document = CreatePrayerIntercessionDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const DeletePrayerIntercessionDocument = gql`
+    mutation DeletePrayerIntercession($id: UUID!) {
+  deleteFromprayer_intercessionsCollection(filter: {id: {eq: $id}}) {
+    records {
+      id
+    }
+  }
+}
+    `;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class DeletePrayerIntercessionGQL extends Apollo.Mutation<DeletePrayerIntercessionMutation, DeletePrayerIntercessionMutationVariables> {
+    override document = DeletePrayerIntercessionDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const LikeIntercessionDocument = gql`
+    mutation LikeIntercession($intercessionId: UUID!) {
+  insertIntointercession_likesCollection(
+    objects: [{intercession_id: $intercessionId}]
+  ) {
+    records {
+      intercession_id
+      user_id
+    }
+  }
+}
+    `;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class LikeIntercessionGQL extends Apollo.Mutation<LikeIntercessionMutation, LikeIntercessionMutationVariables> {
+    override document = LikeIntercessionDocument;
+    
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+export const UnlikeIntercessionDocument = gql`
+    mutation UnlikeIntercession($intercessionId: UUID!) {
+  deleteFromintercession_likesCollection(
+    filter: {intercession_id: {eq: $intercessionId}}
+  ) {
+    records {
+      intercession_id
+    }
+  }
+}
+    `;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class UnlikeIntercessionGQL extends Apollo.Mutation<UnlikeIntercessionMutation, UnlikeIntercessionMutationVariables> {
+    override document = UnlikeIntercessionDocument;
     
     constructor(apollo: Apollo.Apollo) {
       super(apollo);

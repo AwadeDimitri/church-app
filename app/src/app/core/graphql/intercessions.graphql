@@ -1,0 +1,92 @@
+query GetPrayerIntercessions(
+  $prayerId: UUID!
+  $userId: UUID!
+  $limit: Int = 20
+  $offset: Int = 0
+) {
+  prayer_intercessionsCollection(
+    filter: { prayer_id: { eq: $prayerId } }
+    first: $limit
+    offset: $offset
+    orderBy: [{ created_at: DescNullsLast }]
+  ) {
+    totalCount
+    edges {
+      node {
+        id
+        content
+        is_anonymous
+        created_at
+        author: users {
+          id
+          full_name
+        }
+        likes: intercession_likesCollection {
+          totalCount
+        }
+        my_likes: intercession_likesCollection(
+          filter: { user_id: { eq: $userId } }
+          first: 1
+        ) {
+          edges {
+            node {
+              user_id
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+mutation CreatePrayerIntercession(
+  $prayer_id: UUID!
+  $content: String!
+  $is_anonymous: Boolean!
+) {
+  insertIntoprayer_intercessionsCollection(
+    objects: [
+      {
+        prayer_id: $prayer_id
+        content: $content
+        is_anonymous: $is_anonymous
+      }
+    ]
+  ) {
+    records {
+      id
+      created_at
+    }
+  }
+}
+
+mutation DeletePrayerIntercession($id: UUID!) {
+  deleteFromprayer_intercessionsCollection(
+    filter: { id: { eq: $id } }
+  ) {
+    records {
+      id
+    }
+  }
+}
+
+mutation LikeIntercession($intercessionId: UUID!) {
+  insertIntointercession_likesCollection(
+    objects: [{ intercession_id: $intercessionId }]
+  ) {
+    records {
+      intercession_id
+      user_id
+    }
+  }
+}
+
+mutation UnlikeIntercession($intercessionId: UUID!) {
+  deleteFromintercession_likesCollection(
+    filter: { intercession_id: { eq: $intercessionId } }
+  ) {
+    records {
+      intercession_id
+    }
+  }
+}

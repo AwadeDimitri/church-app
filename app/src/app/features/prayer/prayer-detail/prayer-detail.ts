@@ -1,11 +1,26 @@
-import { Component, ChangeDetectionStrategy, inject, input, computed } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  inject,
+  input,
+  signal,
+  computed,
+} from '@angular/core';
 import { toSignal, toObservable } from '@angular/core/rxjs-interop';
 import { switchMap } from 'rxjs';
 import { DatePipe } from '@angular/common';
+import {
+  ReactiveFormsModule,
+  NonNullableFormBuilder,
+  Validators,
+} from '@angular/forms';
 import { NzIconDirective } from 'ng-zorro-antd/icon';
 import { PageHeader } from '@shared/components/page-header/page-header';
 import { Avatar } from '@shared/components/avatar/avatar';
+import { RelativeTimePipe } from '@shared/pipes/relative-time.pipe';
 import { PrayerService } from '@core/services/prayer.service';
+import { IntercessionService } from '@core/services/intercession.service';
+import { AuthService } from '@core/services/auth.service';
 
 const PALETTE: Record<string, { bg: string; text: string }> = {
   red:    { bg: 'bg-church-red-light',  text: 'text-church-red' },
@@ -17,14 +32,37 @@ const PALETTE: Record<string, { bg: string; text: string }> = {
 };
 const FALLBACK_COLOR = PALETTE['gray']!;
 
+const AVATAR_COLORS = ['blue', 'red', 'green', 'gold', 'purple'] as const;
+type AvatarColor = (typeof AVATAR_COLORS)[number];
+
+type IntercessionItem = {
+  id: string;
+  content: string;
+  is_anonymous: boolean;
+  created_at: string;
+  author?: { id: string; full_name?: string | null } | null;
+  likes?: { totalCount?: number | null } | null;
+  my_likes?: { edges: { node: { user_id: string } }[] } | null;
+};
+
 @Component({
   selector: 'app-prayer-detail',
-  imports: [DatePipe, NzIconDirective, PageHeader, Avatar],
+  imports: [
+    DatePipe,
+    ReactiveFormsModule,
+    NzIconDirective,
+    PageHeader,
+    Avatar,
+    RelativeTimePipe,
+  ],
   templateUrl: './prayer-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class PrayerDetail {
   private readonly prayerService = inject(PrayerService);
+  private readonly intercessionService = inject(IntercessionService);
+  private readonly auth = inject(AuthService);
+  private readonly fb = inject(NonNullableFormBuilder);
 
   readonly id = input.required<string>();
 
@@ -34,10 +72,26 @@ export default class PrayerDetail {
     ),
   );
 
+  private readonly feed = toSignal(
+    toObservable(this.id).pipe(
+      switchMap(id => this.intercessionService.forPrayer(id)),
+    ),
+  );
+
+  readonly intercessions = computed(() => this.feed()?.items ?? []);
+  readonly intercessionsCount = computed(() => this.feed()?.totalCount ?? 0);
+  readonly intercessionsLoading = computed(() => this.feed() === undefined);
+
   readonly authorName = computed(() => {
     const p = this.prayer();
     if (!p) return '';
     return p.is_anonymous ? 'Anonyme' : (p.author?.full_name ?? 'Membre');
+  });
+
+  readonly currentUserName = computed(() => {
+    const u = this.auth.user();
+    const meta = (u?.user_metadata ?? {}) as { full_name?: string };
+    return meta.full_name ?? 'Moi';
   });
 
   readonly categoryColor = computed(() => {
@@ -49,7 +103,68 @@ export default class PrayerDetail {
     () => (this.prayer()?.my_likes?.edges.length ?? 0) > 0,
   );
 
-  togglePray() {
+  readonly form = this.fb.group({
+    content: ['', [Validators.required, Validators.pattern(/\S/)]],
+    isAnonymous: [false],
+  });
+
+  readonly submitting = signal(false);
+
+  authorNameOf(item: IntercessionItem): string {
+    if (item.is_anonymous) return 'Anonyme';
+    return item.author?.full_name ?? 'Membre';
+  }
+
+  avatarColorOf(name: string): AvatarColor {
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = (hash * 31 + name.charCodeAt(i)) | 0;
+    }
+    return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length]!;
+  }
+
+  isMineOf(item: IntercessionItem): boolean {
+    const meId = this.auth.user()?.id;
+    return !!meId && item.author?.id === meId;
+  }
+
+  isLikedByMeOf(item: IntercessionItem): boolean {
+    return (item.my_likes?.edges.length ?? 0) > 0;
+  }
+
+  amenCountOf(item: IntercessionItem): number {
+    return item.likes?.totalCount ?? 0;
+  }
+
+  submit(): void {
+    if (this.form.invalid || this.submitting()) return;
+    const { content, isAnonymous } = this.form.getRawValue();
+    this.submitting.set(true);
+    this.intercessionService
+      .create(this.id(), content.trim(), isAnonymous)
+      .subscribe({
+        next: () => {
+          this.form.reset({ content: '', isAnonymous: false });
+          this.submitting.set(false);
+        },
+        error: () => this.submitting.set(false),
+      });
+  }
+
+  toggleAmen(item: IntercessionItem): void {
+    if (this.isLikedByMeOf(item)) {
+      this.intercessionService.unlike(item.id).subscribe();
+    } else {
+      this.intercessionService.like(item.id).subscribe();
+    }
+  }
+
+  deleteIntercession(item: IntercessionItem): void {
+    if (!window.confirm('Supprimer cette intercession ?')) return;
+    this.intercessionService.delete(item.id).subscribe();
+  }
+
+  togglePray(): void {
     const p = this.prayer();
     if (!p) return;
     if (this.isLikedByMe()) {
@@ -59,7 +174,7 @@ export default class PrayerDetail {
     }
   }
 
-  async onShare() {
+  async onShare(): Promise<void> {
     const p = this.prayer();
     if (!p) return;
     const text = `Prière : ${p.content}`;
