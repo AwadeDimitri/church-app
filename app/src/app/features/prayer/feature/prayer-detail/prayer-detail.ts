@@ -15,11 +15,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { Dispatcher, Events } from '@ngrx/signals/events';
-import {
-  injectQuery,
-  keepPreviousData,
-} from '@tanstack/angular-query-experimental';
-import { firstValueFrom } from 'rxjs';
+
 import { NzIconDirective } from 'ng-zorro-antd/icon';
 import { PageHeader } from '@shared/components/page-header/page-header';
 import { Avatar } from '@shared/components/avatar/avatar';
@@ -29,13 +25,13 @@ import {
 } from '@shared/components/avatar/avatar-colors';
 import { Button } from '@shared/components/button/button';
 import { RelativeTimePipe } from '@shared/pipes/relative-time.pipe';
-import { GetPrayerRequestGQL } from '@core/graphql/generated';
 import { AuthService } from '@core/services/auth.service';
 import {
   PrayerStore,
   intercessionEntityEvents,
   intercessionListEvents,
   intercessionMutationEvents,
+  prayerDetailEvents,
   prayerEntityEvents,
   prayerMutationEvents,
 } from '@features/prayer/data-access';
@@ -59,29 +55,11 @@ export default class PrayerDetail {
   private readonly store = inject(PrayerStore);
   private readonly dispatcher = inject(Dispatcher);
   private readonly auth = inject(AuthService);
-  private readonly getPrayerGQL = inject(GetPrayerRequestGQL);
   private readonly fb = inject(NonNullableFormBuilder);
 
   readonly id = input.required<string>();
 
-  private readonly prayerQuery = injectQuery(() => ({
-    queryKey: ['prayers', 'detail', this.id()],
-    enabled: !!this.auth.user(),
-    queryFn: async ({ signal }) => {
-      const userId = this.auth.user()!.id;
-      const result = await firstValueFrom(
-        this.getPrayerGQL.fetch({
-          variables: { id: this.id(), userId },
-          context: { fetchOptions: { signal } },
-        }),
-      );
-      return result.data?.prayer_requestsCollection?.edges?.[0]?.node ?? null;
-    },
-    placeholderData: keepPreviousData,
-  }));
-
-  readonly prayer = computed(() => this.prayerQuery.data() ?? undefined);
-
+  readonly prayer = this.store.prayer;
   readonly intercessions = this.store.intercessions;
   readonly intercessionsCount = this.store.intercessionsCount;
   readonly intercessionsLoading = this.store.intercessionsLoading;
@@ -104,12 +82,26 @@ export default class PrayerDetail {
   );
 
   readonly form = this.fb.group({
-    content: ['', [Validators.required, Validators.pattern(/\S/), Validators.maxLength(300)]],
+    content: [
+      '',
+      [
+        Validators.required,
+        Validators.pattern(/\S/),
+        Validators.maxLength(300),
+      ],
+    ],
     isAnonymous: [false],
   });
 
   readonly testimonyForm = this.fb.group({
-    testimony: ['', [Validators.required, Validators.pattern(/\S/), Validators.maxLength(1000)]],
+    testimony: [
+      '',
+      [
+        Validators.required,
+        Validators.pattern(/\S/),
+        Validators.maxLength(1000),
+      ],
+    ],
   });
 
   readonly markDialogOpen = signal(false);
@@ -125,6 +117,9 @@ export default class PrayerDetail {
     effect(() => {
       const id = this.id();
       if (id) {
+        this.dispatcher.dispatch(
+          prayerDetailEvents.viewRequested({ id: this.id() }),
+        );
         this.dispatcher.dispatch(
           intercessionListEvents.viewRequested({ prayerId: id }),
         );
@@ -210,7 +205,9 @@ export default class PrayerDetail {
     const p = this.prayer();
     if (!p) return;
     const title = p.is_answered ? 'Prière exaucée' : 'Demande de prière';
-    const text = p.is_answered ? `Prière exaucée : ${p.content}` : `Prière : ${p.content}`;
+    const text = p.is_answered
+      ? `Prière exaucée : ${p.content}`
+      : `Prière : ${p.content}`;
     if (navigator.share) {
       await navigator.share({ title, text });
     }
