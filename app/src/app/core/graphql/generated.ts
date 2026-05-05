@@ -2449,6 +2449,7 @@ export type GetPrayerRequestsQueryVariables = Exact<{
   userId: Scalars['UUID']['input'];
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
+  filter?: InputMaybe<Prayer_RequestsFilter>;
 }>;
 
 
@@ -2784,8 +2785,9 @@ export const GetPostsDocument = gql`
     }
   }
 export const GetPrayerRequestsDocument = gql`
-    query GetPrayerRequests($userId: UUID!, $limit: Int = 10, $offset: Int = 0) {
+    query GetPrayerRequests($userId: UUID!, $limit: Int = 10, $offset: Int = 0, $filter: prayer_requestsFilter) {
   prayer_requestsCollection(
+    filter: $filter
     first: $limit
     offset: $offset
     orderBy: [{created_at: DescNullsLast}]

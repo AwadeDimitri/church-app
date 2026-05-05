@@ -1,10 +1,13 @@
-import { Component, ChangeDetectionStrategy, inject, signal, effect } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, ChangeDetectionStrategy, inject, effect } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Dispatcher } from '@ngrx/signals/events';
 import { NzIconDirective } from 'ng-zorro-antd/icon';
 import { Button } from '@shared/components/button/button';
 import { PageHeader } from '@shared/components/page-header/page-header';
-import { PrayerService } from '@core/services/prayer.service';
+import {
+  PrayerStore,
+  prayerMutationEvents,
+} from '@features/prayer/data-access';
 
 @Component({
   selector: 'app-prayer-new',
@@ -13,12 +16,12 @@ import { PrayerService } from '@core/services/prayer.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class PrayerNew {
-  private readonly prayerService = inject(PrayerService);
+  private readonly store = inject(PrayerStore);
+  private readonly dispatcher = inject(Dispatcher);
   private readonly fb = inject(NonNullableFormBuilder);
-  private readonly router = inject(Router);
 
-  readonly categories = this.prayerService.categories;
-  readonly submitting = signal(false);
+  readonly categories = this.store.categories;
+  readonly submitting = this.store.isCreating;
 
   readonly form = this.fb.group({
     categoryId: ['', Validators.required],
@@ -35,22 +38,19 @@ export default class PrayerNew {
     });
   }
 
-  submit() {
+  submit(): void {
     if (this.submitting()) return;
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
-
-    this.submitting.set(true);
     const { content, categoryId, isAnonymous } = this.form.getRawValue();
-
-    this.prayerService.create(content.trim(), categoryId, isAnonymous).subscribe({
-      next: () => {
-        this.submitting.set(false);
-        this.router.navigate(['/prayer']);
-      },
-      error: () => this.submitting.set(false),
-    });
+    this.dispatcher.dispatch(
+      prayerMutationEvents.createRequested({
+        content: content.trim(),
+        category_id: categoryId,
+        is_anonymous: isAnonymous,
+      }),
+    );
   }
 }

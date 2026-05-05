@@ -78,21 +78,22 @@ export const routes: Routes = [
         path: 'prayer',
         canActivate: [memberGuard],
         data: { reason: 'prayer' },
-        loadComponent: () => import('./features/prayer/prayer'),
+        loadComponent: () =>
+          import('./features/prayer/feature/prayer-list/prayer-list'),
       },
       {
         path: 'prayer/new',
         canActivate: [memberGuard],
         data: { reason: 'prayer' },
         loadComponent: () =>
-          import('./features/prayer/prayer-new/prayer-new'),
+          import('./features/prayer/feature/prayer-new/prayer-new'),
       },
       {
         path: 'prayer/:id',
         canActivate: [memberGuard],
         data: { reason: 'prayer' },
         loadComponent: () =>
-          import('./features/prayer/prayer-detail/prayer-detail'),
+          import('./features/prayer/feature/prayer-detail/prayer-detail'),
       },
       {
         path: 'profile',

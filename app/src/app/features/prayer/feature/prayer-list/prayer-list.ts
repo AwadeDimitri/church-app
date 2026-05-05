@@ -1,6 +1,14 @@
-import { Component, ChangeDetectionStrategy, inject, computed, signal, effect } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  inject,
+  computed,
+  signal,
+  effect,
+} from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
+import { Dispatcher } from '@ngrx/signals/events';
 import { NzIconDirective } from 'ng-zorro-antd/icon';
 import { Button } from '@shared/components/button/button';
 import { StatCard } from '@shared/components/stat-card/stat-card';
@@ -8,9 +16,12 @@ import { CategoryFilter } from '@shared/components/category-filter/category-filt
 import { PrayerCard } from '@shared/components/prayer-card/prayer-card';
 import { PageHeader } from '@shared/components/page-header/page-header';
 import { PullToRefresh } from '@shared/components/pull-to-refresh/pull-to-refresh';
-import { PrayerService } from '@core/services/prayer.service';
+import {
+  PrayerScope,
+  PrayerStore,
+  prayerListEvents,
+} from '@features/prayer/data-access';
 
-// Mapping clé couleur DB -> classes Tailwind (palette de theming, pas de donnée)
 const PALETTE: Record<string, { bg: string; text: string }> = {
   red:    { bg: 'bg-church-red-light',  text: 'text-church-red' },
   blue:   { bg: 'bg-church-blue-light', text: 'text-church-blue' },
@@ -26,65 +37,73 @@ const AVATAR_COLORS: Array<'blue' | 'red' | 'green' | 'gold'> = [
 ];
 
 @Component({
-  selector: 'app-prayer',
+  selector: 'app-prayer-list',
   imports: [DatePipe, RouterLink, NzIconDirective, Button, StatCard, CategoryFilter, PrayerCard, PageHeader, PullToRefresh],
-  templateUrl: './prayer.html',
+  templateUrl: './prayer-list.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export default class Prayer {
-  private readonly prayerService = inject(PrayerService);
+export default class PrayerList {
+  private readonly store = inject(PrayerStore);
+  private readonly dispatcher = inject(Dispatcher);
   private readonly router = inject(Router);
 
-  readonly serviceCategories = this.prayerService.categories;
+  readonly prayers = this.store.items;
+  readonly hasMore = this.store.hasMore;
+  readonly isPending = this.store.isPending;
+  readonly isFetchingNext = this.store.isFetchingNext;
+  readonly error = this.store.error;
+  readonly stats = this.store.stats;
+  readonly scope = this.store.scope;
 
-  // "Toutes" = concept UX (filtre désactivé), préfixé côté client
-  readonly filterCategories = computed(() =>
-    ['Toutes', ...this.serviceCategories().map(c => c.name)],
-  );
-  readonly selectedCategory = signal('Toutes');
+  readonly filterCategories = computed(() => {
+    const cats = this.store.categories() ?? [];
+    return ['Toutes', ...cats.map((c) => c.name)];
+  });
 
-  readonly loading = this.prayerService.loading;
-  readonly error = this.prayerService.error;
-  readonly hasMore = this.prayerService.hasMore;
-  readonly allPrayers = this.prayerService.prayers;
-  readonly stats = this.prayerService.stats;
-  readonly scope = this.prayerService.scope;
+  readonly selectedCategoryName = computed(() => {
+    const slug = this.store.selectedCategory();
+    if (slug === 'all') return 'Toutes';
+    const cat = (this.store.categories() ?? []).find((c) => c.slug === slug);
+    return cat?.name ?? 'Toutes';
+  });
 
   readonly pullRefreshing = signal(false);
 
   constructor() {
-    // Clear pull-refresh state quand le service termine son fetch
     effect(() => {
-      if (this.pullRefreshing() && !this.prayerService.loading()) {
+      if (this.pullRefreshing() && !this.store.isFetching()) {
         this.pullRefreshing.set(false);
       }
     });
   }
 
-  loadMore(): void {
-    this.prayerService.loadMore();
+  setScope(scope: PrayerScope): void {
+    this.dispatcher.dispatch(prayerListEvents.scopeChanged({ scope }));
   }
 
-  setScope(scope: 'all' | 'mine'): void {
-    this.prayerService.setScope(scope);
+  onCategorySelected(name: string): void {
+    if (name === 'Toutes') {
+      this.dispatcher.dispatch(prayerListEvents.categoryChanged({ category: 'all' }));
+      return;
+    }
+    const cat = (this.store.categories() ?? []).find((c) => c.name === name);
+    if (cat) {
+      this.dispatcher.dispatch(prayerListEvents.categoryChanged({ category: cat.slug }));
+    }
+  }
+
+  loadMore(): void {
+    this.dispatcher.dispatch(prayerListEvents.loadMoreRequested());
   }
 
   onPullRefresh(): void {
     this.pullRefreshing.set(true);
-    this.prayerService.refresh();
+    this.dispatcher.dispatch(prayerListEvents.refreshed());
   }
 
   goToNew(): void {
     this.router.navigate(['/prayer/new']);
   }
-
-  readonly prayers = computed(() => {
-    const selected = this.selectedCategory();
-    const all = this.prayerService.prayers();
-
-    if (selected === 'Toutes') return all;
-    return all.filter(p => p.category?.name === selected);
-  });
 
   getAuthorName(prayer: { is_anonymous: boolean; author?: { full_name: string } | null }): string {
     return prayer.is_anonymous ? 'Anonyme' : (prayer.author?.full_name ?? 'Membre');

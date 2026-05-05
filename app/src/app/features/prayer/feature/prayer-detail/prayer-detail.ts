@@ -6,22 +6,32 @@ import {
   signal,
   computed,
 } from '@angular/core';
-import { toSignal, toObservable } from '@angular/core/rxjs-interop';
-import { switchMap } from 'rxjs';
+import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { DatePipe } from '@angular/common';
 import {
   ReactiveFormsModule,
   NonNullableFormBuilder,
   Validators,
 } from '@angular/forms';
+import { Dispatcher, Events } from '@ngrx/signals/events';
+import {
+  injectQuery,
+  keepPreviousData,
+} from '@tanstack/angular-query-experimental';
+import { firstValueFrom, switchMap } from 'rxjs';
 import { NzIconDirective } from 'ng-zorro-antd/icon';
 import { PageHeader } from '@shared/components/page-header/page-header';
 import { Avatar } from '@shared/components/avatar/avatar';
 import { Button } from '@shared/components/button/button';
 import { RelativeTimePipe } from '@shared/pipes/relative-time.pipe';
-import { PrayerService } from '@core/services/prayer.service';
+import { GetPrayerRequestGQL } from '@core/graphql/generated';
 import { IntercessionService } from '@core/services/intercession.service';
 import { AuthService } from '@core/services/auth.service';
+import {
+  PrayerStore,
+  prayerEntityEvents,
+  prayerMutationEvents,
+} from '@features/prayer/data-access';
 
 const PALETTE: Record<string, { bg: string; text: string }> = {
   red:    { bg: 'bg-church-red-light',  text: 'text-church-red' },
@@ -61,25 +71,38 @@ type IntercessionItem = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class PrayerDetail {
-  private readonly prayerService = inject(PrayerService);
+  private readonly store = inject(PrayerStore);
+  private readonly dispatcher = inject(Dispatcher);
   private readonly intercessionService = inject(IntercessionService);
   private readonly auth = inject(AuthService);
+  private readonly getPrayerGQL = inject(GetPrayerRequestGQL);
   private readonly fb = inject(NonNullableFormBuilder);
 
   readonly id = input.required<string>();
 
-  readonly prayer = toSignal(
-    toObservable(this.id).pipe(
-      switchMap(id => this.prayerService.getById(id)),
-    ),
-  );
+  private readonly prayerQuery = injectQuery(() => ({
+    queryKey: ['prayers', 'detail', this.id()],
+    enabled: !!this.auth.user(),
+    queryFn: async ({ signal }) => {
+      const userId = this.auth.user()!.id;
+      const result = await firstValueFrom(
+        this.getPrayerGQL.fetch({
+          variables: { id: this.id(), userId },
+          context: { fetchOptions: { signal } },
+        }),
+      );
+      return result.data?.prayer_requestsCollection?.edges?.[0]?.node ?? null;
+    },
+    placeholderData: keepPreviousData,
+  }));
+
+  readonly prayer = computed(() => this.prayerQuery.data() ?? undefined);
 
   private readonly feed = toSignal(
     toObservable(this.id).pipe(
       switchMap(id => this.intercessionService.forPrayer(id)),
     ),
   );
-
   readonly intercessions = computed(() => this.feed()?.items ?? []);
   readonly intercessionsCount = computed(() => this.feed()?.totalCount ?? 0);
   readonly intercessionsLoading = computed(() => this.feed() === undefined);
@@ -116,13 +139,20 @@ export default class PrayerDetail {
 
   readonly submitting = signal(false);
   readonly markDialogOpen = signal(false);
-  readonly marking = signal(false);
+  readonly marking = this.store.isMarkingAnswered;
 
   readonly canMarkAsAnswered = computed(() => {
     const p = this.prayer();
     const meId = this.auth.user()?.id;
     return !!p && !!meId && p.author?.id === meId && !p.is_answered;
   });
+
+  constructor() {
+    inject(Events)
+      .on(prayerEntityEvents.markedAnswered)
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => this.markDialogOpen.set(false));
+  }
 
   authorNameOf(item: IntercessionItem): string {
     if (item.is_anonymous) return 'Anonyme';
@@ -182,9 +212,13 @@ export default class PrayerDetail {
     const p = this.prayer();
     if (!p) return;
     if (this.isLikedByMe()) {
-      this.prayerService.unlike(p.id).subscribe();
+      this.dispatcher.dispatch(
+        prayerMutationEvents.unlikeRequested({ prayerId: p.id }),
+      );
     } else {
-      this.prayerService.like(p.id).subscribe();
+      this.dispatcher.dispatch(
+        prayerMutationEvents.likeRequested({ prayerId: p.id }),
+      );
     }
   }
 
@@ -211,13 +245,11 @@ export default class PrayerDetail {
   confirmMarkAsAnswered(): void {
     if (this.testimonyForm.invalid || this.marking()) return;
     const { testimony } = this.testimonyForm.getRawValue();
-    this.marking.set(true);
-    this.prayerService.markAsAnswered(this.id(), testimony.trim()).subscribe({
-      next: () => {
-        this.marking.set(false);
-        this.markDialogOpen.set(false);
-      },
-      error: () => this.marking.set(false),
-    });
+    this.dispatcher.dispatch(
+      prayerMutationEvents.markAnsweredRequested({
+        id: this.id(),
+        testimony: testimony.trim(),
+      }),
+    );
   }
 }
