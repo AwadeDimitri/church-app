@@ -5,8 +5,9 @@ import {
   input,
   signal,
   computed,
+  effect,
 } from '@angular/core';
-import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DatePipe } from '@angular/common';
 import {
   ReactiveFormsModule,
@@ -18,43 +19,27 @@ import {
   injectQuery,
   keepPreviousData,
 } from '@tanstack/angular-query-experimental';
-import { firstValueFrom, switchMap } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { NzIconDirective } from 'ng-zorro-antd/icon';
 import { PageHeader } from '@shared/components/page-header/page-header';
 import { Avatar } from '@shared/components/avatar/avatar';
+import {
+  avatarColorFor,
+  type AvatarColor,
+} from '@shared/components/avatar/avatar-colors';
 import { Button } from '@shared/components/button/button';
 import { RelativeTimePipe } from '@shared/pipes/relative-time.pipe';
 import { GetPrayerRequestGQL } from '@core/graphql/generated';
-import { IntercessionService } from '@core/services/intercession.service';
 import { AuthService } from '@core/services/auth.service';
 import {
   PrayerStore,
+  intercessionEntityEvents,
+  intercessionListEvents,
+  intercessionMutationEvents,
   prayerEntityEvents,
   prayerMutationEvents,
 } from '@features/prayer/data-access';
-
-const PALETTE: Record<string, { bg: string; text: string }> = {
-  red:    { bg: 'bg-church-red-light',  text: 'text-church-red' },
-  blue:   { bg: 'bg-church-blue-light', text: 'text-church-blue' },
-  green:  { bg: 'bg-green-50',          text: 'text-church-green' },
-  gold:   { bg: 'bg-amber-50',          text: 'text-church-gold' },
-  purple: { bg: 'bg-purple-50',         text: 'text-purple-500' },
-  gray:   { bg: 'bg-gray-100',          text: 'text-gray-600' },
-};
-const FALLBACK_COLOR = PALETTE['gray']!;
-
-const AVATAR_COLORS = ['blue', 'red', 'green', 'gold', 'purple'] as const;
-type AvatarColor = (typeof AVATAR_COLORS)[number];
-
-type IntercessionItem = {
-  id: string;
-  content: string;
-  is_anonymous: boolean;
-  created_at: string;
-  author?: { id: string; full_name?: string | null } | null;
-  likes?: { totalCount?: number | null } | null;
-  my_likes?: { edges: { node: { user_id: string } }[] } | null;
-};
+import type { Intercession } from '@features/prayer/util';
 
 @Component({
   selector: 'app-prayer-detail',
@@ -73,7 +58,6 @@ type IntercessionItem = {
 export default class PrayerDetail {
   private readonly store = inject(PrayerStore);
   private readonly dispatcher = inject(Dispatcher);
-  private readonly intercessionService = inject(IntercessionService);
   private readonly auth = inject(AuthService);
   private readonly getPrayerGQL = inject(GetPrayerRequestGQL);
   private readonly fb = inject(NonNullableFormBuilder);
@@ -98,14 +82,10 @@ export default class PrayerDetail {
 
   readonly prayer = computed(() => this.prayerQuery.data() ?? undefined);
 
-  private readonly feed = toSignal(
-    toObservable(this.id).pipe(
-      switchMap(id => this.intercessionService.forPrayer(id)),
-    ),
-  );
-  readonly intercessions = computed(() => this.feed()?.items ?? []);
-  readonly intercessionsCount = computed(() => this.feed()?.totalCount ?? 0);
-  readonly intercessionsLoading = computed(() => this.feed() === undefined);
+  readonly intercessions = this.store.intercessions;
+  readonly intercessionsCount = this.store.intercessionsCount;
+  readonly intercessionsLoading = this.store.intercessionsLoading;
+  readonly submitting = this.store.isCreatingIntercession;
 
   readonly authorName = computed(() => {
     const p = this.prayer();
@@ -117,11 +97,6 @@ export default class PrayerDetail {
     const u = this.auth.user();
     const meta = (u?.user_metadata ?? {}) as { full_name?: string };
     return meta.full_name ?? 'Moi';
-  });
-
-  readonly categoryColor = computed(() => {
-    const key = this.prayer()?.category?.color ?? '';
-    return PALETTE[key] ?? FALLBACK_COLOR;
   });
 
   readonly isLikedByMe = computed(
@@ -137,7 +112,6 @@ export default class PrayerDetail {
     testimony: ['', [Validators.required, Validators.pattern(/\S/), Validators.maxLength(1000)]],
   });
 
-  readonly submitting = signal(false);
   readonly markDialogOpen = signal(false);
   readonly marking = this.store.isMarkingAnswered;
 
@@ -148,64 +122,74 @@ export default class PrayerDetail {
   });
 
   constructor() {
-    inject(Events)
+    effect(() => {
+      const id = this.id();
+      if (id) {
+        this.dispatcher.dispatch(
+          intercessionListEvents.viewRequested({ prayerId: id }),
+        );
+      }
+    });
+
+    const events = inject(Events);
+
+    events
       .on(prayerEntityEvents.markedAnswered)
       .pipe(takeUntilDestroyed())
       .subscribe(() => this.markDialogOpen.set(false));
+
+    events
+      .on(intercessionEntityEvents.created)
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => this.form.reset({ content: '', isAnonymous: false }));
   }
 
-  authorNameOf(item: IntercessionItem): string {
+  authorNameOf(item: Intercession): string {
     if (item.is_anonymous) return 'Anonyme';
     return item.author?.full_name ?? 'Membre';
   }
 
   avatarColorOf(name: string): AvatarColor {
-    let hash = 0;
-    for (let i = 0; i < name.length; i++) {
-      hash = (hash * 31 + name.charCodeAt(i)) | 0;
-    }
-    return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length]!;
+    return avatarColorFor(name);
   }
 
-  isMineOf(item: IntercessionItem): boolean {
+  isMineOf(item: Intercession): boolean {
     const meId = this.auth.user()?.id;
     return !!meId && item.author?.id === meId;
   }
 
-  isLikedByMeOf(item: IntercessionItem): boolean {
+  isLikedByMeOf(item: Intercession): boolean {
     return (item.my_likes?.edges.length ?? 0) > 0;
   }
 
-  amenCountOf(item: IntercessionItem): number {
+  amenCountOf(item: Intercession): number {
     return item.likes?.totalCount ?? 0;
   }
 
   submit(): void {
     if (this.form.invalid || this.submitting()) return;
     const { content, isAnonymous } = this.form.getRawValue();
-    this.submitting.set(true);
-    this.intercessionService
-      .create(this.id(), content.trim(), isAnonymous)
-      .subscribe({
-        next: () => {
-          this.form.reset({ content: '', isAnonymous: false });
-          this.submitting.set(false);
-        },
-        error: () => this.submitting.set(false),
-      });
+    this.dispatcher.dispatch(
+      intercessionMutationEvents.createRequested({
+        prayer_id: this.id(),
+        content: content.trim(),
+        is_anonymous: isAnonymous,
+      }),
+    );
   }
 
-  toggleAmen(item: IntercessionItem): void {
-    if (this.isLikedByMeOf(item)) {
-      this.intercessionService.unlike(item.id).subscribe();
-    } else {
-      this.intercessionService.like(item.id).subscribe();
-    }
+  toggleAmen(item: Intercession): void {
+    const event = this.isLikedByMeOf(item)
+      ? intercessionMutationEvents.unlikeRequested({ intercessionId: item.id })
+      : intercessionMutationEvents.likeRequested({ intercessionId: item.id });
+    this.dispatcher.dispatch(event);
   }
 
-  deleteIntercession(item: IntercessionItem): void {
+  deleteIntercession(item: Intercession): void {
     if (!window.confirm('Supprimer cette intercession ?')) return;
-    this.intercessionService.delete(item.id).subscribe();
+    this.dispatcher.dispatch(
+      intercessionMutationEvents.deleteRequested({ id: item.id }),
+    );
   }
 
   togglePray(): void {

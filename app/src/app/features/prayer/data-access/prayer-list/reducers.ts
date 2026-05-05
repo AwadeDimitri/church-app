@@ -1,7 +1,7 @@
 import { signalStoreFeature, withState } from '@ngrx/signals';
 import { withReducer, on } from '@ngrx/signals/events';
+import type { PrayerListState } from '@features/prayer/util';
 import { prayerListEvents } from './events';
-import type { PrayerListState } from './types';
 
 const initialState: PrayerListState = {
   scope: 'all',

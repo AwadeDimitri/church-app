@@ -17,8 +17,13 @@ import {
 import { unwrapNodes } from '@core/graphql/unwrap';
 import { AuthService } from '@core/services/auth.service';
 
+import type {
+  Prayer,
+  PrayerCategory,
+  PrayerListState,
+} from '@features/prayer/util';
+
 import { prayerListEvents } from './events';
-import type { Prayer, PrayerCategory, PrayerListState } from './types';
 
 const PAGE_SIZE = 10;
 const CATEGORIES_STALE_TIME = 10 * 60 * 1000;

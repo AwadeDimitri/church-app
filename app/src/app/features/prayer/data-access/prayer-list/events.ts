@@ -1,6 +1,9 @@
 import { eventGroup } from '@ngrx/signals/events';
 import { type } from '@ngrx/signals';
-import type { PrayerCategoryFilter, PrayerScope } from './types';
+import type {
+  PrayerCategoryFilter,
+  PrayerScope,
+} from '@features/prayer/util';
 
 export const prayerListEvents = eventGroup({
   source: 'PrayerList',

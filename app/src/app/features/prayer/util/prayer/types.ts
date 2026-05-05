@@ -3,7 +3,9 @@ import type {
   GetPrayerRequestsQuery,
 } from '@core/graphql/generated';
 
-export type PrayerCategory = NonNullable<GetPrayerCategoriesQuery['categoriesCollection']>['edges'][number]['node'];
+export type PrayerCategory = NonNullable<
+  GetPrayerCategoriesQuery['categoriesCollection']
+>['edges'][number]['node'];
 
 export type PrayerCategorySlug = PrayerCategory['slug'];
 

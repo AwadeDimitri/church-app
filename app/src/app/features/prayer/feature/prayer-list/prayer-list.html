@@ -107,7 +107,7 @@
 
     <!-- Prayer Requests -->
     <div class="flex flex-col gap-3 mb-6">
-      @for (prayer of prayers(); track prayer.id; let i = $index) {
+      @for (prayer of prayers(); track prayer.id) {
         <a [routerLink]="['/prayer', prayer.id]" class="block active:opacity-80 transition-opacity">
           <app-prayer-card
             [author]="getAuthorName(prayer)"
@@ -116,8 +116,8 @@
             [category]="prayer.category?.name ?? ''"
             [prayerCount]="prayer.likes?.totalCount ?? 0"
             [isAnswered]="prayer.is_answered"
-            [avatarColor]="getAvatarColor(i)"
-            [categoryColor]="getCategoryColor(prayer.category?.color ?? '')" />
+            [avatarColor]="getAvatarColor(prayer)"
+            [categoryColor]="getCategoryColor(prayer.category?.color)" />
         </a>
       }
     </div>

@@ -1,4 +1,5 @@
 import { Component, ChangeDetectionStrategy, input, computed } from '@angular/core';
+import type { AvatarColor } from './avatar-colors';
 
 @Component({
   selector: 'app-avatar',
@@ -13,7 +14,7 @@ import { Component, ChangeDetectionStrategy, input, computed } from '@angular/co
 })
 export class Avatar {
   readonly name = input.required<string>();
-  readonly color = input<'blue' | 'red' | 'green' | 'gold' | 'purple'>('blue');
+  readonly color = input<AvatarColor>('blue');
   readonly size = input<'sm' | 'md' | 'lg'>('sm');
 
   protected readonly initials = computed(() => {

@@ -17,24 +17,15 @@ import { PrayerCard } from '@shared/components/prayer-card/prayer-card';
 import { PageHeader } from '@shared/components/page-header/page-header';
 import { PullToRefresh } from '@shared/components/pull-to-refresh/pull-to-refresh';
 import {
-  PrayerScope,
-  PrayerStore,
-  prayerListEvents,
-} from '@features/prayer/data-access';
-
-const PALETTE: Record<string, { bg: string; text: string }> = {
-  red:    { bg: 'bg-church-red-light',  text: 'text-church-red' },
-  blue:   { bg: 'bg-church-blue-light', text: 'text-church-blue' },
-  green:  { bg: 'bg-church-green/10',   text: 'text-church-green' },
-  gold:   { bg: 'bg-church-gold-light', text: 'text-church-gold' },
-  purple: { bg: 'bg-church-blue-light', text: 'text-church-blue' },
-  gray:   { bg: 'bg-church-text/5',     text: 'text-church-text-secondary' },
-};
-const FALLBACK_COLOR = PALETTE['gray']!;
-
-const AVATAR_COLORS: Array<'blue' | 'red' | 'green' | 'gold'> = [
-  'blue', 'red', 'green', 'gold',
-];
+  avatarColorFor,
+  type AvatarColor,
+} from '@shared/components/avatar/avatar-colors';
+import { PrayerStore, prayerListEvents } from '@features/prayer/data-access';
+import {
+  categoryColor,
+  type CategoryColor,
+  type PrayerScope,
+} from '@features/prayer/util';
 
 @Component({
   selector: 'app-prayer-list',
@@ -109,11 +100,11 @@ export default class PrayerList {
     return prayer.is_anonymous ? 'Anonyme' : (prayer.author?.full_name ?? 'Membre');
   }
 
-  getCategoryColor(colorKey: string) {
-    return PALETTE[colorKey] ?? FALLBACK_COLOR;
+  getCategoryColor(colorKey: string | null | undefined): CategoryColor {
+    return categoryColor(colorKey);
   }
 
-  getAvatarColor(index: number): 'blue' | 'red' | 'green' | 'gold' {
-    return AVATAR_COLORS[index % AVATAR_COLORS.length] ?? 'blue';
+  getAvatarColor(prayer: { is_anonymous: boolean; author?: { full_name: string } | null }): AvatarColor {
+    return avatarColorFor(this.getAuthorName(prayer));
   }
 }
