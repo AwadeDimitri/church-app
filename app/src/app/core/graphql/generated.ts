@@ -2400,12 +2400,12 @@ export type GetUpcomingEventsQuery = { __typename?: 'Query', eventsCollection?: 
 export type GetPrayerIntercessionsQueryVariables = Exact<{
   prayerId: Scalars['UUID']['input'];
   userId: Scalars['UUID']['input'];
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars['Cursor']['input']>;
 }>;
 
 
-export type GetPrayerIntercessionsQuery = { __typename?: 'Query', prayer_intercessionsCollection?: { __typename?: 'prayer_intercessionsConnection', totalCount: number, edges: Array<{ __typename?: 'prayer_intercessionsEdge', node: { __typename?: 'prayer_intercessions', id: string, content: string, is_anonymous: boolean, created_at: string, author?: { __typename?: 'users', id: string, full_name: string } | null, likes?: { __typename?: 'intercession_likesConnection', totalCount: number } | null, my_likes?: { __typename?: 'intercession_likesConnection', edges: Array<{ __typename?: 'intercession_likesEdge', node: { __typename?: 'intercession_likes', user_id: string } }> } | null } }> } | null };
+export type GetPrayerIntercessionsQuery = { __typename?: 'Query', prayer_intercessionsCollection?: { __typename?: 'prayer_intercessionsConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null }, edges: Array<{ __typename?: 'prayer_intercessionsEdge', cursor: string, node: { __typename?: 'prayer_intercessions', id: string, content: string, is_anonymous: boolean, created_at: string, author?: { __typename?: 'users', id: string, full_name: string } | null, likes?: { __typename?: 'intercession_likesConnection', totalCount: number } | null, my_likes?: { __typename?: 'intercession_likesConnection', edges: Array<{ __typename?: 'intercession_likesEdge', node: { __typename?: 'intercession_likes', user_id: string } }> } | null } }> } | null };
 
 export type CreatePrayerIntercessionMutationVariables = Exact<{
   prayer_id: Scalars['UUID']['input'];
@@ -2617,15 +2617,20 @@ export const GetUpcomingEventsDocument = gql`
     }
   }
 export const GetPrayerIntercessionsDocument = gql`
-    query GetPrayerIntercessions($prayerId: UUID!, $userId: UUID!, $limit: Int = 20, $offset: Int = 0) {
+    query GetPrayerIntercessions($prayerId: UUID!, $userId: UUID!, $first: Int = 30, $after: Cursor) {
   prayer_intercessionsCollection(
     filter: {prayer_id: {eq: $prayerId}}
-    first: $limit
-    offset: $offset
+    first: $first
+    after: $after
     orderBy: [{created_at: DescNullsLast}]
   ) {
     totalCount
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
     edges {
+      cursor
       node {
         id
         content

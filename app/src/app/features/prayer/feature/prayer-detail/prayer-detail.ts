@@ -24,12 +24,12 @@ import {
   type AvatarColor,
 } from '@shared/components/avatar/avatar-colors';
 import { Button } from '@shared/components/button/button';
+import { InfiniteScrollDirective } from '@shared/directives/infinite-scroll.directive';
 import { RelativeTimePipe } from '@shared/pipes/relative-time.pipe';
 import { AuthService } from '@core/services/auth.service';
 import {
   PrayerStore,
   intercessionEntityEvents,
-  intercessionListEvents,
   intercessionMutationEvents,
   prayerDetailEvents,
   prayerEntityEvents,
@@ -46,6 +46,7 @@ import type { Intercession } from '@features/prayer/util';
     PageHeader,
     Avatar,
     Button,
+    InfiniteScrollDirective,
     RelativeTimePipe,
   ],
   templateUrl: './prayer-detail.html',
@@ -63,6 +64,8 @@ export default class PrayerDetail {
   readonly intercessions = this.store.intercessions;
   readonly intercessionsCount = this.store.intercessionsCount;
   readonly intercessionsLoading = this.store.intercessionsLoading;
+  readonly hasMoreIntercessions = this.store.hasMoreIntercessions;
+  readonly isLoadingMoreIntercessions = this.store.isLoadingMoreIntercessions;
   readonly submitting = this.store.isCreatingIntercession;
 
   readonly authorName = computed(() => {
@@ -120,9 +123,6 @@ export default class PrayerDetail {
         this.dispatcher.dispatch(
           prayerDetailEvents.viewRequested({ id: this.id() }),
         );
-        this.dispatcher.dispatch(
-          intercessionListEvents.viewRequested({ prayerId: id }),
-        );
       }
     });
 
@@ -159,6 +159,10 @@ export default class PrayerDetail {
 
   amenCountOf(item: Intercession): number {
     return item.likes?.totalCount ?? 0;
+  }
+
+  loadMoreIntercessions(): void {
+    this.store.loadMoreIntercessions();
   }
 
   submit(): void {

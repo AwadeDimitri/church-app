@@ -7,14 +7,6 @@ import type {
   UnlikeIntercessionMutationVariables,
 } from '@core/graphql/generated';
 
-export const intercessionListEvents = eventGroup({
-  source: 'IntercessionList',
-  events: {
-    viewRequested: type<{ prayerId: string }>(),
-    cleared: type<void>(),
-  },
-});
-
 export const intercessionMutationEvents = eventGroup({
   source: 'IntercessionMutations',
   events: {

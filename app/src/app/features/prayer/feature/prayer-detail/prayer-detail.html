@@ -94,6 +94,7 @@
     }
 
     <section
+      #scrollContainer
       class="p-5 flex-1 overflow-y-auto min-h-0"
       [class]="p.is_answered ? 'bg-church-green/5' : 'bg-amber-50'">
       <div class="mb-4">
@@ -203,6 +204,20 @@
             </article>
           }
         </div>
+
+        @if (hasMoreIntercessions()) {
+          <button
+            type="button"
+            appInfiniteScroll
+            [appInfiniteScrollRoot]="scrollContainer"
+            [appInfiniteScrollDisabled]="isLoadingMoreIntercessions()"
+            (appInfiniteScroll)="loadMoreIntercessions()"
+            (click)="loadMoreIntercessions()"
+            [disabled]="isLoadingMoreIntercessions()"
+            class="block w-full text-xs text-church-text-secondary py-4 mt-4 hover:text-church-text disabled:opacity-50">
+            {{ isLoadingMoreIntercessions() ? 'Chargement…' : 'Voir les anciennes intercessions' }}
+          </button>
+        }
       }
     </section>
   }

@@ -1,8 +1,5 @@
 import { signalStore } from '@ngrx/signals';
-import {
-  withIntercessionHandlers,
-  withIntercessionReducers,
-} from './intercessions';
+import { withIntercessionHandlers } from './intercessions';
 import { withPrayerListHandlers, withPrayerListReducers } from './prayer-list';
 import { withPrayerMutationHandlers } from './prayer-mutations';
 import {
@@ -15,8 +12,7 @@ export const PrayerStore = signalStore(
   withPrayerListReducers(),
   withPrayerListHandlers(),
   withPrayerMutationHandlers(),
-  withIntercessionReducers(),
-  withIntercessionHandlers(),
   withPrayerDetailReducers(),
   withPrayerDetailHandlers(),
+  withIntercessionHandlers(),
 );

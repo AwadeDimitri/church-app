@@ -1,17 +1,22 @@
 query GetPrayerIntercessions(
   $prayerId: UUID!
   $userId: UUID!
-  $limit: Int = 20
-  $offset: Int = 0
+  $first: Int = 30
+  $after: Cursor
 ) {
   prayer_intercessionsCollection(
     filter: { prayer_id: { eq: $prayerId } }
-    first: $limit
-    offset: $offset
+    first: $first
+    after: $after
     orderBy: [{ created_at: DescNullsLast }]
   ) {
     totalCount
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
     edges {
+      cursor
       node {
         id
         content

@@ -2,8 +2,8 @@ import { computed, inject } from '@angular/core';
 import { signalStoreFeature, type, withProps } from '@ngrx/signals';
 import { Dispatcher, Events, withEffects } from '@ngrx/signals/events';
 import {
+  injectInfiniteQuery,
   injectMutation,
-  injectQuery,
   QueryClient,
 } from '@tanstack/angular-query-experimental';
 import { firstValueFrom, lastValueFrom, tap } from 'rxjs';
@@ -21,18 +21,17 @@ import {
 } from '@core/graphql/generated';
 import { unwrapNodes } from '@core/graphql/unwrap';
 import { AuthService } from '@core/services/auth.service';
-import type {
-  Intercession,
-  IntercessionListState,
-} from '@features/prayer/util';
+import type { Intercession } from '@features/prayer/util';
 
 import { intercessionEntityEvents, intercessionMutationEvents } from './events';
+
+type IntercessionStoreState = { currentPrayerId: string | null };
 
 const STALE_TIME = 30_000;
 
 export function withIntercessionHandlers() {
   return signalStoreFeature(
-    { state: type<IntercessionListState>() },
+    { state: type<IntercessionStoreState>() },
 
     withProps((store) => {
       const auth = inject(AuthService);
@@ -44,34 +43,63 @@ export function withIntercessionHandlers() {
       const likeGQL = inject(LikeIntercessionGQL);
       const unlikeGQL = inject(UnlikeIntercessionGQL);
 
-      const intercessionListQuery = injectQuery(() => ({
+      const intercessionListQuery = injectInfiniteQuery(() => ({
         queryKey: ['intercessions', 'list', store.currentPrayerId()],
         enabled: !!store.currentPrayerId() && !!auth.user(),
-        queryFn: async ({ signal }) => {
+        initialPageParam: null as string | null,
+        queryFn: async ({ signal, pageParam }) => {
           const prayerId = store.currentPrayerId()!;
           const userId = auth.user()!.id;
           const result = await firstValueFrom(
             listGQL.fetch({
-              variables: { prayerId, userId },
+              variables: {
+                prayerId,
+                userId,
+                after: pageParam ?? undefined,
+              },
               context: { fetchOptions: { signal } },
             }),
           );
           return result.data?.prayer_intercessionsCollection ?? null;
         },
+        getNextPageParam: (lastPage): string | undefined =>
+          lastPage?.pageInfo?.hasNextPage
+            ? (lastPage.pageInfo.endCursor ?? undefined)
+            : undefined,
         staleTime: STALE_TIME,
       }));
 
-      const intercessions = computed<Intercession[]>(() =>
-        unwrapNodes<Intercession>(intercessionListQuery.data()),
+      const intercessions = computed<Intercession[]>(
+        () =>
+          intercessionListQuery
+            .data()
+            ?.pages.flatMap((p) => unwrapNodes<Intercession>(p)) ?? [],
       );
 
       const intercessionsCount = computed(
-        () => intercessionListQuery.data()?.totalCount ?? 0,
+        () => intercessionListQuery.data()?.pages[0]?.totalCount ?? 0,
       );
 
       const intercessionsLoading = computed(
         () => !!store.currentPrayerId() && intercessionListQuery.isLoading(),
       );
+
+      const hasMoreIntercessions = computed(() =>
+        intercessionListQuery.hasNextPage(),
+      );
+
+      const isLoadingMoreIntercessions = computed(() =>
+        intercessionListQuery.isFetchingNextPage(),
+      );
+
+      const loadMoreIntercessions = () => {
+        if (
+          intercessionListQuery.hasNextPage() &&
+          !intercessionListQuery.isFetchingNextPage()
+        ) {
+          intercessionListQuery.fetchNextPage();
+        }
+      };
 
       const invalidateList = () => {
         const prayerId = store.currentPrayerId();
@@ -139,6 +167,9 @@ export function withIntercessionHandlers() {
         intercessions,
         intercessionsCount,
         intercessionsLoading,
+        hasMoreIntercessions,
+        isLoadingMoreIntercessions,
+        loadMoreIntercessions,
         createIntercessionMutation,
         likeIntercessionMutation,
         unlikeIntercessionMutation,
