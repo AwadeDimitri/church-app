@@ -117,6 +117,11 @@ export const appConfig: ApplicationConfig = {
       return {
         link: httpLink.create({ uri: environment.apiUrl }),
         cache: new InMemoryCache(),
+        defaultOptions: {
+          query: { fetchPolicy: 'no-cache' },
+          watchQuery: { fetchPolicy: 'no-cache' },
+          mutate: { fetchPolicy: 'no-cache' },
+        },
       };
     }),
     provideTanStackQuery(new QueryClient()),
