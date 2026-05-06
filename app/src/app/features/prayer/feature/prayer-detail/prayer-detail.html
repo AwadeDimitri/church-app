@@ -93,53 +93,22 @@
       </div>
     }
 
-    <section
-      #scrollContainer
-      class="p-5 flex-1 overflow-y-auto min-h-0"
+    <div
+      class="flex flex-col flex-1 min-h-0"
       [class]="p.is_answered ? 'bg-church-green/5' : 'bg-amber-50'">
-      <div class="mb-4">
+      <div class="text-center px-5 pt-5 shrink-0 mb-3">
         <h2 class="text-sm font-semibold text-church-text">
           {{ intercessionsCount() }}
           {{ intercessionsCount() > 1 ? 'Intercessions' : 'Intercession' }}
         </h2>
-        <p class="text-xs text-church-text-secondary mt-0.5">
+        <p class="text-xs text-church-text-secondary">
           {{ p.is_answered ? 'Les intercessions reçues pour cette prière' : 'Laisse un mot de soutien à ce frère/cette sœur' }}
         </p>
       </div>
 
-      @if (!p.is_answered) {
-      <form [formGroup]="form" (ngSubmit)="submit()" class="flex gap-3 mb-6">
-        <app-avatar [name]="currentUserName()" [color]="avatarColorOf(currentUserName())" size="sm" />
-        <div class="flex-1">
-          <textarea
-            rows="2"
-            maxlength="300"
-            formControlName="content"
-            placeholder="Écris un mot d'intercession..."
-            class="w-full bg-white rounded-church-sm px-3 py-2 text-church-text placeholder:text-church-text-secondary border-0 focus:outline-none ring-2 ring-amber-200 focus:ring-amber-400 resize-none"></textarea>
-          <p class="text-[11px] text-right mt-1 mb-0!"
-            [class]="form.controls.content.value.length >= 300 ? 'text-church-red' : (form.controls.content.value.length >= 270 ? 'text-church-gold' : 'text-church-text-secondary')">
-            {{ form.controls.content.value.length }}/300
-          </p>
-          <div class="flex items-center justify-between mt-2">
-            <label class="flex items-center gap-2 text-xs text-church-text-secondary">
-              <input type="checkbox" formControlName="isAnonymous" class="accent-church-blue" />
-              Anonyme
-            </label>
-            <app-button
-              variant="primary"
-              size="sm"
-              type="submit"
-              [disabled]="form.invalid"
-              [loading]="submitting()"
-              loadingText="Publication…">
-              Publier
-            </app-button>
-          </div>
-        </div>
-      </form>
-      }
-
+      <section
+        #scrollContainer
+        class="px-5 pb-5 flex-1 overflow-y-auto min-h-0">
       @if (intercessionsLoading()) {
         <div class="space-y-5">
           @for (_ of [1,2,3]; track $index) {
@@ -219,7 +188,56 @@
           </button>
         }
       }
-    </section>
+      </section>
+
+      @if (!p.is_answered) {
+        <div class="px-5 py-3 shrink-0 border-t border-church-text/5">
+          <div class="flex">
+            <!-- <app-avatar [name]="currentUserName()" [color]="avatarColorOf(currentUserName())" size="sm" /> -->
+            <div class="flex-1">
+              @if (!formExpanded()) {
+                <button
+                  type="button"
+                  (click)="expandForm()"
+                  class="block w-full text-left px-3 py-2 bg-white rounded-church-sm text-sm text-church-text-secondary ring-2 ring-amber-200">
+                  Écris un mot d'intercession...
+                </button>
+              } @else {
+                <form [formGroup]="form" (ngSubmit)="submit()">
+                  <textarea
+                    #textareaInput
+                    rows="2"
+                    maxlength="300"
+                    formControlName="content"
+                    (blur)="onTextareaBlur()"
+                    placeholder="Écris un mot d'intercession..."
+                    class="w-full bg-white rounded-church-sm px-3 py-2 text-church-text placeholder:text-church-text-secondary border-0 focus:outline-none ring-2 ring-amber-200 focus:ring-amber-400 resize-none"></textarea>
+                  <p class="text-[11px] text-right mt-1 mb-0!"
+                    [class]="form.controls.content.value.length >= 300 ? 'text-church-red' : (form.controls.content.value.length >= 270 ? 'text-church-gold' : 'text-church-text-secondary')">
+                    {{ form.controls.content.value.length }}/300
+                  </p>
+                  <div class="flex items-center justify-between mt-2">
+                    <label class="flex items-center gap-2 text-xs text-church-text-secondary">
+                      <input type="checkbox" formControlName="isAnonymous" class="accent-church-blue" />
+                      Anonyme
+                    </label>
+                    <app-button
+                      variant="primary"
+                      size="sm"
+                      type="submit"
+                      [disabled]="form.invalid"
+                      [loading]="submitting()"
+                      loadingText="Publication…">
+                      Publier
+                    </app-button>
+                  </div>
+                </form>
+              }
+            </div>
+          </div>
+        </div>
+      }
+    </div>
   }
 
   @if (markDialogOpen()) {

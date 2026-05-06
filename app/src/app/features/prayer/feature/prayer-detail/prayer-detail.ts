@@ -1,11 +1,13 @@
 import {
   Component,
   ChangeDetectionStrategy,
+  ElementRef,
   inject,
   input,
   signal,
   computed,
   effect,
+  viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DatePipe } from '@angular/common';
@@ -110,6 +112,10 @@ export default class PrayerDetail {
   readonly markDialogOpen = signal(false);
   readonly marking = this.store.isMarkingAnswered;
 
+  readonly formExpanded = signal(false);
+  private readonly textareaRef =
+    viewChild<ElementRef<HTMLTextAreaElement>>('textareaInput');
+
   readonly canMarkAsAnswered = computed(() => {
     const p = this.prayer();
     const meId = this.auth.user()?.id;
@@ -136,7 +142,21 @@ export default class PrayerDetail {
     events
       .on(intercessionEntityEvents.created)
       .pipe(takeUntilDestroyed())
-      .subscribe(() => this.form.reset({ content: '', isAnonymous: false }));
+      .subscribe(() => {
+        this.form.reset({ content: '', isAnonymous: false });
+        this.formExpanded.set(false);
+      });
+  }
+
+  expandForm(): void {
+    this.formExpanded.set(true);
+    setTimeout(() => this.textareaRef()?.nativeElement.focus(), 0);
+  }
+
+  onTextareaBlur(): void {
+    if (!this.form.controls.content.value.trim()) {
+      this.formExpanded.set(false);
+    }
   }
 
   authorNameOf(item: Intercession): string {
