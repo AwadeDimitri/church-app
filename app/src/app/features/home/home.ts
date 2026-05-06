@@ -2,9 +2,9 @@ import { Component, ChangeDetectionStrategy, inject, computed } from '@angular/c
 import { Router, RouterLink } from '@angular/router';
 import { NzIconDirective } from 'ng-zorro-antd/icon';
 import { BibleService } from '@core/services/bible.service';
-import { SermonService } from '@core/services/sermon.service';
 import { EventService } from '@core/services/event.service';
 import { ProfileService } from '@core/services/profile.service';
+import { SermonStore } from '@features/sermons/data-access';
 import { getYouTubeThumbnail } from '@core/utils/youtube.util';
 import { SectionHeader } from '@shared/components/section-header/section-header';
 import { SermonCard } from '@shared/components/sermon-card/sermon-card';
@@ -29,14 +29,14 @@ const SERMON_DATE_FMT = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month
 export default class Home {
   private readonly router = inject(Router);
   private readonly bibleService = inject(BibleService);
-  private readonly sermonService = inject(SermonService);
+  private readonly sermonStore = inject(SermonStore);
   private readonly eventService = inject(EventService);
   private readonly profileService = inject(ProfileService);
 
   readonly dailyVerse = this.bibleService.dailyVerseDisplay;
   readonly lastReading = this.bibleService.lastReading;
   readonly eventsLoading = computed(() => this.eventService.events().length === 0);
-  readonly sermonsLoading = this.sermonService.loading;
+  readonly sermonsLoading = this.sermonStore.isPending;
 
   readonly firstName = computed(() => {
     const full = this.profileService.user()?.full_name?.trim();
@@ -60,7 +60,7 @@ export default class Home {
   );
 
   readonly latestSermons = computed(() =>
-    this.sermonService.sermons().slice(0, 3).map(s => ({
+    this.sermonStore.items().slice(0, 3).map(s => ({
       id: s.id,
       title: s.title,
       speaker: s.preacher_name,
