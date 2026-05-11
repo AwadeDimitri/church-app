@@ -2,8 +2,8 @@ import { Component, ChangeDetectionStrategy, inject, computed } from '@angular/c
 import { Router, RouterLink } from '@angular/router';
 import { NzIconDirective } from 'ng-zorro-antd/icon';
 import { BibleService } from '@core/services/bible.service';
-import { EventService } from '@core/services/event.service';
 import { ProfileService } from '@core/services/profile.service';
+import { EventStore } from '@features/events/data-access';
 import { SermonStore } from '@features/sermons/data-access';
 import { getYouTubeThumbnail } from '@core/utils/youtube.util';
 import { SectionHeader } from '@shared/components/section-header/section-header';
@@ -30,12 +30,12 @@ export default class Home {
   private readonly router = inject(Router);
   private readonly bibleService = inject(BibleService);
   private readonly sermonStore = inject(SermonStore);
-  private readonly eventService = inject(EventService);
+  private readonly eventStore = inject(EventStore);
   private readonly profileService = inject(ProfileService);
 
   readonly dailyVerse = this.bibleService.dailyVerseDisplay;
   readonly lastReading = this.bibleService.lastReading;
-  readonly eventsLoading = computed(() => this.eventService.events().length === 0);
+  readonly eventsLoading = this.eventStore.isPending;
   readonly sermonsLoading = this.sermonStore.isPending;
 
   readonly firstName = computed(() => {
@@ -44,7 +44,7 @@ export default class Home {
   });
 
   readonly upcomingEvents = computed(() =>
-    this.eventService.events().slice(0, 3).map(e => {
+    this.eventStore.items().slice(0, 3).map(e => {
       const start = new Date(e.starts_at);
       return {
         id: e.id,

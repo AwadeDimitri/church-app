@@ -1,6 +1,7 @@
 import { Component, ChangeDetectionStrategy, inject, computed, signal, effect } from '@angular/core';
+import { Dispatcher } from '@ngrx/signals/events';
 import { NzIconDirective } from 'ng-zorro-antd/icon';
-import { EventService } from '@core/services/event.service';
+import { EventStore, eventListEvents } from '@features/events/data-access';
 import { PageHeader } from '@shared/components/page-header/page-header';
 import { Button } from '@shared/components/button/button';
 import { PullToRefresh } from '@shared/components/pull-to-refresh/pull-to-refresh';
@@ -16,30 +17,36 @@ const FULL_DATE_FMT = new Intl.DateTimeFormat('fr-FR', {
 });
 
 @Component({
-  selector: 'app-events',
+  selector: 'app-event-list',
   imports: [NzIconDirective, PageHeader, Button, PullToRefresh],
-  templateUrl: './events.html',
+  templateUrl: './event-list.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export default class Events {
-  private readonly eventService = inject(EventService);
+export default class EventList {
+  private readonly store = inject(EventStore);
+  private readonly dispatcher = inject(Dispatcher);
 
-  readonly loading = this.eventService.loading;
-  readonly error = this.eventService.error;
-  readonly hasMore = this.eventService.hasMore;
+  readonly loading = this.store.isPending;
+  readonly loadingMore = this.store.isFetchingNext;
+  readonly hasMore = this.store.hasMore;
+
+  readonly error = computed(() => {
+    const e = this.store.error();
+    return e ? (e.message ?? 'Erreur de chargement') : null;
+  });
 
   readonly pullRefreshing = signal(false);
 
   constructor() {
     effect(() => {
-      if (this.pullRefreshing() && !this.eventService.loading()) {
+      if (this.pullRefreshing() && !this.store.isFetching()) {
         this.pullRefreshing.set(false);
       }
     });
   }
 
   readonly events = computed(() =>
-    this.eventService.events().map(e => {
+    this.store.items().map(e => {
       const start = new Date(e.starts_at);
       const end = e.ends_at ? new Date(e.ends_at) : null;
       return {
@@ -60,12 +67,12 @@ export default class Events {
   );
 
   loadMore(): void {
-    this.eventService.loadMore();
+    this.dispatcher.dispatch(eventListEvents.loadMoreRequested());
   }
 
   onPullRefresh(): void {
     this.pullRefreshing.set(true);
-    this.eventService.refresh();
+    this.dispatcher.dispatch(eventListEvents.refreshed());
   }
 
   private capitalize(s: string): string {

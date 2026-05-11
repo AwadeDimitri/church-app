@@ -55,7 +55,8 @@ export const routes: Routes = [
       },
       {
         path: 'events',
-        loadComponent: () => import('./features/events/events'),
+        loadComponent: () =>
+          import('./features/events/feature/event-list/event-list'),
       },
       {
         path: 'donate',

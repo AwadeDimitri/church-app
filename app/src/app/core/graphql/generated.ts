@@ -2380,14 +2380,6 @@ export type UsersUpdateResponse = {
   records: Array<Users>;
 };
 
-export type GetEventsQueryVariables = Exact<{
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-}>;
-
-
-export type GetEventsQuery = { __typename?: 'Query', eventsCollection?: { __typename?: 'eventsConnection', edges: Array<{ __typename?: 'eventsEdge', node: { __typename?: 'events', id: string, title: string, description?: string | null, location?: string | null, cover_url: string, starts_at: string, ends_at?: string | null } }> } | null };
-
 export type GetUpcomingEventsQueryVariables = Exact<{
   now: Scalars['Datetime']['input'];
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -2551,38 +2543,6 @@ export type UpdateProfileMutationVariables = Exact<{
 
 export type UpdateProfileMutation = { __typename?: 'Mutation', updateusersCollection: { __typename?: 'usersUpdateResponse', records: Array<{ __typename?: 'users', id: string, full_name: string, phone?: string | null }> } };
 
-export const GetEventsDocument = gql`
-    query GetEvents($limit: Int = 20, $offset: Int = 0) {
-  eventsCollection(
-    first: $limit
-    offset: $offset
-    orderBy: [{starts_at: AscNullsLast}]
-  ) {
-    edges {
-      node {
-        id
-        title
-        description
-        location
-        cover_url
-        starts_at
-        ends_at
-      }
-    }
-  }
-}
-    `;
-
-  @Injectable({
-    providedIn: 'root'
-  })
-  export class GetEventsGQL extends Apollo.Query<GetEventsQuery, GetEventsQueryVariables> {
-    override document = GetEventsDocument;
-    
-    constructor(apollo: Apollo.Apollo) {
-      super(apollo);
-    }
-  }
 export const GetUpcomingEventsDocument = gql`
     query GetUpcomingEvents($now: Datetime!, $limit: Int = 20, $offset: Int = 0) {
   eventsCollection(
