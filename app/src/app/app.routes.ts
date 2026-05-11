@@ -46,12 +46,13 @@ export const routes: Routes = [
       },
       {
         path: 'sermons',
-        loadComponent: () => import('./features/sermons/sermons'),
+        loadComponent: () =>
+          import('./features/sermons/feature/sermon-list/sermon-list'),
       },
       {
         path: 'sermons/:id',
         loadComponent: () =>
-          import('./features/sermons/sermon-detail/sermon-detail'),
+          import('./features/sermons/feature/sermon-detail/sermon-detail'),
       },
       {
         path: 'events',

@@ -15,12 +15,12 @@ import { SermonStore, sermonListEvents } from '@features/sermons/data-access';
 import { getYouTubeThumbnail } from '@core/utils/youtube.util';
 
 @Component({
-  selector: 'app-sermons',
+  selector: 'app-sermon-list',
   imports: [DatePipe, NzIconDirective, CategoryFilter, SermonCard, PageHeader, Button, PullToRefresh, DurationPipe],
-  templateUrl: './sermons.html',
+  templateUrl: './sermon-list.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export default class Sermons {
+export default class SermonList {
   private readonly store = inject(SermonStore);
   private readonly dispatcher = inject(Dispatcher);
   private readonly router = inject(Router);
