@@ -2,7 +2,7 @@ import { Component, ChangeDetectionStrategy, inject, input, computed } from '@an
 import { RouterLink } from '@angular/router';
 import { NzIconDirective } from 'ng-zorro-antd/icon';
 import { PageHeader } from '@shared/components/page-header/page-header';
-import { BibleService } from '@core/services/bible.service';
+import { BibleStore } from '@features/bible/data-access';
 
 @Component({
   selector: 'app-bible-book',
@@ -11,15 +11,15 @@ import { BibleService } from '@core/services/bible.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class BibleBook {
-  private readonly bibleService = inject(BibleService);
+  private readonly store = inject(BibleStore);
 
   readonly bookSlug = input.required<string>();
 
-  readonly loading = this.bibleService.loading;
-  readonly error = this.bibleService.error;
+  readonly loading = this.store.loading;
+  readonly error = this.store.error;
 
   readonly book = computed(() =>
-    this.bibleService.books().find(b => b.slug === this.bookSlug()) ?? null,
+    this.store.books().find(b => b.slug === this.bookSlug()) ?? null,
   );
 
   readonly chapters = computed(() => {

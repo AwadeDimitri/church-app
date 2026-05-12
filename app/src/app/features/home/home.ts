@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, inject, computed } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { NzIconDirective } from 'ng-zorro-antd/icon';
-import { BibleService } from '@core/services/bible.service';
+import { BibleStore } from '@features/bible/data-access';
 import { EventStore } from '@features/events/data-access';
 import { ProfileStore } from '@features/profile/data-access';
 import { SermonStore } from '@features/sermons/data-access';
@@ -28,13 +28,13 @@ const SERMON_DATE_FMT = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month
 })
 export default class Home {
   private readonly router = inject(Router);
-  private readonly bibleService = inject(BibleService);
+  private readonly bibleStore = inject(BibleStore);
   private readonly sermonStore = inject(SermonStore);
   private readonly eventStore = inject(EventStore);
   private readonly profileStore = inject(ProfileStore);
 
-  readonly dailyVerse = this.bibleService.dailyVerseDisplay;
-  readonly lastReading = this.bibleService.lastReading;
+  readonly dailyVerse = this.bibleStore.dailyVerseDisplay;
+  readonly lastReading = this.bibleStore.lastReading;
   readonly eventsLoading = this.eventStore.isPending;
   readonly sermonsLoading = this.sermonStore.isPending;
 

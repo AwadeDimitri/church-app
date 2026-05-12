@@ -65,16 +65,18 @@ export const routes: Routes = [
       },
       {
         path: 'bible',
-        loadComponent: () => import('./features/bible/bible'),
+        loadComponent: () =>
+          import('./features/bible/feature/bible-list/bible-list'),
       },
       {
         path: 'bible/:bookSlug',
-        loadComponent: () => import('./features/bible/bible-book/bible-book'),
+        loadComponent: () =>
+          import('./features/bible/feature/bible-book/bible-book'),
       },
       {
         path: 'bible/:bookSlug/:chapter',
         loadComponent: () =>
-          import('./features/bible/bible-chapter/bible-chapter'),
+          import('./features/bible/feature/bible-chapter/bible-chapter'),
       },
       {
         path: 'prayer',

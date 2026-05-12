@@ -2,27 +2,27 @@ import { Component, ChangeDetectionStrategy, inject, signal, computed } from '@a
 import { RouterLink } from '@angular/router';
 import { NzIconDirective } from 'ng-zorro-antd/icon';
 import { PageHeader } from '@shared/components/page-header/page-header';
-import { BibleService } from '@core/services/bible.service';
+import { BibleStore } from '@features/bible/data-access';
 
 type Testament = 1 | 2;
 
 @Component({
-  selector: 'app-bible',
+  selector: 'app-bible-list',
   imports: [RouterLink, NzIconDirective, PageHeader],
-  templateUrl: './bible.html',
+  templateUrl: './bible-list.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export default class Bible {
-  private readonly bibleService = inject(BibleService);
+export default class BibleList {
+  private readonly store = inject(BibleStore);
 
-  readonly loading = this.bibleService.loading;
-  readonly error = this.bibleService.error;
-  readonly lastReading = this.bibleService.lastReading;
+  readonly loading = this.store.loading;
+  readonly error = this.store.error;
+  readonly lastReading = this.store.lastReading;
 
   readonly selectedTestament = signal<Testament>(1);
 
   readonly filteredBooks = computed(() =>
-    this.bibleService.books().filter(b => b.testament === this.selectedTestament()),
+    this.store.books().filter(b => b.testament === this.selectedTestament()),
   );
 
   selectTestament(t: Testament): void {
