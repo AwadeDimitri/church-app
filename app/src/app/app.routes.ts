@@ -101,14 +101,15 @@ export const routes: Routes = [
         path: 'profile',
         canActivate: [memberGuard],
         data: { reason: 'profile' },
-        loadComponent: () => import('./features/profile/profile'),
+        loadComponent: () =>
+          import('./features/profile/feature/profile/profile'),
       },
       {
         path: 'profile/edit',
         canActivate: [memberGuard],
         data: { reason: 'profile' },
         loadComponent: () =>
-          import('./features/profile/profile-edit/profile-edit'),
+          import('./features/profile/feature/profile-edit/profile-edit'),
       },
       {
         path: 'about',

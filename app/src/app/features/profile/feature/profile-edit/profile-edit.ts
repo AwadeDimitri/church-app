@@ -1,19 +1,19 @@
 import {
   Component,
   ChangeDetectionStrategy,
+  computed,
   inject,
-  signal,
   effect,
 } from '@angular/core';
-import { Router } from '@angular/router';
 import {
   NonNullableFormBuilder,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+import { Dispatcher } from '@ngrx/signals/events';
 import { Button } from '@shared/components/button/button';
 import { PageHeader } from '@shared/components/page-header/page-header';
-import { ProfileService } from '@core/services/profile.service';
+import { ProfileStore, profileEvents } from '@features/profile/data-access';
 
 @Component({
   selector: 'app-profile-edit',
@@ -22,13 +22,16 @@ import { ProfileService } from '@core/services/profile.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class ProfileEdit {
-  private readonly profileService = inject(ProfileService);
-  private readonly router = inject(Router);
+  private readonly store = inject(ProfileStore);
+  private readonly dispatcher = inject(Dispatcher);
   private readonly fb = inject(NonNullableFormBuilder);
 
-  protected readonly user = this.profileService.user;
-  protected readonly loading = signal(false);
-  protected readonly errorMessage = signal<string | null>(null);
+  protected readonly user = this.store.user;
+  protected readonly loading = this.store.isUpdating;
+  protected readonly errorMessage = computed(() => {
+    const err = this.store.updateError();
+    return err ? (err.message ?? 'Erreur de mise à jour') : null;
+  });
 
   readonly form = this.fb.group({
     full_name: ['', [Validators.required, Validators.minLength(2)]],
@@ -47,28 +50,18 @@ export default class ProfileEdit {
     });
   }
 
-  async onSubmit() {
+  onSubmit() {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
 
-    this.loading.set(true);
-    this.errorMessage.set(null);
-
-    try {
-      const value = this.form.getRawValue();
-      await this.profileService.updateProfile({
+    const value = this.form.getRawValue();
+    this.dispatcher.dispatch(
+      profileEvents.updateRequested({
         full_name: value.full_name,
         phone: value.phone || null,
-      });
-      this.router.navigateByUrl('/profile');
-    } catch (err) {
-      this.errorMessage.set(
-        err instanceof Error ? err.message : 'Erreur de mise à jour',
-      );
-    } finally {
-      this.loading.set(false);
-    }
+      }),
+    );
   }
 }

@@ -1,10 +1,12 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { User } from '@supabase/supabase-js';
 import { SupabaseService } from '@core/services/supabase.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly supabase = inject(SupabaseService).client;
+  private readonly router = inject(Router);
   private readonly _user = signal<User | null>(null);
   private readonly _loading = signal(true);
   private readonly _ready: Promise<void>;
@@ -68,6 +70,7 @@ export class AuthService {
   async signOut() {
     const { error } = await this.supabase.auth.signOut();
     if (error) throw error;
+    await this.router.navigate(['/login']);
   }
 
   async resetPassword(email: string) {

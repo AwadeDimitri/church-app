@@ -2,8 +2,8 @@ import { Component, ChangeDetectionStrategy, inject, computed } from '@angular/c
 import { Router, RouterLink } from '@angular/router';
 import { NzIconDirective } from 'ng-zorro-antd/icon';
 import { BibleService } from '@core/services/bible.service';
-import { ProfileService } from '@core/services/profile.service';
 import { EventStore } from '@features/events/data-access';
+import { ProfileStore } from '@features/profile/data-access';
 import { SermonStore } from '@features/sermons/data-access';
 import { getYouTubeThumbnail } from '@core/utils/youtube.util';
 import { SectionHeader } from '@shared/components/section-header/section-header';
@@ -31,7 +31,7 @@ export default class Home {
   private readonly bibleService = inject(BibleService);
   private readonly sermonStore = inject(SermonStore);
   private readonly eventStore = inject(EventStore);
-  private readonly profileService = inject(ProfileService);
+  private readonly profileStore = inject(ProfileStore);
 
   readonly dailyVerse = this.bibleService.dailyVerseDisplay;
   readonly lastReading = this.bibleService.lastReading;
@@ -39,7 +39,7 @@ export default class Home {
   readonly sermonsLoading = this.sermonStore.isPending;
 
   readonly firstName = computed(() => {
-    const full = this.profileService.user()?.full_name?.trim();
+    const full = this.profileStore.user()?.full_name?.trim();
     return full ? full.split(/\s+/)[0] : '';
   });
 

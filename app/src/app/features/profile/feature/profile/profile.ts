@@ -3,7 +3,8 @@ import { Router } from '@angular/router';
 import { Avatar } from '@shared/components/avatar/avatar';
 import { StatCard } from '@shared/components/stat-card/stat-card';
 import { MenuItem } from '@shared/components/menu-item/menu-item';
-import { ProfileService } from '@core/services/profile.service';
+import { AuthService } from '@core/services/auth.service';
+import { ProfileStore } from '@features/profile/data-access';
 
 interface MenuEntry {
   readonly icon: string;
@@ -20,11 +21,12 @@ interface MenuEntry {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class Profile {
-  private readonly profileService = inject(ProfileService);
+  private readonly store = inject(ProfileStore);
+  private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
 
-  protected readonly user = this.profileService.user;
-  protected readonly stats = this.profileService.stats;
+  protected readonly user = this.store.user;
+  protected readonly stats = this.store.stats;
 
   protected readonly displayName = computed(() => this.user()?.full_name ?? '');
   protected readonly memberSince = computed(() => {
@@ -45,6 +47,6 @@ export default class Profile {
   }
 
   signOut() {
-    this.profileService.signOut();
+    this.authService.signOut();
   }
 }
