@@ -26,6 +26,17 @@ Built on a strict zero-budget constraint, the project is a deliberate exercise i
 - **Single source of truth for server state.** Apollo configured with `fetchPolicy: 'no-cache'` globally; TanStack Query owns caching and invalidation. Avoids dual-cache drift.
 - **Zero-budget infrastructure.** Supabase free tier (DB + GraphQL + auth), Vercel for frontend hosting, GitHub Actions cron to keep the Supabase project warm. Every service stays under the free quota.
 
+## Screenshots
+
+<table>
+  <tr>
+    <td align="center"><img src="docs/screenshots/01-home.png" width="220" alt="Home with verse of the day"><br><sub><b>Home</b> — daily verse and quick access</sub></td>
+    <td align="center"><img src="docs/screenshots/02-sermons.png" width="220" alt="Sermons library"><br><sub><b>Sermons</b> — library with categories</sub></td>
+    <td align="center"><img src="docs/screenshots/03-bible.png" width="220" alt="Bible chapter offline"><br><sub><b>Bible</b> — offline reading, Psalm 23</sub></td>
+    <td align="center"><img src="docs/screenshots/04-prayer.png" width="220" alt="Prayer requests"><br><sub><b>Prayer</b> — community intercessions</sub></td>
+  </tr>
+</table>
+
 ## Live demo
 
 <https://church-app-cyan.vercel.app/>
