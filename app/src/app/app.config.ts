@@ -81,6 +81,7 @@ import {
   LoadingOutline,
   ArrowDownOutline,
   DisconnectOutline,
+  CloseCircleFill,
 } from '@ant-design/icons-angular/icons';
 
 const icons = [
@@ -95,7 +96,7 @@ const icons = [
   FilterOutline, DownOutline, CameraOutline, BookOutline,
   EyeOutline, EyeInvisibleOutline, ArrowLeftOutline, ArrowRightOutline,
   CaretRightFill, PlayCircleFill, AudioOutline, MessageOutline, DeleteOutline,
-  LoadingOutline, ArrowDownOutline, DisconnectOutline,
+  LoadingOutline, ArrowDownOutline, DisconnectOutline, CloseCircleFill,
 ];
 
 // TanStack se croit en ligne au démarrage et ne suit ensuite que les événements

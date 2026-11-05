@@ -11,6 +11,7 @@
   @if (dailyVerse(); as verse) {
     <a
       [routerLink]="verse.route"
+      [queryParams]="{ v: verse.verse }"
       class="block relative bg-gradient-to-br from-church-gold-light to-amber-50 rounded-church-sm p-5 pl-6 mb-6 border-l-4 border-church-gold active:opacity-80 transition-opacity"
     >
       <div class="flex items-center gap-2 mb-3">

@@ -60,7 +60,7 @@ export function withBibleHandlers() {
         const route = book
           ? (['/bible', book.slug, verse.chapter] as const)
           : null;
-        return { text: verse.text, reference, route };
+        return { text: verse.text, reference, route, verse: verse.verse };
       });
 
       return {
