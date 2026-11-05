@@ -54,7 +54,7 @@ export function withBibleSearchHandlers() {
     }),
 
     withMethods((store) => ({
-      /** Les `limit` premiers versets trouvés, dans l'ordre de la Bible. */
+      /** Les `limit` premiers versets trouvés : mots exacts d'abord, puis ordre de la Bible. */
       searchHits(limit: number): BibleSearchHit[] {
         const verses = store.verses();
         const terms = store._searchTerms();

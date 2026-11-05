@@ -73,6 +73,17 @@ describe('recherche dans la Bible', () => {
       expect(search('erger')).toEqual([]);
     });
 
+    it('place d’abord les versets où le mot est entier', () => {
+      const index = buildSearchIndex([
+        { book_id: 1, chapter: 1, verse: 1, text: 'Ils ne purent répondre.' },
+        { book_id: 1, chapter: 1, verse: 2, text: 'Un cœur pur.' },
+        { book_id: 1, chapter: 1, verse: 3, text: 'La purification.' },
+        { book_id: 1, chapter: 1, verse: 4, text: 'Heureux ceux qui ont le cœur pur!' },
+      ]);
+      expect(searchVerseIndexes(index, ['pur'])).toEqual([1, 3, 0, 2]);
+      expect(searchVerseIndexes(index, ['coeur', 'pur'])).toEqual([1, 3]);
+    });
+
     it('ne renvoie rien sans terme exploitable', () => {
       expect(search('')).toEqual([]);
       expect(search('a')).toEqual([]);

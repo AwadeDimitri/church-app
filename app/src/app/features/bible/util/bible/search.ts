@@ -32,9 +32,9 @@ export function foldText(text: string): string {
   return text.toLowerCase().replace(/[^a-z0-9 ]/g, foldChar);
 }
 
-/** Un texte replié par verset, précédé d'une espace pour chercher en début de mot. */
+/** Un texte replié par verset, entouré d'espaces pour chercher un début de mot ou un mot entier. */
 export function buildSearchIndex(verses: readonly BibleVerseRow[]): string[] {
-  return verses.map((verse) => ' ' + foldText(verse.text));
+  return verses.map((verse) => ' ' + foldText(verse.text) + ' ');
 }
 
 export function parseSearchTerms(query: string): string[] {
@@ -44,20 +44,30 @@ export function parseSearchTerms(query: string): string[] {
   return [...new Set(terms)];
 }
 
-/** Positions des versets contenant tous les termes, chacun en début de mot. */
+/**
+ * Positions des versets contenant tous les termes, chacun en début de mot.
+ * Ceux où chaque terme est un mot entier viennent d'abord (« pur » avant
+ * « purent ») ; chaque groupe suit l'ordre de la Bible.
+ */
 export function searchVerseIndexes(
   index: readonly string[],
   terms: readonly string[],
 ): number[] {
   if (terms.length === 0) return [];
-  const needles = terms.map((term) => ' ' + term);
-  const matches: number[] = [];
+  const wordStarts = terms.map((term) => ' ' + term);
+  const wholeWords = terms.map((term) => ' ' + term + ' ');
+  const exact: number[] = [];
+  const partial: number[] = [];
   for (let i = 0; i < index.length; i++) {
-    if (needles.every((needle) => index[i].includes(needle))) {
-      matches.push(i);
+    const text = index[i];
+    if (!wordStarts.every((needle) => text.includes(needle))) continue;
+    if (wholeWords.every((needle) => text.includes(needle))) {
+      exact.push(i);
+    } else {
+      partial.push(i);
     }
   }
-  return matches;
+  return exact.concat(partial);
 }
 
 /** Découpe un verset en fragments, en marquant les mots qui commencent par un terme cherché. */
