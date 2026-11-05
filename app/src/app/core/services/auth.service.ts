@@ -1,34 +1,34 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { User } from '@supabase/supabase-js';
+import { Session } from '@supabase/supabase-js';
 import { SupabaseService } from '@core/services/supabase.service';
+import { NetworkService } from '@core/services/network.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly supabase = inject(SupabaseService).client;
+  private readonly network = inject(NetworkService);
   private readonly router = inject(Router);
-  private readonly _user = signal<User | null>(null);
-  private readonly _loading = signal(true);
-  private readonly _ready: Promise<void>;
 
-  readonly user = this._user.asReadonly();
-  readonly loading = this._loading.asReadonly();
-  readonly isAuthenticated = computed(() => !!this._user());
+  // Amorcée de façon synchrone depuis la session persistée : le démarrage de
+  // l'app ne dépend ni du réseau ni du refresh du token. Supabase la tient
+  // ensuite à jour via onAuthStateChange.
+  private readonly _session = signal<Session | null>(
+    inject(SupabaseService).persistedSession(),
+  );
+
+  readonly user = computed(() => this._session()?.user ?? null);
+  readonly isAuthenticated = computed(() => !!this.user());
 
   constructor() {
-    this.supabase.auth.onAuthStateChange((_event, session) => {
-      this._user.set(session?.user ?? null);
-      this._loading.set(false);
+    this.supabase.auth.onAuthStateChange((event, session) => {
+      // Un événement sans session n'est une déconnexion que pour SIGNED_OUT :
+      // sans réseau, Supabase émet INITIAL_SESSION à vide faute d'avoir pu
+      // rafraîchir le token, alors que la session reste valable.
+      if (session || event === 'SIGNED_OUT') {
+        this._session.set(session);
+      }
     });
-
-    this._ready = this.supabase.auth.getSession().then(({ data }) => {
-      this._user.set(data.session?.user ?? null);
-      this._loading.set(false);
-    });
-  }
-
-  ready(): Promise<void> {
-    return this._ready;
   }
 
   async signUp(email: string, password: string, fullName: string) {
@@ -88,6 +88,11 @@ export class AuthService {
   }
 
   async getAccessToken(): Promise<string | null> {
+    // Hors ligne, la requête échouera de toute façon : on n'attend pas le
+    // refresh du token (cf. SupabaseService.persistedSession).
+    if (!this.network.online()) {
+      return this._session()?.access_token ?? null;
+    }
     const { data } = await this.supabase.auth.getSession();
     return data.session?.access_token ?? null;
   }

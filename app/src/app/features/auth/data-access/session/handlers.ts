@@ -3,7 +3,7 @@ import { inject } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
 import { withEffects, Events, Dispatcher } from '@ngrx/signals/events';
 import { Router } from '@angular/router';
-import { combineLatest, distinctUntilChanged, filter, map, tap } from 'rxjs';
+import { distinctUntilChanged, map, tap } from 'rxjs';
 import { AuthService } from '@core/services/auth.service';
 import { sessionEvents } from './events';
 import type { SessionUser } from './types';
@@ -19,13 +19,9 @@ export function withSessionHandlers() {
       const authService = inject(AuthService);
       const dispatcher = inject(Dispatcher);
 
-      const user$ = toObservable(authService.user);
-      const loading$ = toObservable(authService.loading);
-
       return {
-        bootstrapSession$: combineLatest([user$, loading$]).pipe(
-          filter(([, loading]) => !loading),
-          map(([user]): SessionUser | null =>
+        bootstrapSession$: toObservable(authService.user).pipe(
+          map((user): SessionUser | null =>
             user
               ? {
                   id: user.id,
