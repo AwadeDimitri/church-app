@@ -6,10 +6,20 @@ on:
     - cron: '0 5 * * *'
   workflow_dispatch: # Permet de le lancer manuellement pour tester
 
+permissions:
+  actions: write
+
 jobs:
   ping_db:
     runs-on: ubuntu-latest
     steps:
+      # GitHub desactive les workflows planifies apres 60 jours sans activite
+      # sur le repo. Reactiver le workflow a chaque run remet ce compteur a zero.
+      - name: Keep this scheduled workflow enabled
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X PUT "repos/$GITHUB_REPOSITORY/actions/workflows/keep-alive.yml/enable"
+
       - name: Install PostgreSQL Client
         run: sudo apt-get update && sudo apt-get install -y postgresql-client
 
