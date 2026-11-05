@@ -7,7 +7,7 @@
     <p class="text-sm text-church-text-secondary mt-1">Église CI-JCM</p>
   </header>
 
-  <!-- Verset du jour : seul élément "sacré" — accent gold rare (cf. la croix dorée du logo) -->
+  <!-- Verset du jour : seul élément "sacré" - accent gold rare (cf. la croix dorée du logo) -->
   @if (dailyVerse(); as verse) {
     <a
       [routerLink]="verse.route"
@@ -88,6 +88,8 @@
           </article>
         }
       </div>
+    } @else if (eventsOffline()) {
+      <app-offline-notice variant="inline" />
     } @else if (eventsLoading()) {
       <div class="flex gap-3 overflow-hidden">
         @for (i of [0, 1]; track i) {
@@ -101,6 +103,8 @@
           </div>
         }
       </div>
+    } @else if (eventsFailed()) {
+      <p class="text-sm text-church-text-secondary py-4">Chargement impossible pour le moment.</p>
     } @else {
       <p class="text-sm text-church-text-secondary py-4">Aucun événement à venir.</p>
     }
@@ -123,6 +127,8 @@
             (play)="openSermon(sermon.id)" />
         }
       </div>
+    } @else if (sermonsOffline()) {
+      <app-offline-notice variant="inline" />
     } @else if (sermonsLoading()) {
       <div class="flex flex-col gap-3">
         @for (i of [0, 1, 2]; track i) {
@@ -136,6 +142,8 @@
           </div>
         }
       </div>
+    } @else if (sermonsFailed()) {
+      <p class="text-sm text-church-text-secondary py-4">Chargement impossible pour le moment.</p>
     } @else {
       <p class="text-sm text-church-text-secondary py-4">Aucun sermon disponible.</p>
     }

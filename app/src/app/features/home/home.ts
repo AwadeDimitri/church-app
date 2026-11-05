@@ -6,6 +6,7 @@ import { EventStore } from '@features/events/data-access';
 import { ProfileStore } from '@features/profile/data-access';
 import { SermonStore } from '@features/sermons/data-access';
 import { getYouTubeThumbnail } from '@core/utils/youtube.util';
+import { OfflineNotice } from '@shared/components/offline-notice/offline-notice';
 import { SectionHeader } from '@shared/components/section-header/section-header';
 import { SermonCard } from '@shared/components/sermon-card/sermon-card';
 
@@ -22,7 +23,7 @@ const SERMON_DATE_FMT = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month
 
 @Component({
   selector: 'app-home',
-  imports: [NzIconDirective, RouterLink, SectionHeader, SermonCard],
+  imports: [NzIconDirective, RouterLink, OfflineNotice, SectionHeader, SermonCard],
   templateUrl: './home.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -36,10 +37,14 @@ export default class Home {
   readonly dailyVerse = this.bibleStore.dailyVerseDisplay;
   readonly lastReading = this.bibleStore.lastReading;
   readonly eventsLoading = this.eventStore.isPending;
+  readonly eventsOffline = this.eventStore.isWaitingForNetwork;
+  readonly eventsFailed = computed(() => !!this.eventStore.error());
   readonly sermonsLoading = this.sermonStore.isPending;
+  readonly sermonsOffline = this.sermonStore.isWaitingForNetwork;
+  readonly sermonsFailed = computed(() => !!this.sermonStore.error());
 
   readonly firstName = computed(() => {
-    const full = this.profileStore.user()?.full_name?.trim();
+    const full = this.profileStore.displayName().trim();
     return full ? full.split(/\s+/)[0] : '';
   });
 

@@ -15,6 +15,7 @@ import { StatCard } from '@shared/components/stat-card/stat-card';
 import { CategoryFilter } from '@shared/components/category-filter/category-filter';
 import { PrayerCard } from '@shared/components/prayer-card/prayer-card';
 import { PageHeader } from '@shared/components/page-header/page-header';
+import { OfflineNotice } from '@shared/components/offline-notice/offline-notice';
 import { PullToRefresh } from '@shared/components/pull-to-refresh/pull-to-refresh';
 import {
   avatarColorFor,
@@ -29,7 +30,7 @@ import {
 
 @Component({
   selector: 'app-prayer-list',
-  imports: [DatePipe, RouterLink, NzIconDirective, Button, StatCard, CategoryFilter, PrayerCard, PageHeader, PullToRefresh],
+  imports: [DatePipe, RouterLink, NzIconDirective, Button, StatCard, CategoryFilter, PrayerCard, PageHeader, OfflineNotice, PullToRefresh],
   templateUrl: './prayer-list.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -41,6 +42,7 @@ export default class PrayerList {
   readonly prayers = this.store.items;
   readonly hasMore = this.store.hasMore;
   readonly isPending = this.store.isPending;
+  readonly offline = this.store.isWaitingForNetwork;
   readonly isFetchingNext = this.store.isFetchingNext;
   readonly error = this.store.error;
   readonly stats = this.store.stats;

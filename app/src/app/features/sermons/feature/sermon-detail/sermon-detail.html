@@ -1,7 +1,9 @@
 <div class="px-5 safe-area-top">
   <app-page-header title="Sermon" [backLink]="true" />
 
-  @if (!sermon()) {
+  @if (offline()) {
+    <app-offline-notice />
+  } @else if (!sermon()) {
     <div class="space-y-5">
       <div class="w-full bg-church-text/10 rounded-church animate-pulse" style="padding-top: 56.25%"></div>
       <div class="space-y-2">

@@ -37,8 +37,11 @@ export function withSermonDetailHandlers() {
       return {
         sermonQuery,
         sermon: computed(() => sermonQuery.data() ?? null),
-        isPending: computed(() => sermonQuery.isPending()),
-        error: computed(() => sermonQuery.error()),
+        // Clés préfixées : `isPending` / `isWaitingForNetwork` / `error` appartiennent à la
+        // liste dans SermonStore, les reposer ici les écraserait.
+        isSermonWaitingForNetwork: computed(
+          () => sermonQuery.isPending() && sermonQuery.isPaused(),
+        ),
       };
     }),
   );

@@ -34,7 +34,7 @@ export class SupabaseService {
    *
    * `auth.getSession()` rafraîchit d'abord un token expiré : hors ligne, il
    * retente pendant ~25 s avant de répondre. Cette lecture ne dépend que du
-   * localStorage — le token d'accès retourné peut donc être expiré.
+   * localStorage : le token d'accès retourné peut donc être expiré.
    */
   persistedSession(): Session | null {
     try {

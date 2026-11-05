@@ -28,7 +28,7 @@ export default class Profile {
   protected readonly user = this.store.user;
   protected readonly stats = this.store.stats;
 
-  protected readonly displayName = computed(() => this.user()?.full_name ?? '');
+  protected readonly displayName = this.store.displayName;
   protected readonly memberSince = computed(() => {
     const createdAt = this.user()?.created_at;
     if (!createdAt) return '';

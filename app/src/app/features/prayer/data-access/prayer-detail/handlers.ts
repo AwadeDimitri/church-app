@@ -38,6 +38,9 @@ export function withPrayerDetailHandlers() {
 
       return {
         prayer: computed(() => prayerQuery.data() ?? undefined),
+        isPrayerWaitingForNetwork: computed(
+          () => prayerQuery.isPending() && prayerQuery.isPaused(),
+        ),
       };
     }),
   );

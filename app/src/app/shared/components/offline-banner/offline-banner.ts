@@ -19,6 +19,8 @@ import { NetworkService } from '@core/services/network.service';
       </div>
     }
   `,
+  // Région live toujours présente : le passage hors ligne est annoncé aux lecteurs d'écran.
+  host: { role: 'status' },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OfflineBanner {

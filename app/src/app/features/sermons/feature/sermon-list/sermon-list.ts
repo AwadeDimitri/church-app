@@ -9,6 +9,7 @@ import { CategoryFilter } from '@shared/components/category-filter/category-filt
 import { SermonCard } from '@shared/components/sermon-card/sermon-card';
 import { PageHeader } from '@shared/components/page-header/page-header';
 import { Button } from '@shared/components/button/button';
+import { OfflineNotice } from '@shared/components/offline-notice/offline-notice';
 import { PullToRefresh } from '@shared/components/pull-to-refresh/pull-to-refresh';
 import { DurationPipe } from '@shared/pipes/duration.pipe';
 import { SermonStore, sermonListEvents } from '@features/sermons/data-access';
@@ -16,7 +17,7 @@ import { getYouTubeThumbnail } from '@core/utils/youtube.util';
 
 @Component({
   selector: 'app-sermon-list',
-  imports: [DatePipe, NzIconDirective, CategoryFilter, SermonCard, PageHeader, Button, PullToRefresh, DurationPipe],
+  imports: [DatePipe, NzIconDirective, CategoryFilter, SermonCard, PageHeader, Button, OfflineNotice, PullToRefresh, DurationPipe],
   templateUrl: './sermon-list.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -29,6 +30,7 @@ export default class SermonList {
   readonly searchQuery = signal('');
 
   readonly loading = this.store.isPending;
+  readonly offline = this.store.isWaitingForNetwork;
   readonly loadingMore = this.store.isFetchingNext;
   readonly hasMore = this.store.hasMore;
   readonly allSermons = this.store.items;

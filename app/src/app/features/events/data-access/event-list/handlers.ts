@@ -60,6 +60,10 @@ export function withEventListHandlers() {
         items,
         hasMore: computed(() => listQuery.hasNextPage()),
         isPending: computed(() => listQuery.isPending()),
+        // Rien à afficher et requête suspendue faute de réseau.
+        isWaitingForNetwork: computed(
+          () => listQuery.isPending() && listQuery.isPaused(),
+        ),
         isFetching: computed(() => listQuery.isFetching()),
         isFetchingNext: computed(() => listQuery.isFetchingNextPage()),
         error: computed(() => listQuery.error()),

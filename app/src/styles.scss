@@ -2,11 +2,11 @@
 @use 'tailwindcss';
 
 @theme {
-  /* Typography — switch between 'Inter' and 'Plus Jakarta Sans' to compare */
+  /* Typography - switch between 'Inter' and 'Plus Jakarta Sans' to compare */
   --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
   // --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
 
-  /* Heritage palette — inspired by CI-JCM logo */
+  /* Heritage palette - inspired by CI-JCM logo */
   --color-church-blue: #1A2B6D;
   --color-church-blue-light: #E8EBF5;
   --color-church-blue-dark: #0F1B45;

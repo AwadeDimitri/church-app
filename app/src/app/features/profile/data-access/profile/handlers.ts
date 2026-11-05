@@ -21,8 +21,6 @@ import type { ProfileStats, ProfileUser } from '@features/profile/util';
 
 import { profileEntityEvents, profileEvents } from './events';
 
-const EMPTY_STATS: ProfileStats = { sermons: 0, prayers: 0, donations: 0 };
-
 export function withProfileHandlers() {
   return signalStoreFeature(
     withProps(() => {
@@ -74,12 +72,23 @@ export function withProfileHandlers() {
         },
       }));
 
+      const user = computed(() => profileQuery.data()?.user ?? null);
+
       return {
         profileQuery,
         updateProfileMutation,
         userId,
-        user: computed(() => profileQuery.data()?.user ?? null),
-        stats: computed(() => profileQuery.data()?.stats ?? EMPTY_STATS),
+        user,
+        // Tant que le profil n'est pas chargé (ou hors ligne), le nom connu de
+        // la session évite un affichage vide.
+        displayName: computed<string>(
+          () =>
+            user()?.full_name ??
+            authService.user()?.user_metadata?.['full_name'] ??
+            '',
+        ),
+        // `undefined` tant que les compteurs sont inconnus (pas chargés, hors ligne).
+        stats: computed(() => profileQuery.data()?.stats),
         isPending: computed(() => profileQuery.isPending()),
         loading: computed(() => profileQuery.isFetching()),
         error: computed(() => profileQuery.error()),

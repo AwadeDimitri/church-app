@@ -5,12 +5,13 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { Dispatcher } from '@ngrx/signals/events';
 import { SermonStore, sermonDetailEvents } from '@features/sermons/data-access';
 import { getYouTubeId } from '@core/utils/youtube.util';
+import { OfflineNotice } from '@shared/components/offline-notice/offline-notice';
 import { PageHeader } from '@shared/components/page-header/page-header';
 import { DurationPipe } from '@shared/pipes/duration.pipe';
 
 @Component({
   selector: 'app-sermon-detail',
-  imports: [DatePipe, NzIconDirective, PageHeader, DurationPipe],
+  imports: [DatePipe, NzIconDirective, OfflineNotice, PageHeader, DurationPipe],
   templateUrl: './sermon-detail.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -22,6 +23,7 @@ export default class SermonDetail {
   readonly id = input.required<string>();
 
   readonly sermon = this.store.sermon;
+  readonly offline = this.store.isSermonWaitingForNetwork;
 
   readonly youtubeEmbedUrl = computed(() => {
     const videoId = getYouTubeId(this.sermon()?.video_url);

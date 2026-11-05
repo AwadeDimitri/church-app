@@ -1,7 +1,9 @@
 <div class="px-5 safe-area-top h-full flex flex-col">
   <app-page-header title="Prière" backLink="/prayer" />
 
-  @if (!prayer()) {
+  @if (offline()) {
+    <app-offline-notice />
+  } @else if (!prayer()) {
     <div class="bg-white rounded-church p-5 shadow-church-card">
       <div class="flex items-center gap-3 mb-4">
         <div class="w-14 h-14 bg-church-text/10 rounded-full animate-pulse shrink-0"></div>
@@ -79,7 +81,7 @@
         <p class="text-xs font-semibold text-church-green uppercase tracking-wide mb-2!">Témoignage</p>
         <p class="text-sm text-church-text leading-relaxed whitespace-pre-line mb-2!">{{ p.testimony }}</p>
         <p class="text-xs text-church-text-secondary mb-0!">
-          — {{ authorName() }} · {{ p.answered_at | date:'d MMMM yyyy' }}
+          - {{ authorName() }} · {{ p.answered_at | date:'d MMMM yyyy' }}
         </p>
       </div>
     }

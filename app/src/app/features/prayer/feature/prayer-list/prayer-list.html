@@ -4,13 +4,15 @@
 
   <!-- Stats -->
   <div class="grid grid-cols-3 gap-3 mb-6">
-    <app-stat-card [value]="stats().active" label="Prières actives" color="text-church-blue" />
-    <app-stat-card [value]="stats().answered" label="Exaucées" color="text-church-green" />
-    <app-stat-card [value]="stats().intercessors" label="Intercesseurs" color="text-church-blue" />
+    <app-stat-card [value]="stats()?.active" label="Prières actives" color="text-church-blue" />
+    <app-stat-card [value]="stats()?.answered" label="Exaucées" color="text-church-green" />
+    <app-stat-card [value]="stats()?.intercessors" label="Intercesseurs" color="text-church-blue" />
   </div>
 
   <!-- Loading initial : skeletons -->
-  @if (isPending()) {
+  @if (offline()) {
+    <app-offline-notice />
+  } @else if (isPending()) {
     <div class="flex flex-col gap-3">
       @for (i of [0, 1, 2, 3]; track i) {
         <div class="bg-white rounded-church-sm p-4 shadow-church-card">
@@ -58,7 +60,7 @@
             : 'flex-1 py-2 rounded-full text-church-text-secondary text-xs font-semibold transition-colors'
         "
       >
-        Toutes ({{ stats().total }})
+        Toutes @if (stats(); as s) {({{ s.total }})}
       </button>
       <button
         type="button"
@@ -69,7 +71,7 @@
             : 'flex-1 py-2 rounded-full text-church-text-secondary text-xs font-semibold transition-colors'
         "
       >
-        Mes prières ({{ stats().mine }})
+        Mes prières @if (stats(); as s) {({{ s.mine }})}
       </button>
     </div>
 

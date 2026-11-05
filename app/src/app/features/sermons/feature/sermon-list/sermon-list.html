@@ -17,7 +17,9 @@
   <app-category-filter [categories]="categories()" [(selected)]="selectedCategory" />
 
   <!-- Loading initial : skeletons (cohérent avec home) -->
-  @if (loading() && allSermons().length === 0) {
+  @if (offline()) {
+    <app-offline-notice />
+  } @else if (loading() && allSermons().length === 0) {
     <div class="flex flex-col gap-3">
       @for (i of [0, 1, 2, 3]; track i) {
         <div class="bg-white rounded-2xl p-4 shadow-church-card flex gap-4 items-center">

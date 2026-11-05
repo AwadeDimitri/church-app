@@ -30,14 +30,6 @@ const CATEGORIES_STALE_TIME = 10 * 60 * 1000;
 const PRAYERS_STALE_TIME = 30_000;
 const STATS_STALE_TIME = 30_000;
 
-const DEFAULT_STATS = {
-  active: 0,
-  answered: 0,
-  total: 0,
-  mine: 0,
-  intercessors: 0,
-};
-
 export function withPrayerListHandlers() {
   return signalStoreFeature(
     { state: type<PrayerListState>() },
@@ -147,7 +139,9 @@ export function withPrayerListHandlers() {
         staleTime: STATS_STALE_TIME,
       }));
 
-      const stats = computed(() => statsQuery.data() ?? DEFAULT_STATS);
+      // `undefined` tant que les compteurs sont inconnus (pas chargés, hors
+      // ligne) : un zéro par défaut les ferait passer pour une vraie valeur.
+      const stats = computed(() => statsQuery.data());
 
       return {
         listQuery,
@@ -159,6 +153,10 @@ export function withPrayerListHandlers() {
         categories: computed(() => categoriesQuery.data() ?? []),
         hasMore: computed(() => listQuery.hasNextPage()),
         isPending: computed(() => listQuery.isPending()),
+        // Rien à afficher et requête suspendue faute de réseau.
+        isWaitingForNetwork: computed(
+          () => listQuery.isPending() && listQuery.isPaused(),
+        ),
         isFetching: computed(() => listQuery.isFetching()),
         isFetchingNext: computed(() => listQuery.isFetchingNextPage()),
         error: computed(() => listQuery.error()),

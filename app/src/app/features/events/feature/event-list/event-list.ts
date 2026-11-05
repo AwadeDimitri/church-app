@@ -4,6 +4,7 @@ import { NzIconDirective } from 'ng-zorro-antd/icon';
 import { EventStore, eventListEvents } from '@features/events/data-access';
 import { PageHeader } from '@shared/components/page-header/page-header';
 import { Button } from '@shared/components/button/button';
+import { OfflineNotice } from '@shared/components/offline-notice/offline-notice';
 import { PullToRefresh } from '@shared/components/pull-to-refresh/pull-to-refresh';
 
 const DAY_FMT = new Intl.DateTimeFormat('fr-FR', { weekday: 'short' });
@@ -18,7 +19,7 @@ const FULL_DATE_FMT = new Intl.DateTimeFormat('fr-FR', {
 
 @Component({
   selector: 'app-event-list',
-  imports: [NzIconDirective, PageHeader, Button, PullToRefresh],
+  imports: [NzIconDirective, PageHeader, Button, OfflineNotice, PullToRefresh],
   templateUrl: './event-list.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -27,6 +28,7 @@ export default class EventList {
   private readonly dispatcher = inject(Dispatcher);
 
   readonly loading = this.store.isPending;
+  readonly offline = this.store.isWaitingForNetwork;
   readonly loadingMore = this.store.isFetchingNext;
   readonly hasMore = this.store.hasMore;
 

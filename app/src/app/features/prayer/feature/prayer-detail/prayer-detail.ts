@@ -26,6 +26,7 @@ import {
   type AvatarColor,
 } from '@shared/components/avatar/avatar-colors';
 import { Button } from '@shared/components/button/button';
+import { OfflineNotice } from '@shared/components/offline-notice/offline-notice';
 import { InfiniteScrollDirective } from '@shared/directives/infinite-scroll.directive';
 import { RelativeTimePipe } from '@shared/pipes/relative-time.pipe';
 import { AuthService } from '@core/services/auth.service';
@@ -48,6 +49,7 @@ import type { Intercession } from '@features/prayer/util';
     PageHeader,
     Avatar,
     Button,
+    OfflineNotice,
     InfiniteScrollDirective,
     RelativeTimePipe,
   ],
@@ -63,6 +65,7 @@ export default class PrayerDetail {
   readonly id = input.required<string>();
 
   readonly prayer = this.store.prayer;
+  readonly offline = this.store.isPrayerWaitingForNetwork;
   readonly intercessions = this.store.intercessions;
   readonly intercessionsCount = this.store.intercessionsCount;
   readonly intercessionsLoading = this.store.intercessionsLoading;
