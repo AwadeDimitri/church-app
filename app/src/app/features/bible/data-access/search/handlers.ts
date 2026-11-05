@@ -1,4 +1,4 @@
-import { computed, type Signal } from '@angular/core';
+import { computed } from '@angular/core';
 import {
   signalStoreFeature,
   type,
@@ -18,33 +18,37 @@ import {
   type BibleVerse,
 } from '@features/bible/util';
 
+const sameTerms = (a: readonly string[], b: readonly string[]): boolean =>
+  a.length === b.length && a.every((term, i) => term === b[i]);
+
 export function withBibleSearchHandlers() {
   return signalStoreFeature(
     {
       state: type<BibleState & BibleSearchState>(),
-      props: type<{ versesByChapter: Signal<Map<string, BibleVerse[]>> }>(),
+      methods: type<{
+        getChapter(bookId: number, chapter: number): BibleVerse[];
+      }>(),
     },
 
     withProps((store) => {
       // Construit à la première recherche seulement, puis gardé en mémoire.
       const searchIndex = computed(() => buildSearchIndex(store.verses()));
-      const searchTerms = computed(() => parseSearchTerms(store.searchQuery()));
+      // Une saisie qui ne change pas les termes (« amour » puis « amour d »)
+      // ne relance pas la recherche.
+      const searchTerms = computed(() => parseSearchTerms(store.searchQuery()), {
+        equal: sameTerms,
+      });
       const searchMatches = computed(() => {
         const terms = searchTerms();
         return terms.length > 0 ? searchVerseIndexes(searchIndex(), terms) : [];
       });
 
       return {
-        searchTerms,
-        searchMatches,
+        _searchTerms: searchTerms,
+        _searchMatches: searchMatches,
         searchTotal: computed(() => searchMatches().length),
         searchReferences: computed(() =>
-          matchReferences(
-            store.searchQuery(),
-            store.books(),
-            (bookId, chapter) =>
-              store.versesByChapter().get(`${bookId}.${chapter}`) ?? [],
-          ),
+          matchReferences(store.searchQuery(), store.books(), store.getChapter),
         ),
       };
     }),
@@ -53,10 +57,10 @@ export function withBibleSearchHandlers() {
       /** Les `limit` premiers versets trouvés, dans l'ordre de la Bible. */
       searchHits(limit: number): BibleSearchHit[] {
         const verses = store.verses();
-        const terms = store.searchTerms();
+        const terms = store._searchTerms();
         const books = new Map(store.books().map((book) => [book.id, book]));
         return store
-          .searchMatches()
+          ._searchMatches()
           .slice(0, limit)
           .flatMap((index) => {
             const row = verses[index];

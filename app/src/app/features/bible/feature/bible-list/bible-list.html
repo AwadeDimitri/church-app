@@ -29,7 +29,7 @@
     }
   </div>
 
-  @if (searchQuery(); as query) {
+  @if (searching()) {
     @if (loading()) {
       <div class="flex flex-col gap-2">
         @for (i of [0, 1, 2, 3]; track i) {
@@ -40,9 +40,14 @@
           </div>
         }
       </div>
+    } @else if (error(); as err) {
+      <div class="bg-church-red-light rounded-church-sm p-5 text-center">
+        <nz-icon nzType="info-circle" nzTheme="outline" class="text-2xl text-church-red mb-2" />
+        <p class="text-sm text-church-red">{{ err }}</p>
+      </div>
     } @else {
       <app-bible-search-results
-        [query]="query"
+        [query]="searchQuery()"
         [references]="searchReferences()"
         [hits]="searchHits()"
         [total]="searchTotal()"

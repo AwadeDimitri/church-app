@@ -114,7 +114,9 @@ const BOOK_ABBREVIATIONS: Record<string, string> = {
 };
 
 // « 1 cor 13 4 » : numéro du livre, nom (ou début, ou abréviation), chapitre, verset.
-const REFERENCE = /^([1-3])? ?([a-z][a-z ]*?) ?(?:(\d{1,3})(?: (\d{1,3}))?)?$/;
+// Un troisième nombre (« Jean 3:16-18 ») est accepté : la plage ouvre son premier verset.
+const REFERENCE =
+  /^([1-3])? ?([a-z][a-z ]*?) ?(?:(\d{1,3})(?: (\d{1,3})(?: \d{1,3})?)?)?$/;
 const NUMBERED_BOOK = /^([1-3]) (.+)$/;
 
 /**

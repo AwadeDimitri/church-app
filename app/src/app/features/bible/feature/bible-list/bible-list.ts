@@ -21,6 +21,7 @@ import { BibleSearchResults } from '@features/bible/ui/bible-search-results/bibl
 type Testament = 1 | 2;
 
 const SEARCH_DEBOUNCE_MS = 200;
+const SEARCH_MIN_LENGTH = 2;
 const SEARCH_PAGE_SIZE = 30;
 
 @Component({
@@ -56,6 +57,10 @@ export default class BibleList {
 
   protected readonly searchControl = new FormControl('', { nonNullable: true });
   protected readonly searchQuery = this.store.searchQuery;
+  /** En dessous de deux caractères, la liste des livres reste affichée. */
+  protected readonly searching = computed(
+    () => this.searchQuery().length >= SEARCH_MIN_LENGTH,
+  );
   protected readonly searchReferences = this.store.searchReferences;
   protected readonly searchTotal = this.store.searchTotal;
   private readonly searchLimit = signal(SEARCH_PAGE_SIZE);
@@ -68,7 +73,8 @@ export default class BibleList {
 
   constructor() {
     // URL -> store, et -> champ quand le changement ne vient pas de la saisie
-    // (retour arrière, nouvel appui sur l'onglet Bible).
+    // (retour arrière, nouvel appui sur l'onglet Bible). Ce setValue doit
+    // émettre : c'est ce qui remet à jour la dernière valeur connue du champ.
     effect(() => {
       const query = this.q()?.trim() ?? '';
       untracked(() => {
@@ -88,14 +94,7 @@ export default class BibleList {
         distinctUntilChanged(),
         takeUntilDestroyed(),
       )
-      .subscribe(query => {
-        this.typedQuery = query;
-        this.router.navigate([], {
-          relativeTo: this.route,
-          queryParams: { q: query || null },
-          replaceUrl: true,
-        });
-      });
+      .subscribe(query => this.writeQuery(query));
   }
 
   selectTestament(t: Testament): void {
@@ -104,6 +103,16 @@ export default class BibleList {
 
   protected clearSearch(): void {
     this.searchControl.setValue('');
+    this.writeQuery(''); // sans attendre le délai de saisie
+  }
+
+  private writeQuery(query: string): void {
+    this.typedQuery = query;
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { q: query || null },
+      replaceUrl: true,
+    });
   }
 
   protected showMoreResults(): void {

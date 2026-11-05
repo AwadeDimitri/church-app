@@ -1,8 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  Injector,
-  afterNextRender,
+  afterRenderEffect,
   computed,
   effect,
   inject,
@@ -29,7 +28,6 @@ interface ChapterNav {
 export default class BibleChapter {
   private readonly store = inject(BibleStore);
   private readonly dispatcher = inject(Dispatcher);
-  private readonly injector = inject(Injector);
 
   readonly bookSlug = input.required<string>();
   readonly chapter = input.required({ alias: 'chapter', transform: (v: string) => +v });
@@ -41,9 +39,6 @@ export default class BibleChapter {
       return Number.isInteger(verse) && verse > 0 ? verse : null;
     },
   });
-
-  protected readonly targetVerseClass =
-    'bg-church-gold-light rounded-lg -mx-2 px-2 py-1';
 
   readonly booksLoading = this.store.loading;
   readonly error = this.store.error;
@@ -91,19 +86,16 @@ export default class BibleChapter {
   readonly notFound = computed(() => !this.booksLoading() && !this.book());
 
   constructor() {
-    effect(() => {
-      const target = this.targetVerse();
-      if (target === null || this.verses().length === 0) return;
-      afterNextRender(
-        () => {
-          const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
-          document.getElementById(`v${target}`)?.scrollIntoView({
-            block: 'center',
-            behavior: reducedMotion ? 'auto' : 'smooth',
-          });
-        },
-        { injector: this.injector },
-      );
+    afterRenderEffect({
+      read: () => {
+        const target = this.targetVerse();
+        if (target === null || this.verses().length === 0) return;
+        const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+        document.getElementById(`v${target}`)?.scrollIntoView({
+          block: 'center',
+          behavior: reducedMotion ? 'auto' : 'smooth',
+        });
+      },
     });
 
     effect(() => {

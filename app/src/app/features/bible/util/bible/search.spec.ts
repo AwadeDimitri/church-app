@@ -98,6 +98,10 @@ describe('recherche dans la Bible', () => {
       expect(labels('jean3.16')).toEqual(['Jean 3:16', '1 Jean 3:16']);
     });
 
+    it('ouvre le premier verset d’une plage', () => {
+      expect(labels('Jean 3:16-18')).toEqual(['Jean 3:16', '1 Jean 3:16']);
+    });
+
     it('reconnaît les abréviations et les livres numérotés', () => {
       expect(labels('jn 3 16')).toEqual(['Jean 3:16', '1 Jean 3:16']);
       expect(labels('1 jn 3:16')).toEqual(['1 Jean 3:16']);
