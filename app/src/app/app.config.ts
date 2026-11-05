@@ -22,6 +22,10 @@ import { errorInterceptor } from '@core/interceptors/error.interceptor';
 import { authInterceptor } from '@core/interceptors/auth.interceptor';
 import { PwaUpdateService } from '@core/services/pwa-update.service';
 import {
+  QUERY_CACHE_MAX_AGE,
+  QueryPersistenceService,
+} from '@core/services/query-persistence.service';
+import {
   HomeOutline,
   PlayCircleOutline,
   DollarCircleOutline,
@@ -134,6 +138,8 @@ export const appConfig: ApplicationConfig = {
       new QueryClient({
         defaultOptions: {
           queries: {
+            // Un contenu gardé pour le hors ligne ne doit pas être jeté avant son échéance.
+            gcTime: QUERY_CACHE_MAX_AGE,
             // Une première tentative part toujours (navigator.onLine peut se
             // tromper) ; les suivantes attendent le retour du réseau.
             networkMode: 'offlineFirst',
@@ -150,6 +156,8 @@ export const appConfig: ApplicationConfig = {
         },
       }),
     ),
+    // Lecture locale uniquement : le démarrage ne dépend toujours pas du réseau.
+    provideAppInitializer(() => inject(QueryPersistenceService).init()),
     provideAppInitializer(() => inject(PwaUpdateService).init()),
   ],
 };

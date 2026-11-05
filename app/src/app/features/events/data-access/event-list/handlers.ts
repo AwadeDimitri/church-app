@@ -52,7 +52,12 @@ export function withEventListHandlers() {
 
       const items = computed<ChurchEvent[]>(() => {
         const pages = listQuery.data()?.pages ?? [];
-        return pages.flatMap((page) => unwrapNodes<ChurchEvent>(page));
+        // Le serveur ne renvoie que les événements à venir, mais une liste
+        // relue hors ligne peut dater de plusieurs jours : même filtre ici.
+        const now = Date.now();
+        return pages
+          .flatMap((page) => unwrapNodes<ChurchEvent>(page))
+          .filter((event) => new Date(event.starts_at).getTime() >= now);
       });
 
       return {

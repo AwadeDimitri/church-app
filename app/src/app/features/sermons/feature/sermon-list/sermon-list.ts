@@ -36,9 +36,11 @@ export default class SermonList {
   readonly allSermons = this.store.items;
   readonly activeSearch = this.store.search;
 
+  // Un contenu déjà affiché n'est pas remplacé par l'erreur d'un rafraîchissement raté.
   readonly error = computed(() => {
     const e = this.store.error();
-    return e ? (e.message ?? 'Erreur de chargement') : null;
+    if (!e || this.allSermons().length > 0) return null;
+    return e.message ?? 'Erreur de chargement';
   });
 
   readonly hasFilter = computed(

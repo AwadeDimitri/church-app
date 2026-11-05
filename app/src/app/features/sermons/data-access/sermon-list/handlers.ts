@@ -78,6 +78,8 @@ export function withSermonListHandlers() {
 
       const listQuery = injectInfiniteQuery(() => ({
         queryKey: ['sermons', 'list', variables()],
+        // Les résultats de recherche ne sont pas gardés sur l'appareil.
+        meta: { persist: !variables().search },
         initialPageParam: 0,
         queryFn: async ({ pageParam, signal }) => {
           const result = await firstValueFrom(

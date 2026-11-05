@@ -44,7 +44,10 @@ export default class PrayerList {
   readonly isPending = this.store.isPending;
   readonly offline = this.store.isWaitingForNetwork;
   readonly isFetchingNext = this.store.isFetchingNext;
-  readonly error = this.store.error;
+  // Un contenu déjà affiché n'est pas remplacé par l'erreur d'un rafraîchissement raté.
+  readonly error = computed(() =>
+    this.prayers().length > 0 ? null : this.store.error(),
+  );
   readonly stats = this.store.stats;
   readonly scope = this.store.scope;
 
