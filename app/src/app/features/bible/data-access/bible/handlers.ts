@@ -15,6 +15,7 @@ import type {
   DailyVerse,
   DailyVerseDisplay,
 } from '@features/bible/util';
+import { DAILY_VERSE_REFS } from '@features/bible/util';
 
 import { bibleEvents } from './events';
 
@@ -45,9 +46,13 @@ export function withBibleHandlers() {
       });
 
       const dailyVerse = computed<DailyVerse | null>(() => {
-        const verses = store.verses();
-        if (verses.length === 0) return null;
-        return verses[daysSinceEpochUTC() % verses.length];
+        if (store.verses().length === 0) return null;
+        const [book_id, chapter, verse] =
+          DAILY_VERSE_REFS[daysSinceEpochUTC() % DAILY_VERSE_REFS.length];
+        const text = versesByChapter()
+          .get(`${book_id}.${chapter}`)
+          ?.find((v) => v.verse === verse)?.text;
+        return text ? { book_id, chapter, verse, text } : null;
       });
 
       const dailyVerseDisplay = computed<DailyVerseDisplay | null>(() => {
